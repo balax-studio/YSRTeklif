@@ -186,9 +186,17 @@ function renderReports() {
         <td><span style="font-size:12px; font-weight:550; color:var(--text2);">${escapeHTML(r.yazan) || '-'}</span></td>
         <td style="text-align:right;">
           <div style="display:inline-flex; gap:6px;">
-            <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" title="PDF Olarak İndir" style="padding:6px 10px; background:#d97706; color:white; border:none; font-size:12px; cursor:pointer;">📥 PDF</button>
-            <button class="btn-edit" onclick="editReport('${r.id}')" title="Raporu Düzenle" style="padding:6px 10px; font-size:12px;">✏️ Düzenle</button>
-            <button class="btn-del" onclick="deleteReport('${r.id}')" title="Raporu Sil" style="padding:6px 10px; font-size:12px;">🗑️</button>
+            <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" title="PDF Olarak İndir" style="padding:6px 10px; background:#d97706; color:white; border:none; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>PDF</span>
+            </button>
+            <button class="btn-edit" onclick="editReport('${r.id}')" title="Raporu Düzenle" style="padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              <span>Düzenle</span>
+            </button>
+            <button class="btn-del" onclick="deleteReport('${r.id}')" title="Raporu Sil" style="padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; justify-content:center;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
           </div>
         </td>
       </tr>
@@ -273,16 +281,16 @@ function editReport(id) {
     }
   }
   
-  document.getElementById('reportFormTitle').querySelector('span').textContent = '✏️ Raporu Düzenle';
+  document.getElementById('reportFormTitle').querySelector('span').textContent = 'Raporu Düzenle';
   document.getElementById('btnResetReport').style.display = 'inline-block';
-  document.getElementById('btnSaveReport').textContent = '💾 Raporu Güncelle';
+  document.getElementById('btnSaveReport').textContent = 'Raporu Güncelle';
   
   updateReportPreview();
   showToast('Rapor bilgileri forma yüklendi.', 'info');
 }
 
 async function deleteReport(id) {
-  const ok = await customConfirm('Bu günlük raporu silmek istediğinize emin misiniz?');
+  const ok = await showConfirm('Raporu Sil', 'Bu günlük raporu silmek istediğinize emin misiniz?', true);
   if (!ok) return;
   
   try {
@@ -317,7 +325,7 @@ function clearReportForm() {
   
   document.getElementById('reportFormTitle').querySelector('span').textContent = '📝 Günlük Rapor Oluştur';
   document.getElementById('btnResetReport').style.display = 'none';
-  document.getElementById('btnSaveReport').textContent = '💾 Raporu Kaydet';
+  document.getElementById('btnSaveReport').textContent = 'Raporu Kaydet';
   
   updateReportPreview();
 }
