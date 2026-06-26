@@ -2352,6 +2352,46 @@
   </div>
 </div>
 
+<!-- KULLANICI DÜZENLEME MODAL (ADMIN) -->
+<div class="modal-bg" id="userEditModalBg" role="dialog" aria-modal="true" aria-labelledby="userEditModalTitle">
+  <div class="modal">
+    <h3 id="userEditModalTitle">Kullanıcı Düzenle</h3>
+    <div class="form-grid">
+      <div class="fg">
+        <label for="fe_username">Kullanıcı Adı</label>
+        <input id="fe_username" type="text" readonly style="background:var(--border); cursor:not-allowed;">
+      </div>
+      <div class="fg">
+        <label for="fe_role">Rol</label>
+        <select id="fe_role"><option value="user">Kullanıcı</option><option value="admin">Admin</option></select>
+      </div>
+      <div class="fg">
+        <label for="fe_name">Adı Soyadı</label>
+        <input id="fe_name" type="text" placeholder="Örn: Ahmet Yılmaz">
+      </div>
+      <div class="fg">
+        <label for="fe_job">Meslek / Unvan</label>
+        <select id="fe_job">
+          <option value="İnşaat Mühendisi / Mimar">İnşaat Mühendisi / Mimar</option>
+          <option value="Makine Mühendisi">Makine Mühendisi</option>
+          <option value="Elektrik Mühendisi">Elektrik Mühendisi</option>
+          <option value="Finans Yöneticisi">Finans Yöneticisi</option>
+          <option value="Genel Müdür">Genel Müdür</option>
+          <option value="Diğer (Teknik / Yönetici)">Diğer (Teknik / Yönetici)</option>
+        </select>
+      </div>
+      <div class="fg full">
+        <label for="fe_pass">Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)</label>
+        <input id="fe_pass" type="password" placeholder="Yeni şifre girin">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeUserEditModal()" aria-label="Düzenlemeyi İptal Et">İptal</button>
+      <button class="btn-save" id="saveUserEditBtn" onclick="saveUserEdit()" aria-label="Değişiklikleri Kaydet">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -2392,7 +2432,7 @@ try {
 }
 
 // ── State ─────────────────────────────────────────────────────
-let items=[], mahals=[], users=[], surveys=[], currentUser=null, editIdx=-1, sortKey='ttar', sortDir='desc', editKesifId=null, convertingSurveyId=null;
+let items=[], mahals=[], users=[], surveys=[], currentUser=null, editIdx=-1, sortKey='ttar', sortDir='desc', editKesifId=null, convertingSurveyId=null, editUserId=null;
 let catChartInstance = null;
 let statusChartInstance = null;
 let mahalCategoryChartInstance = null;
@@ -3300,8 +3340,39 @@ function renderMahalPanel(){
   tb.innerHTML=sorted.map(m=>`<tr>
     <td><span class="mahal-tag" style="cursor:pointer;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele">${m.name} 🔍</span></td>
     <td style="color:var(--text2); cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</td>
-    <td><button class="btn-del" onclick="delMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini sil">Sil</button></td>
+    <td>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-edit" onclick="editMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini düzenle">Düzenle</button>
+        <button class="btn-del" onclick="delMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini sil">Sil</button>
+      </div>
+    </td>
   </tr>`).join('');
+}
+async function editMahal(id, currentName) {
+  const newName = prompt("Yeni İşveren Adı giriniz:", currentName);
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (!trimmed) {
+    showToast("İşveren adı boş olamaz!", "error");
+    return;
+  }
+  if (mahals.find(m => m.id !== id && m.name.toLowerCase() === trimmed.toLowerCase())) {
+    showToast("Bu isimde bir işveren zaten mevcut!", "error");
+    return;
+  }
+  try {
+    await col('mahals').doc(id).update({ name: trimmed });
+    const mIdx = mahals.findIndex(m => m.id === id);
+    if (mIdx >= 0) mahals[mIdx].name = trimmed;
+    mahals.sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+    
+    showToast("İşveren adı güncellendi.");
+    renderMahalPanel();
+    populateMahalFilter();
+    render();
+  } catch (e) {
+    showToast("İşveren güncellenirken hata: " + e.message, "error");
+  }
 }
 async function addMahal(){
   const v=document.getElementById('new_mahal').value.trim();
@@ -3340,20 +3411,21 @@ async function renderAdminPanel(){
   const tb=document.getElementById('userTbody');
   
   tb.innerHTML=users.map(u=>{
-    // Get personal details from local storage profiles
-    let name = "—";
-    let job = "—";
-    const raw = localStorage.getItem('profile_' + u.u);
-    if (raw) {
-      const profile = JSON.parse(raw);
-      name = profile.name || "—";
-      job = profile.job || "—";
-    } else if (u.u === 'admin') {
-      name = "YSR Admin";
-      job = "Genel Yönetici";
-    } else if (u.u === 'ysr') {
-      name = "YSR Kullanıcı";
-      job = "İnşaat Mühendisi";
+    let name = u.name || "—";
+    let job = u.job || "—";
+    if (name === "—" || job === "—") {
+      const raw = localStorage.getItem('profile_' + u.u);
+      if (raw) {
+        const profile = JSON.parse(raw);
+        if (name === "—") name = profile.name || "—";
+        if (job === "—") job = profile.job || "—";
+      } else if (u.u === 'admin') {
+        if (name === "—") name = "YSR Admin";
+        if (job === "—") job = "Genel Yönetici";
+      } else if (u.u === 'ysr') {
+        if (name === "—") name = "YSR Kullanıcı";
+        if (job === "—") job = "İnşaat Mühendisi";
+      }
     }
 
     return `<tr>
@@ -3361,9 +3433,87 @@ async function renderAdminPanel(){
       <td>${u.r==='admin'?'Admin':'Kullanıcı'}</td>
       <td style="font-weight:700;">${name}</td>
       <td style="color:var(--text2); font-weight:600;">${job}</td>
-      <td>${u.u!=='admin'?`<button class="btn-del" onclick="delUser('${u.id}','${u.u}')" aria-label="${u.u} kullanıcısını sil">Sil</button>`:'—'}</td>
+      <td>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-edit" onclick="openUserEditModal('${u.id}')" aria-label="${u.u} kullanıcısını düzenle">Düzenle</button>
+          ${u.u!=='admin'?`<button class="btn-del" onclick="delUser('${u.id}','${u.u}')" aria-label="${u.u} kullanıcısını sil">Sil</button>`:'—'}
+        </div>
+      </td>
     </tr>`;
   }).join('');
+}
+
+function openUserEditModal(id){
+  editUserId = id;
+  const it = users.find(x => x.id === id);
+  if (!it) return;
+  
+  let name = it.name || "";
+  let job = it.job || "İnşaat Mühendisi / Mimar";
+  if (!name || name === "") {
+    const raw = localStorage.getItem('profile_' + it.u);
+    if (raw) {
+      const p = JSON.parse(raw);
+      name = p.name || "";
+      job = p.job || "İnşaat Mühendisi / Mimar";
+    }
+  }
+  
+  document.getElementById('fe_username').value = it.u;
+  document.getElementById('fe_role').value = it.r || "user";
+  document.getElementById('fe_name').value = name;
+  document.getElementById('fe_job').value = job;
+  document.getElementById('fe_pass').value = "";
+  
+  document.getElementById('userEditModalBg').classList.add('open');
+  document.getElementById('fe_role').focus();
+}
+
+function closeUserEditModal(){
+  document.getElementById('userEditModalBg').classList.remove('open');
+  editUserId = null;
+}
+
+async function saveUserEdit(){
+  const btn = document.getElementById('saveUserEditBtn');
+  btn.disabled = true;
+  btn.textContent = "Kaydediliyor...";
+  
+  try {
+    const it = users.find(x => x.id === editUserId);
+    if (!it) return;
+    
+    const role = document.getElementById('fe_role').value;
+    const name = document.getElementById('fe_name').value.trim();
+    const job = document.getElementById('fe_job').value;
+    const pass = document.getElementById('fe_pass').value;
+    
+    const updates = {
+      r: role,
+      name,
+      job
+    };
+    
+    if (pass) {
+      if (pass.length < 3) {
+        showToast("Şifre en az 3 karakter olmalıdır!", "error");
+        btn.disabled = false;
+        btn.textContent = "Kaydet";
+        return;
+      }
+      updates.p = await sha256(pass);
+    }
+    
+    await col('users').doc(editUserId).update(updates);
+    showToast("Kullanıcı başarıyla güncellendi.");
+    closeUserEditModal();
+    renderAdminPanel();
+  } catch (e) {
+    showToast("Güncellenirken hata oluştu: " + e.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Kaydet";
+  }
 }
 async function addUser(){
   const un=document.getElementById('nu').value.trim(),up=document.getElementById('np').value,ur=document.getElementById('nr').value;
@@ -5225,6 +5375,7 @@ function changeAccentColor(color, isInit = false) {
 // ── Event listeners ───────────────────────────────────────────
 document.getElementById('modalBg').addEventListener('click',function(e){if(e.target===this)closeModal();});
 document.getElementById('kesifModalBg').addEventListener('click',function(e){if(e.target===this)closeKesifModal();});
+document.getElementById('userEditModalBg').addEventListener('click',function(e){if(e.target===this)closeUserEditModal();});
 document.getElementById('approveModalBg').addEventListener('click',function(e){if(e.target===this)closeApproveModal();});
 document.getElementById('hakedisModalBg').addEventListener('click',function(e){if(e.target===this)closeHakedisModal();});
 document.getElementById('invoiceModalBg').addEventListener('click',function(e){if(e.target===this)closeInvoiceModal();});
