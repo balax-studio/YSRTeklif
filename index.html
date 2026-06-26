@@ -1729,6 +1729,185 @@
     50% { transform: translateY(-8px) scale(1.04); }
     100% { transform: translateY(0px) scale(1); }
   }
+
+  /* REPORTS PAGE LAYOUT */
+  .reports-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 1024px) {
+    .reports-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* DINAMIK BIRIM SATIRLARI */
+  .unit-row-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+    animation: fadeIn 0.25s ease;
+  }
+  .unit-row-card .remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .unit-row-card .remove-btn:hover {
+    background: #ef4444;
+    color: white;
+  }
+  
+  /* PDF PREVIEW CARD */
+  .pdf-preview-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  /* REAL A4 PAGE LOOK */
+  .a4-page {
+    width: 100%;
+    aspect-ratio: 1 / 1.414; /* A4 Ratio */
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 30px;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto;
+  }
+  
+  .pdf-header {
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pdf-logo {
+    font-size: 20px;
+    font-weight: 850;
+    color: #0f172a;
+    letter-spacing: -0.04em;
+  }
+  .pdf-logo span {
+    color: #d97706; /* Bronze/gold accent */
+  }
+  .pdf-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #1e293b;
+    text-align: right;
+  }
+  .pdf-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #f1f5f9;
+  }
+  .pdf-meta-item {
+    font-size: 10px;
+    color: #475569;
+  }
+  .pdf-meta-item strong {
+    color: #0f172a;
+  }
+  
+  .pdf-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+  .pdf-table th {
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 6px;
+    text-align: left;
+    border: 1px solid #1e293b;
+  }
+  .pdf-table td {
+    padding: 6px;
+    border: 1px solid #e2e8f0;
+    font-size: 10px;
+    vertical-align: top;
+    color: #334155;
+  }
+  .pdf-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+  
+  .pdf-notes {
+    background: #fdfaf7;
+    border-left: 3px solid #d97706;
+    padding: 8px;
+    border-radius: 0 6px 6px 0;
+    margin-top: auto;
+    margin-bottom: 16px;
+  }
+  
+  .pdf-footer {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: auto;
+  }
+  .pdf-sign-box {
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .pdf-sign-title {
+    font-size: 8px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748b;
+  }
+  .pdf-sign-name {
+    font-size: 10px;
+    font-weight: 600;
+    color: #0f172a;
+  }
 </style>
 </head>
 <body>
@@ -1967,6 +2146,162 @@
             <tbody id="statDetailTbody"></tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <!-- GÜNLÜK İŞ RAPORLARI -->
+    <section class="page" id="page_raporlar" aria-label="Günlük İş Raporları Sayfası">
+      <div class="reports-grid">
+        
+        <!-- Sol Panel: Giriş ve Liste -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          
+          <!-- Rapor Ekle/Düzenle Formu -->
+          <div class="panel-card">
+            <div class="panel-title" id="reportFormTitle" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>📝 Günlük Rapor Oluştur</span>
+              <button class="tb-btn" onclick="clearReportForm()" id="btnResetReport" style="padding: 4px 10px; font-size:12px; display:none;">Yeni Rapor</button>
+            </div>
+            
+            <div class="add-row-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Tarih</label>
+                <input type="date" id="rep_date" oninput="updateReportPreview()" style="width:100%;">
+              </div>
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Hava Durumu</label>
+                <input type="text" id="rep_weather" placeholder="Örn: Güneşli, 24°C" oninput="updateReportPreview()" style="width:100%;">
+              </div>
+            </div>
+
+            <div class="add-row-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">İşveren</label>
+                <select id="rep_mahalId" onchange="updateReportPreview()" style="width:100%; height:42px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); padding:0 12px; font-family:inherit; font-size:14px; font-weight:600;"></select>
+              </div>
+              <div>
+                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Şantiye / Proje Adı</label>
+                <input type="text" id="rep_santiye" placeholder="Örn: Blok A / Bodrum Kat" oninput="updateReportPreview()" style="width:100%;">
+              </div>
+            </div>
+
+            <!-- Dinamik Birimler Bölümü -->
+            <div style="margin-top:20px; margin-bottom:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:14px; font-weight:800; color:var(--text);">Birim / Bölüm Detayları</h4>
+                <button class="tb-btn" onclick="addUnitRow()" style="padding:6px 12px; font-size:12px; background:var(--primary); color:white; border:none; display:flex; align-items:center; gap:6px;">
+                  <span>➕</span> Birim Ekle
+                </button>
+              </div>
+              <div id="reportUnitsContainer">
+                <!-- Birim satırları buraya dinamik eklenecek -->
+              </div>
+            </div>
+
+            <div style="margin-bottom:20px;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Genel Notlar / Açıklamalar</label>
+              <textarea id="rep_notes" placeholder="Gün sonu genel değerlendirmesi, varsa iş kazaları, duruşlar veya önemli notlar..." oninput="updateReportPreview()" style="width:100%; height:80px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); padding:10px; font-family:inherit; font-size:14px;"></textarea>
+            </div>
+
+            <button class="tb-btn" onclick="saveReport()" id="btnSaveReport" style="width:100%; font-size:15px; font-weight:700; padding:12px; border-radius:8px; background:var(--primary); color:white; border:none;">💾 Raporu Kaydet</button>
+          </div>
+
+          <!-- Kayıtlı Raporlar Listesi -->
+          <div class="panel-card">
+            <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <span>📋 Günlük Rapor Arşivi</span>
+              <input type="text" id="srchReport" placeholder="Rapor ara..." oninput="renderReports()" style="width:180px; padding:6px 12px; font-size:13px;">
+            </div>
+            <div class="table-wrap">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tarih</th>
+                      <th>Şantiye / İşveren</th>
+                      <th>Hava</th>
+                      <th>Birimler</th>
+                      <th>Hazırlayan</th>
+                      <th style="text-align:right;">İşlemler</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportsTbody">
+                    <!-- Rapor satırları -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sağ Panel: PDF Canlı Önizleme -->
+        <div>
+          <div class="pdf-preview-container" style="position: sticky; top: 24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:15px; font-weight:800; color:var(--text);">📄 Belge Önizlemesi</h3>
+              <button class="tb-btn" onclick="downloadReportPDF()" style="padding:8px 16px; font-size:13px; font-weight:700; background:#d97706; color:white; border:none; display:flex; align-items:center; gap:6px;">
+                <span>📥</span> PDF İndir
+              </button>
+            </div>
+            
+            <!-- A4 Template Container -->
+            <div class="a4-page" id="reportPDFTemplate">
+              <!-- Header -->
+              <div class="pdf-header">
+                <div class="pdf-logo">YSR <span>CONSTRUCTION</span></div>
+                <div class="pdf-title">GÜNLÜK ŞANTİYE RAPORU<br><span style="font-size:8px; color:#64748b; font-weight:500;">DAILY SITE ACTIVITY REPORT</span></div>
+              </div>
+              
+              <!-- Meta Grid -->
+              <div class="pdf-meta-grid">
+                <div class="pdf-meta-item"><strong>PROJE / ŞANTİYE:</strong> <span id="pdf_santiye">-</span></div>
+                <div class="pdf-meta-item"><strong>RAPOR TARİHİ:</strong> <span id="pdf_tarih">-</span></div>
+                <div class="pdf-meta-item"><strong>İŞVEREN / MÜŞTERİ:</strong> <span id="pdf_isveren">-</span></div>
+                <div class="pdf-meta-item"><strong>HAVA DURUMU:</strong> <span id="pdf_hava">-</span></div>
+              </div>
+
+              <!-- Content Table -->
+              <div style="flex-grow:1; margin-bottom:16px;">
+                <table class="pdf-table">
+                  <thead>
+                    <tr>
+                      <th style="width:20%">Birim / Bölüm</th>
+                      <th style="width:20%">Ekip & Çalışan</th>
+                      <th style="width:40%">Yapılan Faaliyetler / Notlar</th>
+                      <th style="width:20%">Malzeme Durumu</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pdf_table_body">
+                    <tr>
+                      <td colspan="4" style="text-align:center; color:#94a3b8; padding:30px;">Henüz birim eklenmedi. Sol taraftan "+ Birim Ekle" butonuna basın.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Notes -->
+              <div class="pdf-notes" id="pdf_notes_wrap" style="display:none; margin-bottom: 16px;">
+                <div style="font-size:8px; font-weight:700; text-transform:uppercase; color:#d97706; margin-bottom:4px;">Genel Rapor Notları</div>
+                <div id="pdf_notes_text" style="font-size:9px; color:#475569; white-space:pre-wrap;">-</div>
+              </div>
+
+              <!-- Footer / Signature -->
+              <div class="pdf-footer">
+                <div class="pdf-sign-box">
+                  <div class="pdf-sign-title">RAPORU HAZIRLAYAN</div>
+                  <div class="pdf-sign-name" id="pdf_prepared_by">-</div>
+                </div>
+                <div class="pdf-sign-box">
+                  <div class="pdf-sign-title">KONTROL / ONAY</div>
+                  <div class="pdf-sign-name">Şantiye Şefi / Kontrol Mühendisi</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -2415,6 +2750,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <!-- Chart.js for Analiz Dashboard -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- html2pdf.js for Daily Work Reports PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 
 <script>
 // ── Firebase init ─────────────────────────────────────────────
@@ -2432,7 +2770,7 @@ try {
 }
 
 // ── State ─────────────────────────────────────────────────────
-let items=[], mahals=[], users=[], surveys=[], currentUser=null, editIdx=-1, sortKey='ttar', sortDir='desc', editKesifId=null, convertingSurveyId=null, editUserId=null;
+let items=[], mahals=[], users=[], surveys=[], reports=[], currentUser=null, editIdx=-1, sortKey='ttar', sortDir='desc', editKesifId=null, convertingSurveyId=null, editUserId=null, editReportId=null;
 let catChartInstance = null;
 let statusChartInstance = null;
 let mahalCategoryChartInstance = null;
@@ -2458,11 +2796,12 @@ const fmtN=(n,c)=>(!n&&n!==0||n==='')?'-':`${Number(n).toLocaleString('tr-TR')} 
 const col=name=>db.collection(name);
 
 async function loadAll(){
-  const [uSnap,mSnap,iSnap,sSnap]=await Promise.all([
+  const [uSnap,mSnap,iSnap,sSnap,rSnap]=await Promise.all([
     col('users').get(),
     col('mahals').orderBy('name').get(),
     col('items').orderBy('createdAt','desc').get(),
-    col('surveys').get()
+    col('surveys').get(),
+    col('reports').get()
   ]);
   users=uSnap.docs.map(d=>({id:d.id,...d.data()}));
   
@@ -2477,6 +2816,7 @@ async function loadAll(){
   mahals=mSnap.docs.map(d=>({id:d.id,...d.data()}));
   items=iSnap.docs.map(d=>({id:d.id,...d.data()}));
   surveys=sSnap.docs.map(d=>({id:d.id,...d.data()}));
+  reports=rSnap.docs.map(d=>({id:d.id,...d.data()}));
 }
 
 // ── PREMIUM 2026 UX/UI MICRO-DETAILS ─────────────────────────
@@ -3000,6 +3340,7 @@ function buildTabs(){
   let html=`<div class="tab active" id="t_teklifler" role="tab" tabindex="0" aria-selected="true" onclick="showTab('teklifler')">Teklifler</div>`;
   html+=`<div class="tab" id="t_kesifler" role="tab" tabindex="0" aria-selected="false" onclick="showTab('kesifler')">Keşifler</div>`;
   html+=`<div class="tab" id="t_analiz" role="tab" tabindex="0" aria-selected="false" onclick="showTab('analiz')">Analiz</div>`;
+  html+=`<div class="tab" id="t_raporlar" role="tab" tabindex="0" aria-selected="false" onclick="showTab('raporlar')">Raporlar</div>`;
   html+=`<div class="tab" id="t_mahal" role="tab" tabindex="0" aria-selected="false" onclick="showTab('mahal')">İşverenler</div>`;
   html+=`<div class="tab" id="t_hesap" role="tab" tabindex="0" aria-selected="false" onclick="showTab('hesap')">Profilim</div>`;
   if(currentUser.r==='admin')html+=`<div class="tab" id="t_admin" role="tab" tabindex="0" aria-selected="false" onclick="showTab('admin')">Kullanıcılar</div>`;
@@ -3030,6 +3371,10 @@ function buildTabs(){
   mHtml+=`<button class="mobile-nav-item" id="mn_analiz" onclick="showTab('analiz')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
     <span>Analiz</span>
+  </button>`;
+  mHtml+=`<button class="mobile-nav-item" id="mn_raporlar" onclick="showTab('raporlar')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+    <span>Raporlar</span>
   </button>`;
   mHtml+=`<button class="mobile-nav-item" id="mn_mahal" onclick="showTab('mahal')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -3078,6 +3423,7 @@ function showTab(t){
   if(t==='analiz') {
     renderCharts();
   }
+  if(t==='raporlar')renderReports();
   if(t==='mahal')renderMahalPanel();
   if(t==='kesifler')renderKesif();
   if(t==='admin')renderAdminPanel();
@@ -3299,6 +3645,406 @@ function convertToProposal(id){
   document.getElementById('f_durum').value = 'Gönderilecek';
   
   showToast('Keşif bilgileri teklif formuna aktarıldı. Kaydedildiğinde keşif durumu güncellenecektir.', 'info');
+}
+
+// ── Günlük İş Raporları (Daily Work Reports) ───────────────────
+function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: '' }) {
+  const container = document.getElementById('reportUnitsContainer');
+  if (!container) return;
+  
+  const div = document.createElement('div');
+  div.className = 'unit-row-card';
+  div.innerHTML = `
+    <button class="remove-btn" onclick="removeUnitRow(this)">Kaldır</button>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Birim / Bölüm Adı</label>
+        <input type="text" class="unit-name" placeholder="Örn: Asma Tavan, Elektrik" value="${values.birimAdi || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Çalışan Ekip & Sayısı</label>
+        <input type="text" class="unit-crew" placeholder="Örn: 3 Usta, 2 Yardımcı" value="${values.ekip || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Yapılan Faaliyetler</label>
+        <textarea class="unit-activity" placeholder="Örn: 2. kat kablolama tamamlandı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${values.faaliyet || ''}</textarea>
+      </div>
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Kullanılan / Gelen Malzeme</label>
+        <textarea class="unit-material" placeholder="Örn: 100m kablo kullanıldı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${values.malzeme || ''}</textarea>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  updateReportPreview();
+}
+
+function removeUnitRow(btn) {
+  btn.parentElement.remove();
+  updateReportPreview();
+}
+
+function getReportUnitsData() {
+  const container = document.getElementById('reportUnitsContainer');
+  if (!container) return [];
+  const cards = container.querySelectorAll('.unit-row-card');
+  const list = [];
+  cards.forEach(card => {
+    const nameVal = card.querySelector('.unit-name').value.trim();
+    const crewVal = card.querySelector('.unit-crew').value.trim();
+    const actVal = card.querySelector('.unit-activity').value.trim();
+    const matVal = card.querySelector('.unit-material').value.trim();
+    if (nameVal || crewVal || actVal || matVal) {
+      list.push({
+        birimAdi: nameVal,
+        ekip: crewVal,
+        faaliyet: actVal,
+        malzeme: matVal
+      });
+    }
+  });
+  return list;
+}
+
+function populateReportMahalDropdown(){
+  const sel=document.getElementById('rep_mahalId');
+  if(!sel) return;
+  const sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+  const optionsHtml = sortedMahals.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  sel.innerHTML='<option value="">İşveren Seçin...</option>'+optionsHtml;
+}
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function updateReportPreview() {
+  const dateInput = document.getElementById('rep_date').value;
+  const weatherInput = document.getElementById('rep_weather').value;
+  const mahalId = document.getElementById('rep_mahalId').value;
+  const santiyeInput = document.getElementById('rep_santiye').value;
+  const notesInput = document.getElementById('rep_notes').value;
+  
+  document.getElementById('pdf_tarih').textContent = dateInput ? fmt(dateInput) : '-';
+  document.getElementById('pdf_hava').textContent = weatherInput || '-';
+  document.getElementById('pdf_santiye').textContent = santiyeInput || '-';
+  document.getElementById('pdf_isveren').textContent = mahalId ? getMahalName(mahalId) : '-';
+  
+  const notesWrap = document.getElementById('pdf_notes_wrap');
+  if (notesInput && notesInput.trim()) {
+    notesWrap.style.display = 'block';
+    document.getElementById('pdf_notes_text').textContent = notesInput;
+  } else {
+    notesWrap.style.display = 'none';
+  }
+  
+  const preparedByName = (currentUser ? (currentUser.name || currentUser.u) : '-') + 
+                         (currentUser && currentUser.job ? ` (${currentUser.job})` : '');
+  document.getElementById('pdf_prepared_by').textContent = preparedByName;
+  
+  const units = getReportUnitsData();
+  const tableBody = document.getElementById('pdf_table_body');
+  if (units.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align:center; color:#94a3b8; padding:30px;">Henüz birim eklenmedi. Sol taraftan "+ Birim Ekle" butonuna basın.</td>
+      </tr>
+    `;
+  } else {
+    tableBody.innerHTML = units.map(u => `
+      <tr>
+        <td style="font-weight:700; color:#0f172a;">${escapeHTML(u.birimAdi) || '-'}</td>
+        <td style="font-weight:600; color:#334155;">${escapeHTML(u.ekip) || '-'}</td>
+        <td style="white-space:pre-wrap;">${escapeHTML(u.faaliyet) || '-'}</td>
+        <td style="white-space:pre-wrap;">${escapeHTML(u.malzeme) || '-'}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function renderReports() {
+  const q = (document.getElementById('srchReport').value || '').toLowerCase();
+  
+  populateReportMahalDropdown();
+  
+  const repDateInput = document.getElementById('rep_date');
+  if (repDateInput && !repDateInput.value) {
+    repDateInput.value = today();
+  }
+  
+  const container = document.getElementById('reportUnitsContainer');
+  if (container && container.children.length === 0) {
+    addUnitRow();
+  }
+  
+  const sortedReports = [...reports].sort((a,b) => {
+    const dateA = a.tarih || '';
+    const dateB = b.tarih || '';
+    if (dateA !== dateB) return dateB.localeCompare(dateA);
+    const timeA = a.createdAt ? (a.createdAt.seconds || 0) : 0;
+    const timeB = b.createdAt ? (b.createdAt.seconds || 0) : 0;
+    return timeB - timeA;
+  });
+  
+  const filtered = sortedReports.filter(r => {
+    const isveren = getMahalName(r.mahalId).toLowerCase();
+    const santiye = (r.santiye || '').toLowerCase();
+    const dateStr = (r.tarih || '');
+    const preparedBy = (r.yazan || '').toLowerCase();
+    const unitsStr = (r.birimler || []).map(u => u.birimAdi).join(' ').toLowerCase();
+    
+    return isveren.includes(q) || santiye.includes(q) || dateStr.includes(q) || preparedBy.includes(q) || unitsStr.includes(q);
+  });
+  
+  const tbody = document.getElementById('reportsTbody');
+  if (!tbody) return;
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; color:var(--text3); padding:24px;">Arşive kayıtlı günlük rapor bulunamadı.</td>
+      </tr>
+    `;
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(r => {
+    const formattedDate = fmt(r.tarih);
+    const isveren = getMahalName(r.mahalId);
+    const title = r.santiye ? `${r.santiye} / ${isveren}` : isveren;
+    const unitsSummary = (r.birimler || []).map(u => `<span class="badge b-diger" style="margin-right:4px; font-size:10px;">${escapeHTML(u.birimAdi)}</span>`).join('');
+    
+    return `
+      <tr>
+        <td style="font-weight:700;">${formattedDate}</td>
+        <td>
+          <div style="font-weight:600; color:var(--text);">${escapeHTML(title)}</div>
+        </td>
+        <td><span style="font-size:12px; color:var(--text2);">${escapeHTML(r.hava) || '-'}</span></td>
+        <td><div style="display:flex; flex-wrap:wrap; gap:4px;">${unitsSummary || '<span style="color:var(--text3); font-size:11px;">Birim yok</span>'}</div></td>
+        <td><span style="font-size:12px; font-weight:550; color:var(--text2);">${escapeHTML(r.yazan) || '-'}</span></td>
+        <td style="text-align:right;">
+          <div style="display:inline-flex; gap:6px;">
+            <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" title="PDF Olarak İndir" style="padding:6px 10px; background:#d97706; color:white; border:none; font-size:12px; cursor:pointer;">📥 PDF</button>
+            <button class="btn-edit" onclick="editReport('${r.id}')" title="Raporu Düzenle" style="padding:6px 10px; font-size:12px;">✏️ Düzenle</button>
+            <button class="btn-del" onclick="deleteReport('${r.id}')" title="Raporu Sil" style="padding:6px 10px; font-size:12px;">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function saveReport() {
+  const dateInput = document.getElementById('rep_date').value;
+  const weatherInput = document.getElementById('rep_weather').value;
+  const mahalId = document.getElementById('rep_mahalId').value;
+  const santiyeInput = document.getElementById('rep_santiye').value.trim();
+  const notesInput = document.getElementById('rep_notes').value.trim();
+  const units = getReportUnitsData();
+  
+  if (!dateInput) {
+    showToast('Lütfen rapor tarihini seçin.', 'error');
+    return;
+  }
+  if (!mahalId) {
+    showToast('Lütfen işveren bilgisini seçin.', 'error');
+    return;
+  }
+  
+  const btn = document.getElementById('btnSaveReport');
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⚡ Kaydediliyor...';
+  
+  const data = {
+    tarih: dateInput,
+    hava: weatherInput.trim(),
+    mahalId: mahalId,
+    santiye: santiyeInput,
+    notes: notesInput,
+    birimler: units,
+    yazan: currentUser ? (currentUser.name || currentUser.u) : 'Sistem',
+    yazanUnvan: currentUser ? (currentUser.job || '') : '',
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  
+  try {
+    if (editReportId) {
+      await col('reports').doc(editReportId).update(data);
+      showToast('Günlük iş raporu başarıyla güncellendi.', 'success');
+    } else {
+      await col('reports').add(data);
+      showToast('Günlük iş raporu başarıyla kaydedildi.', 'success');
+    }
+    
+    const rSnap = await col('reports').get();
+    reports = rSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    clearReportForm();
+    renderReports();
+  } catch(e) {
+    console.error("Save report error: ", e);
+    showToast('Rapor kaydedilirken hata oluştu.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
+}
+
+function editReport(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  
+  editReportId = id;
+  
+  document.getElementById('rep_date').value = r.tarih || '';
+  document.getElementById('rep_weather').value = r.hava || '';
+  document.getElementById('rep_mahalId').value = r.mahalId || '';
+  document.getElementById('rep_santiye').value = r.santiye || '';
+  document.getElementById('rep_notes').value = r.notes || '';
+  
+  const container = document.getElementById('reportUnitsContainer');
+  if (container) {
+    container.innerHTML = '';
+    if (r.birimler && r.birimler.length) {
+      r.birimler.forEach(u => addUnitRow(u));
+    } else {
+      addUnitRow();
+    }
+  }
+  
+  document.getElementById('reportFormTitle').querySelector('span').textContent = '✏️ Raporu Düzenle';
+  document.getElementById('btnResetReport').style.display = 'inline-block';
+  document.getElementById('btnSaveReport').textContent = '💾 Raporu Güncelle';
+  
+  updateReportPreview();
+  showToast('Rapor bilgileri forma yüklendi.', 'info');
+}
+
+async function deleteReport(id) {
+  const ok = await customConfirm('Bu günlük raporu silmek istediğinize emin misiniz?');
+  if (!ok) return;
+  
+  try {
+    await col('reports').doc(id).delete();
+    showToast('Rapor başarıyla silindi.', 'success');
+    
+    const rSnap = await col('reports').get();
+    reports = rSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    if (editReportId === id) {
+      clearReportForm();
+    }
+    renderReports();
+  } catch(e) {
+    console.error("Delete report error: ", e);
+    showToast('Rapor silinirken hata oluştu.', 'error');
+  }
+}
+
+function clearReportForm() {
+  editReportId = null;
+  document.getElementById('rep_date').value = today();
+  document.getElementById('rep_weather').value = '';
+  document.getElementById('rep_mahalId').value = '';
+  document.getElementById('rep_santiye').value = '';
+  document.getElementById('rep_notes').value = '';
+  
+  const container = document.getElementById('reportUnitsContainer');
+  if (container) {
+    container.innerHTML = '';
+    addUnitRow();
+  }
+  
+  document.getElementById('reportFormTitle').querySelector('span').textContent = '📝 Günlük Rapor Oluştur';
+  document.getElementById('btnResetReport').style.display = 'none';
+  document.getElementById('btnSaveReport').textContent = '💾 Raporu Kaydet';
+  
+  updateReportPreview();
+}
+
+function downloadReportPDF() {
+  const element = document.getElementById('reportPDFTemplate');
+  const dateInput = document.getElementById('rep_date').value || today();
+  const isverenName = document.getElementById('pdf_isveren').textContent || 'Genel';
+  const filename = `YSR_Gunluk_Rapor_${dateInput}_${isverenName.replace(/\s+/g, '_')}.pdf`;
+  
+  const opt = {
+    margin:       10,
+    filename:     filename,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(element).save();
+}
+
+function downloadReportPDFDirect(id) {
+  const r = reports.find(x => x.id === id);
+  if (!r) return;
+  
+  const oldDate = document.getElementById('rep_date').value;
+  const oldWeather = document.getElementById('rep_weather').value;
+  const oldMahal = document.getElementById('rep_mahalId').value;
+  const oldSantiye = document.getElementById('rep_santiye').value;
+  const oldNotes = document.getElementById('rep_notes').value;
+  
+  const container = document.getElementById('reportUnitsContainer');
+  const currentUnitsHTML = container ? container.innerHTML : '';
+  
+  document.getElementById('rep_date').value = r.tarih || '';
+  document.getElementById('rep_weather').value = r.hava || '';
+  document.getElementById('rep_mahalId').value = r.mahalId || '';
+  document.getElementById('rep_santiye').value = r.santiye || '';
+  document.getElementById('rep_notes').value = r.notes || '';
+  
+  if (container) {
+    container.innerHTML = '';
+    if (r.birimler) {
+      r.birimler.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'unit-row-card';
+        div.innerHTML = `
+          <input type="text" class="unit-name" value="${u.birimAdi || ''}">
+          <input type="text" class="unit-crew" value="${u.ekip || ''}">
+          <textarea class="unit-activity">${u.faaliyet || ''}</textarea>
+          <textarea class="unit-material">${u.malzeme || ''}</textarea>
+        `;
+        container.appendChild(div);
+      });
+    }
+  }
+  
+  updateReportPreview();
+  
+  const preparedByName = (r.yazan || '-') + (r.yazanUnvan ? ` (${r.yazanUnvan})` : '');
+  document.getElementById('pdf_prepared_by').textContent = preparedByName;
+  
+  const element = document.getElementById('reportPDFTemplate');
+  const filename = `YSR_Gunluk_Rapor_${r.tarih}_${getMahalName(r.mahalId).replace(/\s+/g, '_')}.pdf`;
+  
+  const opt = {
+    margin:       10,
+    filename:     filename,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(element).save().then(() => {
+    document.getElementById('rep_date').value = oldDate;
+    document.getElementById('rep_weather').value = oldWeather;
+    document.getElementById('rep_mahalId').value = oldMahal;
+    document.getElementById('rep_santiye').value = oldSantiye;
+    document.getElementById('rep_notes').value = oldNotes;
+    if (container) container.innerHTML = currentUnitsHTML;
+    updateReportPreview();
+  });
 }
 
 // ── Mahaller ──────────────────────────────────────────────────
