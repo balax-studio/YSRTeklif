@@ -5352,15 +5352,11 @@ window.addEventListener('load',()=>{
   }
 
   setTimeout(async ()=>{
-    document.getElementById('loadingOverlay').style.display='none';
-    if(!db){
-      document.getElementById('loginScreen').style.display='flex';
-      return;
-    }
-    
     // Auto-login session check on page refresh
     const savedSession = localStorage.getItem('ysr_session');
-    if (savedSession) {
+    let autoLoginSuccess = false;
+    
+    if (savedSession && db) {
       try {
         const session = JSON.parse(savedSession);
         await loadAll();
@@ -5374,14 +5370,19 @@ window.addEventListener('load',()=>{
           document.getElementById('appScreen').style.filter = 'blur(0)';
           document.getElementById('topbarUser').textContent = currentUser.u + (currentUser.r === 'admin' ? ' · Admin' : '');
           buildTabs(); populateMahalFilter(); render(); updateSortHeadersUI(); updateStats(); checkOverdue(); loadProfile();
-          return;
+          autoLoginSuccess = true;
         }
       } catch (err) {
         console.error("Auto login error:", err);
       }
     }
     
-    document.getElementById('loginScreen').style.display='flex';
+    // Hide loading overlay AFTER we have decided which screen to show
+    document.getElementById('loadingOverlay').style.display = 'none';
+    
+    if (!autoLoginSuccess) {
+      document.getElementById('loginScreen').style.display = 'flex';
+    }
   },800);
 });
 </script>
