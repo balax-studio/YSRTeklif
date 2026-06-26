@@ -2174,15 +2174,9 @@
               </div>
             </div>
 
-            <div class="add-row-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
-              <div>
-                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">İşveren</label>
-                <select id="rep_mahalId" onchange="updateReportPreview()" style="width:100%; height:42px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); padding:0 12px; font-family:inherit; font-size:14px; font-weight:600;"></select>
-              </div>
-              <div>
-                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Şantiye / Proje Adı</label>
-                <input type="text" id="rep_santiye" placeholder="Örn: Blok A / Bodrum Kat" oninput="updateReportPreview()" style="width:100%;">
-              </div>
+            <div class="fg" style="margin-bottom:16px;">
+              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Şantiye / Proje Adı</label>
+              <input type="text" id="rep_santiye" placeholder="Örn: Blok A / Bodrum Kat" oninput="updateReportPreview()" style="width:100%;">
             </div>
 
             <!-- Dinamik Birimler Bölümü -->
@@ -2257,8 +2251,8 @@
               <div class="pdf-meta-grid">
                 <div class="pdf-meta-item"><strong>PROJE / ŞANTİYE:</strong> <span id="pdf_santiye">-</span></div>
                 <div class="pdf-meta-item"><strong>RAPOR TARİHİ:</strong> <span id="pdf_tarih">-</span></div>
-                <div class="pdf-meta-item"><strong>İŞVEREN / MÜŞTERİ:</strong> <span id="pdf_isveren">-</span></div>
                 <div class="pdf-meta-item"><strong>HAVA DURUMU:</strong> <span id="pdf_hava">-</span></div>
+                <div class="pdf-meta-item"><strong>HAZIRLAYAN:</strong> <span id="pdf_prepared_by_meta">-</span></div>
               </div>
 
               <!-- Content Table -->
@@ -2266,15 +2260,16 @@
                 <table class="pdf-table">
                   <thead>
                     <tr>
+                      <th style="width:20%">İşveren</th>
                       <th style="width:20%">Birim / Bölüm</th>
-                      <th style="width:20%">Ekip & Çalışan</th>
-                      <th style="width:40%">Yapılan Faaliyetler / Notlar</th>
-                      <th style="width:20%">Malzeme Durumu</th>
+                      <th style="width:15%">Ekip & Çalışan</th>
+                      <th style="width:30%">Yapılan Faaliyetler</th>
+                      <th style="width:15%">Malzeme Durumu</th>
                     </tr>
                   </thead>
                   <tbody id="pdf_table_body">
                     <tr>
-                      <td colspan="4" style="text-align:center; color:#94a3b8; padding:30px;">Henüz birim eklenmedi. Sol taraftan "+ Birim Ekle" butonuna basın.</td>
+                      <td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">Henüz birim eklenmedi. Sol taraftan "+ Birim Ekle" butonuna basın.</td>
                     </tr>
                   </tbody>
                 </table>
@@ -3648,15 +3643,25 @@ function convertToProposal(id){
 }
 
 // ── Günlük İş Raporları (Daily Work Reports) ───────────────────
-function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: '' }) {
+function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: '', mahalId: '' }) {
   const container = document.getElementById('reportUnitsContainer');
   if (!container) return;
+  
+  const sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+  const optionsHtml = sortedMahals.map(m=>`<option value="${m.id}" ${values.mahalId === m.id ? 'selected' : ''}>${escapeHTML(m.name)}</option>`).join('');
   
   const div = document.createElement('div');
   div.className = 'unit-row-card';
   div.innerHTML = `
     <button class="remove-btn" onclick="removeUnitRow(this)">Kaldır</button>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">İşveren</label>
+        <select class="unit-mahal" onchange="updateReportPreview()" style="width:100%; height:34px; padding:0 8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text); font-size:12px; font-weight:600;">
+          <option value="">İşveren Seçin...</option>
+          ${optionsHtml}
+        </select>
+      </div>
       <div>
         <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Birim / Bölüm Adı</label>
         <input type="text" class="unit-name" placeholder="Örn: Asma Tavan, Elektrik" value="${values.birimAdi || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
@@ -3692,12 +3697,15 @@ function getReportUnitsData() {
   const cards = container.querySelectorAll('.unit-row-card');
   const list = [];
   cards.forEach(card => {
+    const mahalSelect = card.querySelector('.unit-mahal');
+    const mahalVal = mahalSelect ? mahalSelect.value : '';
     const nameVal = card.querySelector('.unit-name').value.trim();
     const crewVal = card.querySelector('.unit-crew').value.trim();
     const actVal = card.querySelector('.unit-activity').value.trim();
     const matVal = card.querySelector('.unit-material').value.trim();
-    if (nameVal || crewVal || actVal || matVal) {
+    if (mahalVal || nameVal || crewVal || actVal || matVal) {
       list.push({
+        mahalId: mahalVal,
         birimAdi: nameVal,
         ekip: crewVal,
         faaliyet: actVal,
@@ -3709,11 +3717,7 @@ function getReportUnitsData() {
 }
 
 function populateReportMahalDropdown(){
-  const sel=document.getElementById('rep_mahalId');
-  if(!sel) return;
-  const sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
-  const optionsHtml = sortedMahals.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
-  sel.innerHTML='<option value="">İşveren Seçin...</option>'+optionsHtml;
+  // Obsolete dropdown but keeping as no-op helper for backwards compatibility
 }
 
 function escapeHTML(str) {
@@ -3724,14 +3728,17 @@ function escapeHTML(str) {
 function updateReportPreview() {
   const dateInput = document.getElementById('rep_date').value;
   const weatherInput = document.getElementById('rep_weather').value;
-  const mahalId = document.getElementById('rep_mahalId').value;
   const santiyeInput = document.getElementById('rep_santiye').value;
   const notesInput = document.getElementById('rep_notes').value;
   
   document.getElementById('pdf_tarih').textContent = dateInput ? fmt(dateInput) : '-';
   document.getElementById('pdf_hava').textContent = weatherInput || '-';
   document.getElementById('pdf_santiye').textContent = santiyeInput || '-';
-  document.getElementById('pdf_isveren').textContent = mahalId ? getMahalName(mahalId) : '-';
+  
+  const preparedByName = (currentUser ? (currentUser.name || currentUser.u) : '-') + 
+                         (currentUser && currentUser.job ? ` (${currentUser.job})` : '');
+  document.getElementById('pdf_prepared_by').textContent = preparedByName;
+  document.getElementById('pdf_prepared_by_meta').textContent = preparedByName;
   
   const notesWrap = document.getElementById('pdf_notes_wrap');
   if (notesInput && notesInput.trim()) {
@@ -3741,21 +3748,18 @@ function updateReportPreview() {
     notesWrap.style.display = 'none';
   }
   
-  const preparedByName = (currentUser ? (currentUser.name || currentUser.u) : '-') + 
-                         (currentUser && currentUser.job ? ` (${currentUser.job})` : '');
-  document.getElementById('pdf_prepared_by').textContent = preparedByName;
-  
   const units = getReportUnitsData();
   const tableBody = document.getElementById('pdf_table_body');
   if (units.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="4" style="text-align:center; color:#94a3b8; padding:30px;">Henüz birim eklenmedi. Sol taraftan "+ Birim Ekle" butonuna basın.</td>
+        <td colspan="5" style="text-align:center; color:#94a3b8; padding:30px;">Henüz birim eklenmedi. Sol taraftan "+ Birim Ekle" butonuna basın.</td>
       </tr>
     `;
   } else {
     tableBody.innerHTML = units.map(u => `
       <tr>
+        <td style="font-weight:600; color:#475569; font-size:9px;">${escapeHTML(getMahalName(u.mahalId)) || '-'}</td>
         <td style="font-weight:700; color:#0f172a;">${escapeHTML(u.birimAdi) || '-'}</td>
         <td style="font-weight:600; color:#334155;">${escapeHTML(u.ekip) || '-'}</td>
         <td style="white-space:pre-wrap;">${escapeHTML(u.faaliyet) || '-'}</td>
@@ -3767,8 +3771,6 @@ function updateReportPreview() {
 
 function renderReports() {
   const q = (document.getElementById('srchReport').value || '').toLowerCase();
-  
-  populateReportMahalDropdown();
   
   const repDateInput = document.getElementById('rep_date');
   if (repDateInput && !repDateInput.value) {
@@ -3790,13 +3792,13 @@ function renderReports() {
   });
   
   const filtered = sortedReports.filter(r => {
-    const isveren = getMahalName(r.mahalId).toLowerCase();
+    const associatedEmployers = r.mahalIds ? r.mahalIds.map(id => getMahalName(id).toLowerCase()).join(' ') : getMahalName(r.mahalId).toLowerCase();
     const santiye = (r.santiye || '').toLowerCase();
     const dateStr = (r.tarih || '');
     const preparedBy = (r.yazan || '').toLowerCase();
     const unitsStr = (r.birimler || []).map(u => u.birimAdi).join(' ').toLowerCase();
     
-    return isveren.includes(q) || santiye.includes(q) || dateStr.includes(q) || preparedBy.includes(q) || unitsStr.includes(q);
+    return associatedEmployers.includes(q) || santiye.includes(q) || dateStr.includes(q) || preparedBy.includes(q) || unitsStr.includes(q);
   });
   
   const tbody = document.getElementById('reportsTbody');
@@ -3813,8 +3815,8 @@ function renderReports() {
   
   tbody.innerHTML = filtered.map(r => {
     const formattedDate = fmt(r.tarih);
-    const isveren = getMahalName(r.mahalId);
-    const title = r.santiye ? `${r.santiye} / ${isveren}` : isveren;
+    const employers = r.mahalIds ? r.mahalIds.map(id => getMahalName(id)).filter(name => name !== 'Tanımlanmamış').join(', ') : getMahalName(r.mahalId);
+    const title = r.santiye ? `${r.santiye} / ${employers}` : employers;
     const unitsSummary = (r.birimler || []).map(u => `<span class="badge b-diger" style="margin-right:4px; font-size:10px;">${escapeHTML(u.birimAdi)}</span>`).join('');
     
     return `
@@ -3841,7 +3843,6 @@ function renderReports() {
 async function saveReport() {
   const dateInput = document.getElementById('rep_date').value;
   const weatherInput = document.getElementById('rep_weather').value;
-  const mahalId = document.getElementById('rep_mahalId').value;
   const santiyeInput = document.getElementById('rep_santiye').value.trim();
   const notesInput = document.getElementById('rep_notes').value.trim();
   const units = getReportUnitsData();
@@ -3850,20 +3851,20 @@ async function saveReport() {
     showToast('Lütfen rapor tarihini seçin.', 'error');
     return;
   }
-  if (!mahalId) {
-    showToast('Lütfen işveren bilgisini seçin.', 'error');
-    return;
-  }
   
   const btn = document.getElementById('btnSaveReport');
   const originalText = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '⚡ Kaydediliyor...';
   
+  const uniqueMahalIds = [...new Set(units.map(u => u.mahalId).filter(id => !!id))];
+  const primaryMahalId = uniqueMahalIds.length > 0 ? uniqueMahalIds[0] : '';
+  
   const data = {
     tarih: dateInput,
     hava: weatherInput.trim(),
-    mahalId: mahalId,
+    mahalId: primaryMahalId,
+    mahalIds: uniqueMahalIds,
     santiye: santiyeInput,
     notes: notesInput,
     birimler: units,
@@ -3903,7 +3904,6 @@ function editReport(id) {
   
   document.getElementById('rep_date').value = r.tarih || '';
   document.getElementById('rep_weather').value = r.hava || '';
-  document.getElementById('rep_mahalId').value = r.mahalId || '';
   document.getElementById('rep_santiye').value = r.santiye || '';
   document.getElementById('rep_notes').value = r.notes || '';
   
@@ -3950,7 +3950,6 @@ function clearReportForm() {
   editReportId = null;
   document.getElementById('rep_date').value = today();
   document.getElementById('rep_weather').value = '';
-  document.getElementById('rep_mahalId').value = '';
   document.getElementById('rep_santiye').value = '';
   document.getElementById('rep_notes').value = '';
   
@@ -3970,8 +3969,7 @@ function clearReportForm() {
 function downloadReportPDF() {
   const element = document.getElementById('reportPDFTemplate');
   const dateInput = document.getElementById('rep_date').value || today();
-  const isverenName = document.getElementById('pdf_isveren').textContent || 'Genel';
-  const filename = `YSR_Gunluk_Rapor_${dateInput}_${isverenName.replace(/\s+/g, '_')}.pdf`;
+  const filename = `YSR_Gunluk_Rapor_${dateInput}.pdf`;
   
   const opt = {
     margin:       10,
@@ -3990,7 +3988,6 @@ function downloadReportPDFDirect(id) {
   
   const oldDate = document.getElementById('rep_date').value;
   const oldWeather = document.getElementById('rep_weather').value;
-  const oldMahal = document.getElementById('rep_mahalId').value;
   const oldSantiye = document.getElementById('rep_santiye').value;
   const oldNotes = document.getElementById('rep_notes').value;
   
@@ -3999,7 +3996,6 @@ function downloadReportPDFDirect(id) {
   
   document.getElementById('rep_date').value = r.tarih || '';
   document.getElementById('rep_weather').value = r.hava || '';
-  document.getElementById('rep_mahalId').value = r.mahalId || '';
   document.getElementById('rep_santiye').value = r.santiye || '';
   document.getElementById('rep_notes').value = r.notes || '';
   
