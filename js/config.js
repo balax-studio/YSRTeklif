@@ -125,3 +125,43 @@ function showConfirm(title, message, isDangerous = false) {
     bg.onclick = (e) => { if (e.target === bg) cleanUp(false); };
   });
 }
+
+function showPrompt(title, defaultValue = '') {
+  return new Promise((resolve) => {
+    const bg = document.getElementById('promptBg');
+    const tEl = document.getElementById('promptTitle');
+    const input = document.getElementById('promptInput');
+    const btnOk = document.getElementById('btnPromptOk');
+    const btnCancel = document.getElementById('btnPromptCancel');
+    
+    tEl.textContent = title;
+    input.value = defaultValue;
+    
+    bg.classList.add('open');
+    setTimeout(() => input.focus(), 100);
+    
+    const keyHandler = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        cleanUp(input.value);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        cleanUp(null);
+      }
+    };
+    
+    input.addEventListener('keydown', keyHandler);
+    
+    const cleanUp = (value) => {
+      bg.classList.remove('open');
+      input.removeEventListener('keydown', keyHandler);
+      btnOk.onclick = null;
+      btnCancel.onclick = null;
+      resolve(value);
+    };
+    
+    btnOk.onclick = () => cleanUp(input.value);
+    btnCancel.onclick = () => cleanUp(null);
+    bg.onclick = (e) => { if (e.target === bg) cleanUp(null); };
+  });
+}

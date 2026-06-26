@@ -246,7 +246,7 @@ function renderMahalPanel(){
   </tr>`).join('');
 }
 async function editMahal(id, currentName) {
-  const newName = prompt("Yeni İşveren Adı giriniz:", currentName);
+  const newName = await showPrompt("İşveren Adını Düzenle", currentName);
   if (newName === null) return;
   const trimmed = newName.trim();
   if (!trimmed) {
