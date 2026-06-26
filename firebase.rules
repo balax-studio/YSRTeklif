@@ -1,0 +1,11 @@
+// Firebase security rules (Firestore)
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to all documents for now.
+    // TODO: Refine rules for production.
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
