@@ -871,7 +871,9 @@ function openModal(idx){
     document.getElementById('f_file').value = '';
     document.getElementById('fileUploadProgress').style.display = 'none';
     if (it.fileUrl) {
-      document.getElementById('attachedFileName').textContent = it.fileName || 'Dosya';
+      const fileLink = document.getElementById('attachedFileName');
+      fileLink.textContent = it.fileName || 'Dosya';
+      fileLink.href = it.fileUrl;
       document.getElementById('attachedFileContainer').style.display = 'flex';
     } else {
       document.getElementById('attachedFileContainer').style.display = 'none';
@@ -1025,6 +1027,7 @@ async function handleFileUpload(event) {
         progressDiv.style.display = 'none';
         nameSpan.textContent = file.name;
         nameSpan.title = file.name;
+        nameSpan.href = downloadURL;
         container.style.display = 'flex';
         showToast('Dosya başarıyla yüklendi.');
       }
@@ -1484,8 +1487,42 @@ function openInvoiceModal(event, id) {
 
 // ── Excel Export ──────────────────────────────────────────────
 function exportExcel(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const cat=document.getElementById('fCat').value;
+  const stat=document.getElementById('fStat').value;
+  const mah=document.getElementById('fMahal').value;
+  
+  let filteredItems = items.filter(it=>{
+    const nameVal = it.santiye || it.otel || '';
+    if(q&&!nameVal.toLowerCase().includes(q)&&!getMahalName(it.mahalId).toLowerCase().includes(q))return false;
+    if(cat&&it.kat!==cat)return false;
+    if(stat&&it.durum!==stat)return false;
+    if(mah&&it.mahalId!==mah)return false;
+    return true;
+  });
+
+  filteredItems.sort((a, b) => {
+    let valA = a[sortKey];
+    let valB = b[sortKey];
+    
+    if (sortKey === 'ttut' || sortKey === 'otut') {
+      valA = Number(valA) || 0;
+      valB = Number(valB) || 0;
+    } else if (sortKey === 'ttar' || sortKey === 'otar' || sortKey === 'bas' || sortKey === 'bit') {
+      valA = valA ? new Date(valA).getTime() : 0;
+      valB = valB ? new Date(valB).getTime() : 0;
+    } else {
+      valA = String(valA || '').toLowerCase();
+      valB = String(valB || '').toLowerCase();
+    }
+    
+    if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+    if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   const hdrs=['#','İşveren','Şantiye / Otel','Kategori','Durum','Teklif Tarihi','Teklif Tutarı (KDV Hariç)','Para Birimi','Onay Tarihi','Onay Tutarı (KDV Hariç)','Başlangıç','Bitiş','Gecikme','Fatura Tarihi','Fatura No','Fatura Tutarı (KDV Hariç)'];
-  const rows=items.map((it,i)=>[
+  const rows=filteredItems.map((it,i)=>[
     i+1,
     String(getMahalName(it.mahalId) || ''),
     String(it.santiye || it.otel || ''),
@@ -1508,7 +1545,7 @@ function exportExcel(){
   const currencies = ['₺', '$', '€'];
   const summaryRows = [];
   currencies.forEach(cur => {
-    const curItems = items.filter(it => (it.cur || '₺') === cur);
+    const curItems = filteredItems.filter(it => (it.cur || '₺') === cur);
     if (!curItems.length) return;
 
     const sumT = curItems.reduce((s, it) => s + (Number(it.ttut) || 0), 0);
