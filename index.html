@@ -2887,6 +2887,9 @@ async function doLogin(){
     currentUser=found;
     loginErr.textContent='';
     
+    // Save session to localStorage for auto login on refresh
+    localStorage.setItem('ysr_session', JSON.stringify({ u: found.u, p: found.p }));
+    
     // Smooth transition from login to app dashboard
     const loginScr = document.getElementById('loginScreen');
     const appScr = document.getElementById('appScreen');
@@ -2924,6 +2927,7 @@ async function doLogin(){
 }
 function doLogout(){
   currentUser=null;items=[];mahals=[];users=[];
+  localStorage.removeItem('ysr_session'); // Clear session
   const loginScr = document.getElementById('loginScreen');
   const appScr = document.getElementById('appScreen');
   
@@ -5347,12 +5351,36 @@ window.addEventListener('load',()=>{
     });
   }
 
-  setTimeout(()=>{
+  setTimeout(async ()=>{
     document.getElementById('loadingOverlay').style.display='none';
     if(!db){
       document.getElementById('loginScreen').style.display='flex';
       return;
     }
+    
+    // Auto-login session check on page refresh
+    const savedSession = localStorage.getItem('ysr_session');
+    if (savedSession) {
+      try {
+        const session = JSON.parse(savedSession);
+        await loadAll();
+        const found = users.find(x => x.u === session.u && x.p === session.p);
+        if (found) {
+          currentUser = found;
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('appScreen').style.display = 'flex';
+          document.getElementById('appScreen').style.opacity = '1';
+          document.getElementById('appScreen').style.transform = 'scale(1)';
+          document.getElementById('appScreen').style.filter = 'blur(0)';
+          document.getElementById('topbarUser').textContent = currentUser.u + (currentUser.r === 'admin' ? ' · Admin' : '');
+          buildTabs(); populateMahalFilter(); render(); updateSortHeadersUI(); updateStats(); checkOverdue(); loadProfile();
+          return;
+        }
+      } catch (err) {
+        console.error("Auto login error:", err);
+      }
+    }
+    
     document.getElementById('loginScreen').style.display='flex';
   },800);
 });
