@@ -109,10 +109,35 @@ function openKesifModal(id){
   } else {
     document.getElementById('fk_mahal').value = document.getElementById('fMahal').value || '';
     document.getElementById('fk_otel').value = '';
-    document.getElementById('fk_kat').value = 'İnşaat';
+    
+    // Determine default category based on user's job / department
+    let defaultKat = 'İnşaat';
+    let defaultSorumlu = currentUser ? currentUser.u : '';
+    
+    if (currentUser) {
+      const raw = localStorage.getItem('profile_' + currentUser.u);
+      if (raw) {
+        const profile = JSON.parse(raw);
+        if (profile.name) {
+          defaultSorumlu = profile.name;
+        }
+        const job = (profile.job || '').toLowerCase();
+        if (job.includes('makine') || job.includes('mekanik')) {
+          defaultKat = 'Mekanik';
+        } else if (job.includes('elektrik')) {
+          defaultKat = 'Elektrik';
+        } else if (job.includes('inşaat') || job.includes('mimar')) {
+          defaultKat = 'İnşaat';
+        } else if (job) {
+          defaultKat = 'Diğer';
+        }
+      }
+    }
+    
+    document.getElementById('fk_kat').value = defaultKat;
     document.getElementById('fk_durum').value = 'Keşif Bekliyor';
     document.getElementById('fk_ktar').value = today();
-    document.getElementById('fk_sorumlu').value = '';
+    document.getElementById('fk_sorumlu').value = defaultSorumlu;
     document.getElementById('fk_notlar').value = '';
   }
   
