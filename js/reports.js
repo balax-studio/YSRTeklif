@@ -9,7 +9,13 @@ function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: ''
   const div = document.createElement('div');
   div.className = 'unit-row-card';
   div.innerHTML = `
-    <button class="remove-btn" onclick="removeUnitRow(this)">Kaldır</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+      <span style="font-size:11px; font-weight:700; color:var(--primary); display:inline-flex; align-items:center; gap:6px; text-transform:uppercase; letter-spacing:0.5px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        Birim Bilgileri
+      </span>
+      <button type="button" class="remove-btn" onclick="removeUnitRow(this)" style="position:static; margin:0; padding:4px 10px; font-size:11px; font-weight:700;">Kaldır</button>
+    </div>
     <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">
       <div>
         <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">İşveren</label>
@@ -23,7 +29,7 @@ function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: ''
         <input type="text" class="unit-name" placeholder="Örn: Asma Tavan, Elektrik" value="${values.birimAdi || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
       </div>
       <div>
-        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Çalışan Ekip & Sayısı</label>
+        <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Çalışan Ekip / Sayısı</label>
         <input type="text" class="unit-crew" placeholder="Örn: 3 Usta, 2 Yardımcı" value="${values.ekip || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
       </div>
     </div>
@@ -176,7 +182,7 @@ function renderReports() {
     const unitsSummary = (r.birimler || []).map(u => `<span class="badge b-diger" style="margin-right:4px; font-size:10px;">${escapeHTML(u.birimAdi)}</span>`).join('');
     
     return `
-      <tr>
+      <tr onclick="editReport('${r.id}')" style="cursor:pointer;" class="clickable-row">
         <td style="font-weight:700;">${formattedDate}</td>
         <td>
           <div style="font-weight:600; color:var(--text);">${escapeHTML(title)}</div>
@@ -184,7 +190,7 @@ function renderReports() {
         <td><span style="font-size:12px; color:var(--text2);">${escapeHTML(r.hava) || '-'}</span></td>
         <td><div style="display:flex; flex-wrap:wrap; gap:4px;">${unitsSummary || '<span style="color:var(--text3); font-size:11px;">Birim yok</span>'}</div></td>
         <td><span style="font-size:12px; font-weight:550; color:var(--text2);">${escapeHTML(r.yazan) || '-'}</span></td>
-        <td style="text-align:right;">
+        <td style="text-align:right;" onclick="event.stopPropagation();">
           <div style="display:inline-flex; gap:6px;">
             <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" title="PDF Olarak İndir" style="padding:6px 10px; background:#d97706; color:white; border:none; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>

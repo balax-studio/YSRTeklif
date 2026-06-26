@@ -1877,3 +1877,9 @@
     font-weight: 600;
     color: #0f172a;
   }
+  .clickable-row {
+    transition: background-color 0.15s ease;
+  }
+  .clickable-row:hover {
+    background-color: var(--primary-bg) !important;
+  }
