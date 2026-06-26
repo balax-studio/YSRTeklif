@@ -235,7 +235,7 @@ function renderMahalPanel(){
   if(!mahals.length){tb.innerHTML='<tr><td colspan="3" style="padding:16px;color:var(--text2)">Henüz işveren eklenmedi.</td></tr>';return;}
   const sorted = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
   tb.innerHTML=sorted.map(m=>`<tr>
-    <td><span class="mahal-tag" style="cursor:pointer;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele">${m.name} 🔍</span></td>
+    <td><span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele"><span>${m.name}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span></td>
     <td style="color:var(--text2); cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</td>
     <td>
       <div style="display:flex; gap:6px;">

@@ -193,7 +193,7 @@
       <div class="stats-grid" id="statsGrid" aria-label="Genel İstatistikler"></div>
       
       <div class="filter-bar" role="search" aria-label="Teklif Filtreleme ve Arama">
-        <input type="text" id="srch" placeholder="🔍  Teklif veya işveren ara..." oninput="render()" aria-label="Teklif adına veya işverene göre ara">
+        <input type="text" id="srch" placeholder="Teklif veya işveren ara..." oninput="render()" aria-label="Teklif adına veya işverene göre ara">
         <select id="fMahal" onchange="render()" aria-label="İşverene göre filtrele"><option value="">Tüm işverenler</option></select>
         <select id="fCat" onchange="render()" aria-label="Kategoriye göre filtrele">
           <option value="">Tüm kategoriler</option>
@@ -234,31 +234,46 @@
       <div class="stats-grid" id="analizStatsGrid"></div>
       <div class="charts-grid">
         <div class="chart-card">
-          <div class="chart-title">📊 Kategori Dağılımı (Teklif Sayısı)</div>
+          <div class="chart-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <span>Kategori Dağılımı (Teklif Sayısı)</span>
+          </div>
           <div class="chart-canvas-wrap">
             <canvas id="categoryChart"></canvas>
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">📈 Teklif Durum Dağılımı (Mali Hacim ₺)</div>
+          <div class="chart-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            <span>Teklif Durum Dağılımı (Mali Hacim ₺)</span>
+          </div>
           <div class="chart-canvas-wrap">
             <canvas id="statusChart"></canvas>
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">📍 Şantiye / Mahal ve Kategori Matrisi (Mali Hacim ₺)</div>
+          <div class="chart-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>Şantiye / Mahal ve Kategori Matrisi (Mali Hacim ₺)</span>
+          </div>
           <div class="chart-canvas-wrap">
             <canvas id="mahalCategoryChart"></canvas>
           </div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">📅 Dönemsel Teklif Trendi (Teklif Sayısı / Aylık)</div>
+          <div class="chart-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Dönemsel Teklif Trendi (Teklif Sayısı / Aylık)</span>
+          </div>
           <div class="chart-canvas-wrap">
             <canvas id="monthlyTrendChart"></canvas>
           </div>
         </div>
         <div class="chart-card" style="grid-column: span 2;">
-          <div class="chart-title">🎯 Kategori Bazlı Teklif Kazanma / Onay Oranları (%)</div>
+          <div class="chart-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            <span>Kategori Bazlı Teklif Kazanma / Onay Oranları (%)</span>
+          </div>
           <div class="chart-canvas-wrap" style="height: 320px;">
             <canvas id="conversionChart"></canvas>
           </div>
@@ -448,7 +463,10 @@
     <!-- MAHALLER -->
     <section class="page" id="page_mahal" aria-label="İşveren Yönetimi Sayfası">
       <div class="panel-card">
-        <div class="panel-title">📍 İşveren Yönetimi</div>
+        <div class="panel-title" style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span>İşveren Yönetimi</span>
+        </div>
         <table class="list-table"><thead><tr><th>İşveren Adı</th><th>Teklif Sayısı</th><th>İşlem</th></tr></thead>
         <tbody id="mahalTbody"></tbody></table>
         <div class="add-row" role="form" aria-label="Yeni İşveren Ekle">
