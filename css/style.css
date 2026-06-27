@@ -1456,7 +1456,6 @@
       padding: 8px 10px;
     }
     
-    /* Sticky Bottom Navbar */
     .mobile-nav {
       display: flex !important;
       position: fixed;
@@ -1469,19 +1468,18 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
-      justify-content: flex-start;
+      justify-content: space-around;
       align-items: center;
       z-index: 1000;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
-      padding-left: 16px;
-      padding-right: 16px;
-      gap: 12px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      padding-left: 8px;
+      padding-right: 8px;
+      gap: 2px;
+      overflow-x: hidden;
       scrollbar-width: none;
     }
     .mobile-nav::-webkit-scrollbar {
-      display: none; /* Chrome/Safari için scrollbar gizleme */
+      display: none;
     }
     .mobile-nav-item {
       background: transparent;
@@ -1492,14 +1490,18 @@
       align-items: center;
       justify-content: center;
       gap: 4px;
-      flex: 0 0 auto; /* Sıkışmasını engelle */
-      min-width: 60px; /* Minimum genişlik */
+      flex: 1;
+      min-width: 0;
       height: 100%;
       cursor: pointer;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       transition: color 0.3s ease;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
+
     .mobile-nav-item svg {
       transition: stroke 0.3s ease, transform 0.2s ease;
     }
