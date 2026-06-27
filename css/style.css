@@ -844,6 +844,9 @@
     box-shadow: var(--shadow-lg);
     border-color: var(--primary);
   }
+  .chart-full {
+    grid-column: 1 / -1;
+  }
   .chart-title {
     font-size: 17px;
     font-weight: 850;
@@ -1415,20 +1418,22 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 64px;
+      height: calc(64px + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
       background: rgba(var(--card-rgb), 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
-      justify-content: flex-start; /* Space-around yerine baştan başlasın */
+      justify-content: flex-start;
       align-items: center;
       z-index: 1000;
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
-      padding: 0 16px;
+      padding-left: 16px;
+      padding-right: 16px;
       gap: 12px;
-      overflow-x: auto; /* Yatay kaydırma eklendi */
+      overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none; /* Firefox için scrollbar gizleme */
+      scrollbar-width: none;
     }
     .mobile-nav::-webkit-scrollbar {
       display: none; /* Chrome/Safari için scrollbar gizleme */
@@ -1465,7 +1470,7 @@
     .mobile-fab {
       display: flex !important;
       position: fixed;
-      bottom: 80px;
+      bottom: calc(80px + env(safe-area-inset-bottom));
       right: 20px;
       width: 56px;
       height: 56px;
@@ -1793,6 +1798,9 @@
   }
   @media (max-width: 1024px) {
     .reports-grid {
+      grid-template-columns: 1fr;
+    }
+    .charts-grid {
       grid-template-columns: 1fr;
     }
   }
