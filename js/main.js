@@ -80,10 +80,10 @@ function initEnergyMode() {
 function toggleEnergyMode() {
   if (energyMode === 'enabled') {
     energyMode = 'disabled';
-    showToast('Optimizasyon Modu Kapalı! 🚀', 'info');
+    showToast('Optimizasyon Modu Kapalı!', 'info');
   } else {
     energyMode = 'enabled';
-    showToast('Optimizasyon Modu Devrede (Enerji Tasarrufu). ⚡', 'success');
+    showToast('Optimizasyon Modu Devrede (Enerji Tasarrufu).', 'success');
   }
   localStorage.setItem('energyMode', energyMode);
   initEnergyMode();

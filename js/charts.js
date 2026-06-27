@@ -259,7 +259,7 @@ function renderCharts() {
       }
     });
 
-    // 📍 2. Mahal ve Kategori Matrisi (Stacked Bar Chart in TL)
+    // 2. Mahal ve Kategori Matrisi (Stacked Bar Chart in TL)
     const mNames = mahals.map(m => m.name);
     const getTlVal = (it) => {
       const val = Number(it.ttut) || 0;
@@ -331,7 +331,7 @@ function renderCharts() {
       }
     });
 
-    // 📅 3. Dönemsel Teklif Trendi (Line Chart - Last 6 Months)
+    // 3. Dönemsel Teklif Trendi (Line Chart - Last 6 Months)
     const monthNamesTr = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
     const getMonthLabel = (dateStr) => {
       if (!dateStr) return '';
@@ -404,7 +404,7 @@ function renderCharts() {
       }
     });
 
-    // 🎯 4. Kategori Bazlı Teklif Kazanma / Onay Oranları (Horizontal Bar Chart)
+    // 4. Kategori Bazlı Teklif Kazanma / Onay Oranları (Horizontal Bar Chart)
     const winRates = categories.map(cat => {
       const catItems = items.filter(it => it.kat === cat);
       if (!catItems.length) return 0;

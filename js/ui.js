@@ -354,8 +354,8 @@ function renderMahalPanel(){
         <span style="font-size:12px; color:var(--text2); font-weight:600; cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</span>
       </div>
       <div style="display:flex; gap:8px; margin-top: 4px;">
-        <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px;" onclick="editMahal('${m.id}','${m.name}')">✏️ Düzenle</button>
-        <button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px;" onclick="delMahal('${m.id}','${m.name}')">🗑️ Sil</button>
+        <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="editMahal('${m.id}','${m.name}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
+        <button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delMahal('${m.id}','${m.name}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>
       </div>
     </div>`).join('');
   }
@@ -468,8 +468,8 @@ async function renderAdminPanel(){
           Kullanıcı Adı: <span style="color:var(--text);">${item.u.u}</span> | Meslek: <span style="color:var(--text);">${item.job}</span>
         </div>
         <div style="display:flex; gap:8px; margin-top:4px;">
-          <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px;" onclick="openUserEditModal('${item.u.id}')">✏️ Düzenle</button>
-          ${item.u.u!=='admin'?`<button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px;" onclick="delUser('${item.u.id}','${item.u.u}')">🗑️ Sil</button>`:''}
+          <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openUserEditModal('${item.u.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
+          ${item.u.u!=='admin'?`<button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delUser('${item.u.id}','${item.u.u}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>`:''}
         </div>
       </div>`).join('');
     }
@@ -793,7 +793,7 @@ function render(){
     const invoiceIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
 
     const displayName = it.santiye || it.otel || '-';
-    const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-block;" onclick="event.stopPropagation();">📎</a>` : '';
+    const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
 
     const prog = getProgressData(it.durum);
     return`<tr class="${od?'overdue':''}">
@@ -861,7 +861,7 @@ function render(){
       const invoiceIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
 
       const displayName = it.santiye || it.otel || '-';
-      const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-block;" onclick="event.stopPropagation();">📎</a>` : '';
+      const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
 
       const prog = getProgressData(it.durum);
       return `<div class="mobile-card ${od ? 'overdue' : ''}">
@@ -1523,7 +1523,7 @@ function quickApprove(event, id){
       showToast('Onay işlemi sırasında hata: ' + e.message, 'error');
     } finally {
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '✅ Onayla';
+      saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><polyline points="20 6 9 17 4 12"></polyline></svg>Onayla';
     }
   };
   
@@ -1579,7 +1579,7 @@ function openHakedisModal(event, id) {
       showToast('Hakediş kaydedilirken hata: ' + e.message, 'error');
     } finally {
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '🧾 Hakedişi Kaydet';
+      saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Hakedişi Kaydet';
     }
   };
   
@@ -1694,7 +1694,7 @@ function openInvoiceModal(event, id) {
       showToast('Fatura kaydedilirken hata oluştu: ' + e.message, 'error');
     } finally {
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '🧾 Faturayı Kaydet';
+      saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Faturayı Kaydet';
     }
   };
 

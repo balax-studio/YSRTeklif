@@ -46,8 +46,8 @@ function renderKesif(){
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           ${convertBtn}
-          <button class="btn-edit" style="padding:6px 8px; border-radius:6px;" onclick="openKesifModal('${it.id}')" aria-label="Düzenle">✏️</button>
-          <button class="btn-del" style="padding:6px 8px; border-radius:6px;" onclick="delKesif('${it.id}')" aria-label="Sil">🗑️</button>
+          <button class="btn-edit" style="padding:6px 8px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" onclick="openKesifModal('${it.id}')" aria-label="Düzenle"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
+          <button class="btn-del" style="padding:6px 8px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" onclick="delKesif('${it.id}')" aria-label="Sil"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
         </div>
       </td>
     </tr>`;
@@ -75,8 +75,8 @@ function renderKesif(){
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; gap:6px; width: 100%;">
-            <button class="btn-edit" style="padding:6px 10px; flex:1;" onclick="openKesifModal('${it.id}')">✏️ Düzenle</button>
-            <button class="btn-del" style="padding:6px 10px; flex:1;" onclick="delKesif('${it.id}')">🗑️ Sil</button>
+            <button class="btn-edit" style="padding:6px 10px; flex:1; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openKesifModal('${it.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
+            <button class="btn-del" style="padding:6px 10px; flex:1; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delKesif('${it.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>
           </div>
         </div>
         ${convertBtn}

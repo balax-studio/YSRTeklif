@@ -265,7 +265,7 @@ function renderReports() {
         <div class="mobile-card" onclick="previewReport('${r.id}')" style="cursor:pointer; padding:14px; gap:8px;">
           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:6px;">
             <span style="font-weight:700; font-size:13px; color:var(--text);">${formattedDate}</span>
-            <span style="font-size:11px; color:var(--text2); font-weight:600;">☁️ ${escapeHTML(r.hava) || '-'}</span>
+            <span style="font-size:11px; color:var(--text2); font-weight:600; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle;"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg> ${escapeHTML(r.hava) || '-'}</span>
           </div>
           <div style="font-size:13px; color:var(--text); font-weight:600;">
             Şantiye: <span style="font-weight:500; color:var(--text2);">${escapeHTML(title)}</span>
@@ -310,7 +310,7 @@ async function saveReport() {
   const btn = document.getElementById('btnSaveReport');
   const originalText = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '⚡ Kaydediliyor...';
+  btn.innerHTML = 'Kaydediliyor...';
   
   const uniqueMahalIds = [...new Set(units.map(u => u.mahalId).filter(id => !!id))];
   const primaryMahalId = uniqueMahalIds.length > 0 ? uniqueMahalIds[0] : '';
