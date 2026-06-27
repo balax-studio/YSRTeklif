@@ -658,6 +658,9 @@
   tr:last-child td {
     border-bottom: none;
   }
+  .cell-text {
+    white-space: nowrap;
+  }
   @media (hover: hover) and (pointer: fine) {
     tr:hover td {
       background: var(--primary-color-faded);
@@ -1363,6 +1366,7 @@
       font-size: 13px;
       font-weight: 700;
       color: var(--text);
+      white-space: nowrap;
     }
     .mobile-card-footer {
       display: flex;
