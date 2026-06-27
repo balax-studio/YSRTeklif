@@ -248,6 +248,12 @@ function buildTabs(){
   if(mNav) mNav.innerHTML = mHtml;
 }
 function showTab(t){
+  if (t === 'admin' && (!currentUser || currentUser.r !== 'admin')) {
+    showToast('Bu sayfaya erişim yetkiniz bulunmamaktadır.', 'error');
+    showTab('teklifler');
+    return;
+  }
+
   document.querySelectorAll('.tab').forEach(b=>{
     b.classList.remove('active');
     b.setAttribute('aria-selected', 'false');
@@ -294,8 +300,8 @@ function showTab(t){
 // ── Mahaller ──────────────────────────────────────────────────
 function populateMahalFilter(){
   const sel=document.getElementById('fMahal'),cur=sel.value;
-  const sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
-  const optionsHtml = sortedMahals.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  const sortedMahals = [...mahals].sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
+  const optionsHtml = sortedMahals.map(m=>`<option value="${m.id}">${escapeHTML(m.name)}</option>`).join('');
   sel.innerHTML='<option value="">Tüm işverenler</option>'+optionsHtml;
   if(cur)sel.value=cur;
 }
@@ -303,10 +309,10 @@ function populateModalMahal(val){
   const sel=document.getElementById('f_mahal');
   let matchedId = val;
   if (val) {
-    const m = mahals.find(x => x.id === val || x.name.toLowerCase() === val.toLowerCase());
+    const m = mahals.find(x => x.id === val || (x.name && x.name.toLowerCase() === val.toLowerCase()));
     if (m) matchedId = m.id;
   }
-  let sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+  let sortedMahals = [...mahals].sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
   if (matchedId) {
     const selectedIdx = sortedMahals.findIndex(m => m.id === matchedId);
     if (selectedIdx > -1) {
@@ -314,9 +320,10 @@ function populateModalMahal(val){
       sortedMahals.unshift(selectedMahal);
     }
   }
-  sel.innerHTML='<option value="">— işveren seçin —</option>'+sortedMahals.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  sel.innerHTML='<option value="">— işveren seçin —</option>'+sortedMahals.map(m=>`<option value="${m.id}">${escapeHTML(m.name)}</option>`).join('');
   if(matchedId)sel.value=matchedId;
 }
+
 function filterByMahal(mahalId) {
   document.getElementById('fMahal').value = mahalId;
   showTab('teklifler');
@@ -331,15 +338,15 @@ function renderMahalPanel(){
     if(mobList) mobList.innerHTML='<div style="padding:16px;color:var(--text2);text-align:center;">Henüz işveren eklenmedi.</div>';
     return;
   }
-  const sorted = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+  const sorted = [...mahals].sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
   if(tb) {
     tb.innerHTML=sorted.map(m=>`<tr>
-      <td><span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele"><span>${m.name}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span></td>
+      <td><span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele"><span>${escapeHTML(m.name)}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span></td>
       <td style="color:var(--text2); cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</td>
       <td>
         <div style="display:flex; gap:6px;">
-          <button class="btn-edit" onclick="editMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini düzenle">Düzenle</button>
-          <button class="btn-del" onclick="delMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini sil">Sil</button>
+          <button class="btn-edit" onclick="editMahal('${m.id}','${escapeHTML(escapeJS(m.name))}')" aria-label="${escapeHTML(m.name)} işverenini düzenle">Düzenle</button>
+          <button class="btn-del" onclick="delMahal('${m.id}','${escapeHTML(escapeJS(m.name))}')" aria-label="${escapeHTML(m.name)} işverenini sil">Sil</button>
         </div>
       </td>
     </tr>`).join('');
@@ -348,17 +355,18 @@ function renderMahalPanel(){
     mobList.innerHTML=sorted.map(m=>`<div class="mobile-card" style="padding: 14px; gap: 8px;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700;" onclick="filterByMahal('${m.id}')">
-          <span>${m.name}</span>
+          <span>${escapeHTML(m.name)}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </span>
         <span style="font-size:12px; color:var(--text2); font-weight:600; cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</span>
       </div>
       <div style="display:flex; gap:8px; margin-top: 4px;">
-        <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="editMahal('${m.id}','${m.name}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
-        <button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delMahal('${m.id}','${m.name}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>
+        <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="editMahal('${m.id}','${escapeHTML(escapeJS(m.name))}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
+        <button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delMahal('${m.id}','${escapeHTML(escapeJS(m.name))}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>
       </div>
     </div>`).join('');
   }
+}
 }
 async function editMahal(id, currentName) {
   const newName = await showPrompt("İşveren Adını Düzenle", currentName);
@@ -827,16 +835,17 @@ function render(){
     const invoiceIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
 
     const displayName = it.santiye || it.otel || '-';
-    const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
+    const escapedDisplayName = escapeHTML(displayName);
+    const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${escapeHTML(it.fileName || 'Belgeyi İndir')}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
 
     const prog = getProgressData(it.durum);
     return`<tr class="${od?'overdue':''}">
       <td style="color:var(--text2);font-weight:600">${i+1}</td>
       <td class="editable-cell" data-id="${it.id}" data-field="otel" title="Çift tıklayıp şantiye adını düzenleyin">
-        <div class="cell-text" style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px">${displayName}${fileAttachmentLink}</div>
+        <div class="cell-text" style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px">${escapedDisplayName}${fileAttachmentLink}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${getMahalName(it.mahalId)}</span>
-          <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat||'-'}</span>
+          <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${escapeHTML(getMahalName(it.mahalId))}</span>
+          <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${escapeHTML(it.kat||'-')}</span>
         </div>
       </td>
       <td>
@@ -850,7 +859,7 @@ function render(){
         <div class="cell-text" style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
       </td>
       <td class="editable-cell" data-id="${it.id}" data-field="otut" title="Çift tıklayıp onay tutarını düzenleyin">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${it.durum === 'Faturalandı' ? 'Fat: ' + (it.fno || fmt(it.ftar)) : fmt(it.otar)}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${it.durum === 'Faturalandı' ? 'Fat: ' + (escapeHTML(it.fno) || fmt(it.ftar)) : fmt(it.otar)}</div>
         <div class="cell-text" style="font-weight:700; white-space:nowrap;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut,it.cur)}</div>
       </td>
       <td>
@@ -873,8 +882,8 @@ function render(){
           ${it.durum === 'Hakediş Onaylandı' ? `<button class="btn-quick" style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px" onclick="openInvoiceModal(event, '${it.id}')" title="Fatura Ekle">${invoiceIcon} Fatura Ekle</button>` : ''}
           
           <button class="btn-quick" style="background:#475569;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px" onclick="generatePDF('${it.id}')" title="PDF İndir">${pdfIcon}</button>
-          <button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="openModal('${it.id}')" aria-label="${displayName} düzenle">${editIcon}</button>
-          <button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="delItem('${it.id}')" aria-label="${displayName} sil">${delIcon}</button>
+          <button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="openModal('${it.id}')" aria-label="${escapedDisplayName} düzenle">${editIcon}</button>
+          <button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="delItem('${it.id}')" aria-label="${escapedDisplayName} sil">${delIcon}</button>
         </div>
       </td>
     </tr>`;
@@ -895,16 +904,17 @@ function render(){
       const invoiceIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
 
       const displayName = it.santiye || it.otel || '-';
-      const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
+      const escapedDisplayName = escapeHTML(displayName);
+      const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${escapeHTML(it.fileName || 'Belgeyi İndir')}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
 
       const prog = getProgressData(it.durum);
       return `<div class="mobile-card ${od ? 'overdue' : ''}">
         <div class="mobile-card-header">
           <div>
-            <div class="mobile-card-title">${displayName}${fileAttachmentLink}</div>
+            <div class="mobile-card-title">${escapedDisplayName}${fileAttachmentLink}</div>
             <div class="mobile-card-tags" style="margin-top:6px;">
-              <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${getMahalName(it.mahalId)}</span>
-              <span class="badge ${CAT_CLS[it.kat] || 'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat || '-'}</span>
+              <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${escapeHTML(getMahalName(it.mahalId))}</span>
+              <span class="badge ${CAT_CLS[it.kat] || 'b-diger'}" style="padding:2px 8px;font-size:10px">${escapeHTML(it.kat || '-')}</span>
             </div>
           </div>
           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
@@ -922,7 +932,7 @@ function render(){
           <div class="mobile-card-info-item">
             <span class="mobile-card-info-lbl">${it.durum === 'Faturalandı' ? 'Fatura Tutarı' : 'Onay Tutarı'}</span>
             <span class="mobile-card-info-val" style="color: var(--green); white-space:nowrap;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut, it.cur)}</span>
-            <span style="font-size:10px; color:var(--text3);">${it.durum === 'Faturalandı' ? (it.fno ? '#' + it.fno : fmt(it.ftar)) : fmt(it.otar)}</span>
+            <span style="font-size:10px; color:var(--text3);">${it.durum === 'Faturalandı' ? (it.fno ? '#' + escapeHTML(it.fno) : fmt(it.ftar)) : fmt(it.otar)}</span>
           </div>
         </div>
 
@@ -949,8 +959,8 @@ function render(){
             ${it.durum === 'Hakediş Onaylandı' ? `<button class="btn-quick" style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:11px;display:inline-flex;align-items:center;gap:4px" onclick="openInvoiceModal(event, '${it.id}')" title="Fatura Ekle">${invoiceIcon} Fatura Ekle</button>` : ''}
             
             <button class="btn-quick" style="background:#475569;color:#fff;border:none;border-radius:6px;padding:6px 8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;" onclick="generatePDF('${it.id}')" title="PDF İndir">${pdfIcon}</button>
-            <button class="btn-edit" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="openModal('${it.id}')" aria-label="${displayName} düzenle">${editIcon}</button>
-            <button class="btn-del" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="delItem('${it.id}')" aria-label="${displayName} sil">${delIcon}</button>
+            <button class="btn-edit" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="openModal('${it.id}')" aria-label="${escapedDisplayName} düzenle">${editIcon}</button>
+            <button class="btn-del" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="delItem('${it.id}')" aria-label="${escapedDisplayName} sil">${delIcon}</button>
           </div>
         </div>
       </div>`;
@@ -1227,7 +1237,7 @@ async function addMahalFromModal() {
     const ref = await col('mahals').add({name: v});
     const newMahal = {id: ref.id, name: v};
     mahals.push(newMahal);
-    mahals.sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+    mahals.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
     
     populateMahalFilter(); // Genel filtre listesini yenile
     populateModalMahal(ref.id); // Dropdown'a ekle ve hemen otomatik seç!
@@ -1279,17 +1289,22 @@ async function handleFileUpload(event) {
         showToast('Dosya yüklenirken hata oluştu: ' + error.message, 'error');
       }, 
       async () => {
-        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-        urlInput.value = downloadURL;
-        nameInput.value = file.name;
+        try {
+          const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+          urlInput.value = downloadURL;
+          nameInput.value = file.name;
 
-        // Yükleme durumu arayüz güncellemesi
-        progressDiv.style.display = 'none';
-        nameSpan.textContent = file.name;
-        nameSpan.title = file.name;
-        nameSpan.href = downloadURL;
-        container.style.display = 'flex';
-        showToast('Dosya başarıyla yüklendi.');
+          // Yükleme durumu arayüz güncellemesi
+          progressDiv.style.display = 'none';
+          nameSpan.textContent = file.name;
+          nameSpan.title = file.name;
+          nameSpan.href = downloadURL;
+          container.style.display = 'flex';
+          showToast('Dosya başarıyla yüklendi.');
+        } catch (error) {
+          progressDiv.style.display = 'none';
+          showToast('Dosya URL alınırken hata oluştu: ' + error.message, 'error');
+        }
       }
     );
   } catch (err) {
@@ -1323,7 +1338,7 @@ async function saveItem(){
         const ref = await col('mahals').add({name: newMahalVal});
         const newMahal = {id: ref.id, name: newMahalVal};
         mahals.push(newMahal);
-        mahals.sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+        mahals.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
         populateMahalFilter();
         populateModalMahal(ref.id);
         mahalId = ref.id;
@@ -1530,7 +1545,7 @@ function quickApprove(event, id){
   if(!it) return;
   
   currentApproveId = id;
-  document.getElementById('approveModalDesc').innerHTML = `<b>${it.otel || 'Bu teklif'}</b> isimli projeyi onaylamak üzeresiniz. Lütfen onaylanan tutarı giriniz.`;
+  document.getElementById('approveModalDesc').innerHTML = `<b>${escapeHTML(it.otel || 'Bu teklif')}</b> isimli projeyi onaylamak üzeresiniz. Lütfen onaylanan tutarı giriniz.`;
   document.getElementById('approve_otut').value = it.ttut || '';
   document.getElementById('approve_ocur').value = it.cur || '₺';
   
@@ -1585,7 +1600,7 @@ function openHakedisModal(event, id) {
   if (!it) return;
   
   currentHakedisId = id;
-  document.getElementById('hakedisModalDesc').innerHTML = `<b>${it.santiye || it.otel || 'Bu teklif'}</b> isimli proje için hakediş tutarını giriniz.`;
+  document.getElementById('hakedisModalDesc').innerHTML = `<b>${escapeHTML(it.santiye || it.otel || 'Bu teklif')}</b> isimli proje için hakediş tutarını giriniz.`;
   document.getElementById('hakedis_htut').value = it.htut || it.otut || it.ttut || '';
   document.getElementById('hakedis_ocur').textContent = it.cur || '₺';
   
@@ -1689,7 +1704,7 @@ function openInvoiceModal(event, id) {
   if (!it) return;
 
   currentInvoiceId = id;
-  document.getElementById('invoiceModalDesc').innerHTML = `<b>${it.santiye || it.otel || 'Bu teklif'}</b> isimli proje için fatura detaylarını giriniz.`;
+  document.getElementById('invoiceModalDesc').innerHTML = `<b>${escapeHTML(it.santiye || it.otel || 'Bu teklif')}</b> isimli proje için fatura detaylarını giriniz.`;
   document.getElementById('invoice_fno').value = it.fno || '';
   document.getElementById('invoice_ftut').value = it.ftut || it.htut || it.otut || it.ttut || '';
   document.getElementById('invoice_ocur').textContent = it.cur || '₺';
@@ -1971,26 +1986,26 @@ function showStatDetails(type) {
       return `<tr class="${od?'overdue':''}">
         <td style="color:var(--text2);font-weight:600">${i+1}</td>
         <td>
-          <div style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px" title="${it.otel||''}">${it.otel||'-'}</div>
+          <div style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px" title="${escapeHTML(it.otel||'')}">${escapeHTML(it.otel||'-')}</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${getMahalName(it.mahalId)}</span>
-            <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat||'-'}</span>
+            <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${escapeHTML(getMahalName(it.mahalId))}</span>
+            <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${escapeHTML(it.kat||'-')}</span>
           </div>
         </td>
-        <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
+        <td><span class="badge ${STAT_CLS[si]||'b-0'}">${escapeHTML(it.durum||'-')}</span></td>
         <td>
-          <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
-          <div style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${escapeHTML(fmt(it.ttar))}</div>
+          <div style="font-weight:700; white-space:nowrap;">${escapeHTML(fmtN(it.ttut,it.cur))}</div>
         </td>
         <td>
-          <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.otar)}</div>
-          <div style="font-weight:700; white-space:nowrap;">${fmtN(it.otut,it.cur)}</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${escapeHTML(fmt(it.otar))}</div>
+          <div style="font-weight:700; white-space:nowrap;">${escapeHTML(fmtN(it.otut,it.cur))}</div>
         </td>
         <td>
-          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
-          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
+          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${escapeHTML(fmt(it.bas))}</div>
+          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${escapeHTML(fmt(it.bit))}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
           <div>${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
-          <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
+          <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${escapeHTML(fmt(it.ftar))}</div>
         </td>
       </tr>`;
     }).join('');
@@ -2002,28 +2017,28 @@ function showStatDetails(type) {
       const si = STAT_NAMES.indexOf(it.durum);
       return `<div class="mobile-card ${od?'overdue':''}" style="padding:14px; gap:8px;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:6px;">
-          <span style="font-weight:700; font-size:13px; color:var(--text);">${it.otel||'-'}</span>
-          <span class="badge ${STAT_CLS[si]||'b-0'}" style="font-size:10px; padding:2px 8px;">${it.durum||'-'}</span>
+          <span style="font-weight:700; font-size:13px; color:var(--text);">${escapeHTML(it.otel||'-')}</span>
+          <span class="badge ${STAT_CLS[si]||'b-0'}" style="font-size:10px; padding:2px 8px;">${escapeHTML(it.durum||'-')}</span>
         </div>
         <div style="font-size:12px; color:var(--text2); display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
-          <span class="mahal-tag" style="padding:2px 6px; font-size:9px;">${getMahalName(it.mahalId)}</span>
-          <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 6px; font-size:9px;">${it.kat||'-'}</span>
+          <span class="mahal-tag" style="padding:2px 6px; font-size:9px;">${escapeHTML(getMahalName(it.mahalId))}</span>
+          <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 6px; font-size:9px;">${escapeHTML(it.kat||'-')}</span>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; margin-top:4px;">
           <div>
             <div style="color:var(--text2); font-size:11px;">Teklif Tutarı</div>
-            <div style="font-weight:700; color:var(--text);">${fmtN(it.ttut,it.cur)}</div>
+            <div style="font-weight:700; color:var(--text);">${escapeHTML(fmtN(it.ttut,it.cur))}</div>
           </div>
           <div>
             <div style="color:var(--text2); font-size:11px;">Onay Tutarı</div>
-            <div style="font-weight:700; color:var(--text);">${fmtN(it.otut,it.cur)}</div>
+            <div style="font-weight:700; color:var(--text);">${escapeHTML(fmtN(it.otut,it.cur))}</div>
           </div>
         </div>
         <div style="border-top:1px dashed var(--border); padding-top:6px; font-size:11px; color:var(--text2); display:flex; flex-direction:column; gap:2px;">
-          <div>Başlangıç: <span style="color:var(--text); font-weight:600;">${fmt(it.bas)}</span> | Bitiş: <span style="color:var(--text); font-weight:600;">${fmt(it.bit)}</span></div>
+          <div>Başlangıç: <span style="color:var(--text); font-weight:600;">${escapeHTML(fmt(it.bas))}</span> | Bitiş: <span style="color:var(--text); font-weight:600;">${escapeHTML(fmt(it.bit))}</span></div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
             <span>${getDynamicDateBadge(it.bas, it.bit, it.durum)}</span>
-            ${it.ftar ? `<span>Fatura: <span style="color:var(--text); font-weight:600;">${fmt(it.ftar)}</span></span>` : ''}
+            ${it.ftar ? `<span>Fatura: <span style="color:var(--text); font-weight:600;">${escapeHTML(fmt(it.ftar))}</span></span>` : ''}
           </div>
         </div>
       </div>`;

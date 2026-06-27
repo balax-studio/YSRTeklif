@@ -5,8 +5,11 @@ window.generatePDF = async function(itemId) {
     return;
   }
   
-  const it = window.appData.items.find(i => i.id === itemId);
-  if (!it) return;
+  const it = (typeof items !== 'undefined' ? items : []).find(i => i.id === itemId);
+  if (!it) {
+    alert("Teklif bulunamadı.");
+    return;
+  }
 
   // Show loading indicator
   const loading = document.createElement('div');
@@ -40,6 +43,8 @@ window.generatePDF = async function(itemId) {
     container.style.fontFamily = 'sans-serif';
     
     const cur = it.cur || '₺';
+    const customerName = typeof getMahalName === 'function' ? getMahalName(it.mahalId) : (it.mahal || '-');
+    const jobDescription = it.otel || it.santiye || '-';
     
     container.innerHTML = `
       <div style="border-bottom: 3px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
@@ -57,12 +62,12 @@ window.generatePDF = async function(itemId) {
       <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
         <div style="width: 48%; padding: 15px; background: #f8fafc; border-radius: 8px;">
           <h3 style="margin-top:0; color: #334155; font-size: 14px; text-transform: uppercase;">Müşteri / İşveren</h3>
-          <div style="font-size: 18px; font-weight: bold; color: #0f172a;">${it.mahal || '-'}</div>
-          <div style="margin-top: 5px; color: #475569;">Otel/Şantiye: ${it.otel || '-'}</div>
+          <div style="font-size: 18px; font-weight: bold; color: #0f172a;">${escapeHTML(customerName)}</div>
+          <div style="margin-top: 5px; color: #475569;">Otel/Şantiye: ${escapeHTML(it.otel || '-')}</div>
         </div>
         <div style="width: 48%; padding: 15px; background: #f8fafc; border-radius: 8px;">
           <h3 style="margin-top:0; color: #334155; font-size: 14px; text-transform: uppercase;">İş Tanımı</h3>
-          <div style="font-size: 16px; font-weight: bold; color: #0f172a;">${it.is_tanimi || '-'}</div>
+          <div style="font-size: 16px; font-weight: bold; color: #0f172a;">${escapeHTML(jobDescription)}</div>
           <div style="margin-top: 5px; color: #475569;">Durum: <span style="font-weight:bold; color: #4f46e5;">${it.durum || '-'}</span></div>
         </div>
       </div>
@@ -129,12 +134,14 @@ window.generatePDF = async function(itemId) {
     
     // Log the action
     if (window.logAction) {
-      window.logAction(it.id, "PDF Çıktısı Alındı", "Kullanıcı teklifin PDF çıktısını indirdi.");
+      window.logAction("Hızlı İşlem", "Teklif", it.id, "PDF Çıktısı Alındı");
     }
   } catch (error) {
     console.error("PDF generation error:", error);
     alert("PDF oluşturulurken bir hata oluştu.");
   } finally {
-    document.body.removeChild(loading);
+    if (loading && loading.parentNode) {
+      document.body.removeChild(loading);
+    }
   }
 };

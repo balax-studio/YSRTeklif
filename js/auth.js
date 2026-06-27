@@ -25,15 +25,31 @@ async function doLogin(){
   try{
     await loadAll();
     const hashedP = await sha256(p);
-    const found=users.find(x=>x.u.toLowerCase()===u.toLowerCase()&&(x.p===p||x.p===hashedP));
+    
+    // Secure query: check database directly for username matching lowercase entered input
+    const userQuery = await col('users').where('u', '==', u.toLowerCase()).get();
+    let found = null;
+    userQuery.forEach(doc => {
+      const data = doc.data();
+      if (data.p === p || data.p === hashedP) {
+        found = { id: doc.id, ...data };
+      }
+    });
+    
     if(!found){
       loginErr.textContent='Kullanıcı adı veya şifre hatalı';
       btn.disabled = false;
       btn.innerHTML = originalText;
       return;
     }
+    
     currentUser=found;
     loginErr.textContent='';
+    
+    // Subscribe to users collection only if user has admin role
+    if (currentUser.r === 'admin') {
+      await setupSnapshot('users', null, null, d => { users = d; });
+    }
     
     // Save session to localStorage for auto login on refresh
     localStorage.setItem('ysr_session', JSON.stringify({ u: found.u, p: hashedP }));
@@ -84,6 +100,7 @@ async function doLogout(){
     await updateUserPresence('offline');
   }
   stopPresenceHeartbeat();
+  if (typeof unsubscribeAll === 'function') unsubscribeAll();
   currentUser=null;items=[];mahals=[];users=[];
   localStorage.removeItem('ysr_session'); // Clear session
   const loginScr = document.getElementById('loginScreen');
@@ -119,16 +136,24 @@ async function manualSaveProfile() {
   
   if (currentUser && currentUser.id) {
     try {
-      await col('users').doc(currentUser.id).update({
+      const updates = {
         name: document.getElementById('prof_name').value.trim(),
         job: document.getElementById('prof_job').value.trim(),
         bio: document.getElementById('prof_bio').value.trim(),
         accent: document.getElementById('prof_accent').value
-      });
-      const snap = await col('users').get();
-      users = snap.docs.map(d=>({id:d.id,...d.data()}));
+      };
+      await col('users').doc(currentUser.id).update(updates);
+      
+      // Update local currentUser state
+      Object.assign(currentUser, updates);
+      
+      // Load users collection only if current user is admin
+      if (currentUser.r === 'admin') {
+        const snap = await col('users').get();
+        users = snap.docs.map(d=>({id:d.id,...d.data()}));
+        if(document.getElementById('page_admin').classList.contains('active')) renderAdminPanel();
+      }
       render();
-      if(document.getElementById('page_admin').classList.contains('active')) renderAdminPanel();
     } catch(e) {
       console.error("Firebase user profile sync failed", e);
     }
@@ -256,8 +281,12 @@ function stopPresenceHeartbeat() {
 
 window.addEventListener('beforeunload', () => {
   if (currentUser && currentUser.id) {
-    col('users').doc(currentUser.id).update({
-      status: 'offline'
-    });
+    try {
+      col('users').doc(currentUser.id).update({
+        status: 'offline'
+      }).catch(err => console.error("beforeunload presence error:", err));
+    } catch (e) {
+      console.error("beforeunload exception:", e);
+    }
   }
 });

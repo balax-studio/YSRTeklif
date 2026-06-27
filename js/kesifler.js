@@ -36,13 +36,13 @@ function renderKesif(){
     const convertBtn = it.durum !== 'Teklife Dönüştü' ? `<button class="btn-quick" style="background:var(--primary); color:#fff; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; font-weight:600; font-size:12px;" onclick="convertToProposal('${it.id}')">Teklife Dönüştür</button>` : '';
     return `<tr>
       <td style="color:var(--text2);font-weight:600">${i+1}</td>
-      <td><span class="mahal-tag">${getMahalName(it.mahalId)}</span></td>
-      <td style="font-weight:700; max-width:220px; white-space:normal; line-height:1.3;">${it.santiye || it.otel || '-'}</td>
-      <td><span class="badge ${CAT_CLS[it.kat]||'b-diger'}">${it.kat||'-'}</span></td>
-      <td>${fmt(it.ktar)}</td>
-      <td style="font-weight:600;">${it.sorumlu||'-'}</td>
-      <td><span class="badge ${statusClass}">${it.durum||'-'}</span></td>
-      <td style="max-width:200px; white-space:normal; font-size:12px; color:var(--text2);">${it.notlar||'-'}</td>
+      <td><span class="mahal-tag">${escapeHTML(getMahalName(it.mahalId))}</span></td>
+      <td style="font-weight:700; max-width:220px; white-space:normal; line-height:1.3;">${escapeHTML(it.santiye || it.otel || '-')}</td>
+      <td><span class="badge ${CAT_CLS[it.kat]||'b-diger'}">${escapeHTML(it.kat||'-')}</span></td>
+      <td>${escapeHTML(fmt(it.ktar))}</td>
+      <td style="font-weight:600;">${escapeHTML(it.sorumlu||'-')}</td>
+      <td><span class="badge ${statusClass}">${escapeHTML(it.durum||'-')}</span></td>
+      <td style="max-width:200px; white-space:normal; font-size:12px; color:var(--text2);">${escapeHTML(it.notlar||'-')}</td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           ${convertBtn}
@@ -60,18 +60,18 @@ function renderKesif(){
       return `<div class="mobile-card">
         <div class="mobile-card-header">
           <div>
-            <div class="mobile-card-title">${it.santiye || it.otel || '-'}</div>
+            <div class="mobile-card-title">${escapeHTML(it.santiye || it.otel || '-')}</div>
             <div class="mobile-card-tags" style="margin-top:6px;">
-              <span class="mahal-tag">${getMahalName(it.mahalId)}</span>
-              <span class="badge ${CAT_CLS[it.kat]||'b-diger'}">${it.kat||'-'}</span>
+              <span class="mahal-tag">${escapeHTML(getMahalName(it.mahalId))}</span>
+              <span class="badge ${CAT_CLS[it.kat]||'b-diger'}">${escapeHTML(it.kat||'-')}</span>
             </div>
           </div>
-          <span class="badge ${statusClass}" style="font-size:11px; padding:4px 8px;">${it.durum||'-'}</span>
+          <span class="badge ${statusClass}" style="font-size:11px; padding:4px 8px;">${escapeHTML(it.durum||'-')}</span>
         </div>
         <div style="display:flex; flex-direction:column; gap:4px; font-size:12px; border-bottom: 1px dashed var(--border); padding-bottom:10px; margin-bottom:10px;">
-          <div><span style="color:var(--text2)">Keşif Tarihi:</span> ${fmt(it.ktar)}</div>
-          <div><span style="color:var(--text2)">Sorumlu Mühendis:</span> ${it.sorumlu||'-'}</div>
-          <div style="margin-top:4px; color:var(--text2); font-style:italic;">${it.notlar||'-'}</div>
+          <div><span style="color:var(--text2)">Keşif Tarihi:</span> ${escapeHTML(fmt(it.ktar))}</div>
+          <div><span style="color:var(--text2)">Sorumlu Mühendis:</span> ${escapeHTML(it.sorumlu||'-')}</div>
+          <div style="margin-top:4px; color:var(--text2); font-style:italic;">${escapeHTML(it.notlar||'-')}</div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div style="display:flex; gap:6px; width: 100%;">
@@ -93,8 +93,8 @@ function openKesifModal(id){
   
   // Populate mahal dropdown
   const sel = document.getElementById('fk_mahal');
-  const sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
-  sel.innerHTML = '<option value="">— işveren seçin —</option>' + sortedMahals.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  const sortedMahals = [...mahals].sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
+  sel.innerHTML = '<option value="">— işveren seçin —</option>' + sortedMahals.map(m=>`<option value="${m.id}">${escapeHTML(m.name)}</option>`).join('');
   
   if (isEdit) {
     const it = surveys.find(x => x.id === id);

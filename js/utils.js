@@ -50,7 +50,7 @@ function getRelativeTime(dateStr) {
     if (diffInDays === 1) return 'Dün';
     if (diffInDays < 7) return `${diffInDays} gün önce`;
   }
-  return '';
+  return date.toLocaleDateString('tr-TR');
 }
 
 function escapeHTML(str) {
@@ -58,8 +58,14 @@ function escapeHTML(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
+function escapeJS(str) {
+  if (!str) return '';
+  return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
 // Expose functions globally
 window.debounce = debounce;
 window.shakeElement = shakeElement;
 window.getRelativeTime = getRelativeTime;
 window.escapeHTML = escapeHTML;
+window.escapeJS = escapeJS;

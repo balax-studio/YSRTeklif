@@ -237,7 +237,7 @@ safeListen('f_bit', 'change', function() {
 });
 
 // Double click to inline edit in table
-document.getElementById('tbody').addEventListener('dblclick', function(e) {
+safeListen('tbody', 'dblclick', function(e) {
   const cell = e.target.closest('.editable-cell');
   if (!cell) return;
   if (cell.classList.contains('editing')) return;
@@ -358,13 +358,26 @@ window.addEventListener('load',()=>{
       try {
         const session = JSON.parse(savedSession);
         await loadAll();
-        const found = users.find(x => x.u === session.u);
+        
+        // Fetch only the specific user document to prevent loading entire collection
+        const userQuery = await col('users').where('u', '==', session.u).get();
+        let found = null;
+        userQuery.forEach(doc => {
+          found = { id: doc.id, ...doc.data() };
+        });
+        
         let isMatch = false;
         if (found) {
           isMatch = (found.p === session.p) || (await sha256(found.p) === session.p);
         }
         if (found && isMatch) {
           currentUser = found;
+          
+          // Subscribe to users collection snapshot only if user has admin role
+          if (currentUser.r === 'admin') {
+            await setupSnapshot('users', null, null, d => { users = d; });
+          }
+          
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('appScreen').style.display = 'flex';
           document.getElementById('appScreen').style.opacity = '1';

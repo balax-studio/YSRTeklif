@@ -44,7 +44,12 @@ function renderLogs() {
   if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Yükleniyor...</td></tr>';
   if (mobList) mobList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text2);">Yükleniyor...</div>';
 
-  db.collection(LOGS_COLLECTION)
+  // Clean up any existing logs listener to prevent memory leaks
+  if (window.activeListeners && typeof window.activeListeners.logs === 'function') {
+    try { window.activeListeners.logs(); } catch(e){}
+  }
+
+  const unsubscribe = db.collection(LOGS_COLLECTION)
     .orderBy('createdAt', 'desc')
     .limit(50)
     .onSnapshot(snapshot => {
@@ -76,12 +81,12 @@ function renderLogs() {
         if (tbody) {
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td><div class="cell-text" style="font-weight:600; color:var(--text);">${dateStr}</div></td>
-            <td><div class="cell-text">${data.user}</div></td>
-            <td><span class="status-badge ${badgeClass}">${actionLabel}</span></td>
+            <td><div class="cell-text" style="font-weight:600; color:var(--text);">${escapeHTML(dateStr)}</div></td>
+            <td><div class="cell-text">${escapeHTML(data.user)}</div></td>
+            <td><span class="status-badge ${badgeClass}">${escapeHTML(actionLabel)}</span></td>
             <td>
-              <div class="cell-text" style="color:var(--text); font-weight:500;">[${data.entity}]</div>
-              <div class="cell-sub" style="margin-top:4px;">${data.details}</div>
+              <div class="cell-text" style="color:var(--text); font-weight:500;">[${escapeHTML(data.entity)}]</div>
+              <div class="cell-sub" style="margin-top:4px;">${escapeHTML(data.details)}</div>
             </td>
           `;
           tbody.appendChild(tr);
@@ -94,14 +99,14 @@ function renderLogs() {
           card.style.gap = '8px';
           card.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:6px;">
-              <span class="status-badge ${badgeClass}" style="font-size:10px; padding:2px 6px;">${actionLabel}</span>
-              <span style="font-size:11px; color:var(--text2); font-weight:600;">${dateStr}</span>
+              <span class="status-badge ${badgeClass}" style="font-size:10px; padding:2px 6px;">${escapeHTML(actionLabel)}</span>
+              <span style="font-size:11px; color:var(--text2); font-weight:600;">${escapeHTML(dateStr)}</span>
             </div>
             <div style="font-size:13px; color:var(--text); font-weight:600;">
-              [${data.entity}] <span style="font-weight:400; color:var(--text2);">${data.user}</span>
+              [${escapeHTML(data.entity)}] <span style="font-weight:400; color:var(--text2);">${escapeHTML(data.user)}</span>
             </div>
             <div style="font-size:12px; color:var(--text2); margin-top:2px;">
-              ${data.details}
+              ${escapeHTML(data.details)}
             </div>
           `;
           mobList.appendChild(card);
@@ -112,4 +117,8 @@ function renderLogs() {
       if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red; padding:20px;">Loglar yüklenirken bir hata oluştu.</td></tr>';
       if (mobList) mobList.innerHTML = '<div style="text-align:center; color:red; padding:20px;">Loglar yüklenirken bir hata oluştu.</div>';
     });
+
+  if (window.activeListeners) {
+    window.activeListeners.logs = unsubscribe;
+  }
 }

@@ -5,14 +5,22 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if true;
-      allow create, update: if request.resource.data.u is string
-                            && request.resource.data.p is string
-                            && (request.resource.data.r == 'admin' || request.resource.data.r == 'user')
-                            && (!('name' in request.resource.data) || request.resource.data.name is string)
-                            && (!('job' in request.resource.data) || request.resource.data.job is string)
-                            && (!('bio' in request.resource.data) || request.resource.data.bio is string)
-                            && (!('accent' in request.resource.data) || request.resource.data.accent is string);
-      allow delete: if true;
+      allow create: if request.resource.data.u is string
+                    && request.resource.data.p is string
+                    && (request.resource.data.r == 'admin' || request.resource.data.r == 'user')
+                    && (!('name' in request.resource.data) || request.resource.data.name is string)
+                    && (!('job' in request.resource.data) || request.resource.data.job is string)
+                    && (!('bio' in request.resource.data) || request.resource.data.bio is string)
+                    && (!('accent' in request.resource.data) || request.resource.data.accent is string);
+      allow update: if request.resource.data.u is string
+                    && request.resource.data.p is string
+                    && (request.resource.data.r == 'admin' || request.resource.data.r == 'user')
+                    && (!('name' in request.resource.data) || request.resource.data.name is string)
+                    && (!('job' in request.resource.data) || request.resource.data.job is string)
+                    && (!('bio' in request.resource.data) || request.resource.data.bio is string)
+                    && (!('accent' in request.resource.data) || request.resource.data.accent is string)
+                    && (resource.data.u != 'admin' || (request.resource.data.u == 'admin' && request.resource.data.r == 'admin'));
+      allow delete: if resource.data.u != 'admin';
     }
 
     match /mahals/{mahalId} {

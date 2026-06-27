@@ -48,12 +48,20 @@ const fmtN=(n,c)=>(!n&&n!==0||n==='')?'-':`${Number(n).toLocaleString('tr-TR')}\
 // ── Firestore helpers ─────────────────────────────────────────
 const col=name=>db.collection(name);
 
+window.activeListeners = {};
+
 function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
   return new Promise((resolve, reject) => {
+    // Unsubscribe existing listener for this collection if active
+    if (window.activeListeners && typeof window.activeListeners[colName] === 'function') {
+      try { window.activeListeners[colName](); } catch(e){}
+    }
+    
     let query = col(colName);
     if (orderByField) query = query.orderBy(orderByField, orderByDir);
     let isFirst = true;
-    query.onSnapshot(snap => {
+    
+    const unsubscribe = query.onSnapshot(snap => {
       const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
       onUpdate(data);
       if (isFirst) {
@@ -84,20 +92,25 @@ function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
       console.error(colName, "snapshot error:", err);
       if (isFirst) reject(err);
     });
+    
+    if (window.activeListeners) {
+      window.activeListeners[colName] = unsubscribe;
+    }
   });
 }
 
 async function loadAll(){
   try {
     await Promise.all([
-      setupSnapshot('users', null, null, d => { users = d; }),
       setupSnapshot('mahals', 'name', 'asc', d => { mahals = d; }),
       setupSnapshot('items', 'createdAt', 'desc', d => { items = d; }),
       setupSnapshot('surveys', null, null, d => { surveys = d; }),
       setupSnapshot('reports', null, null, d => { reports = d; })
     ]);
     
-    if(!users.length){
+    // Check and seed default users if empty
+    const usersSnap = await col('users').limit(1).get();
+    if (usersSnap.empty) {
       const passAdmin = await sha256('ysr2024');
       const passUser = await sha256('ysr123');
       await col('users').add({u:'admin',p:passAdmin,r:'admin',status:'offline'});

@@ -3,7 +3,7 @@ function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: ''
   const container = document.getElementById('reportUnitsContainer');
   if (!container) return;
   
-  const sortedMahals = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+  const sortedMahals = [...mahals].sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
   const optionsHtml = sortedMahals.map(m=>`<option value="${m.id}" ${values.mahalId === m.id ? 'selected' : ''}>${escapeHTML(m.name)}</option>`).join('');
   
   const div = document.createElement('div');
@@ -27,22 +27,22 @@ function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: ''
       <div class="grid-2-col" style="display:grid; gap: 12px;">
         <div>
           <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Birim / Bölüm Adı</label>
-          <input type="text" class="unit-name" placeholder="Örn: Asma Tavan, Elektrik" value="${values.birimAdi || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
+          <input type="text" class="unit-name" placeholder="Örn: Asma Tavan, Elektrik" value="${escapeHTML(values.birimAdi || '')}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
         </div>
         <div>
           <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Çalışan Ekip / Sayısı</label>
-          <input type="text" class="unit-crew" placeholder="Örn: 3 Usta, 2 Yardımcı" value="${values.ekip || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
+          <input type="text" class="unit-crew" placeholder="Örn: 3 Usta, 2 Yardımcı" value="${escapeHTML(values.ekip || '')}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
         </div>
       </div>
     </div>
     <div class="grid-2-col" style="display:grid; gap: 12px;">
       <div>
         <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Yapılan Faaliyetler</label>
-        <textarea class="unit-activity" placeholder="Örn: 2. kat kablolama tamamlandı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${values.faaliyet || ''}</textarea>
+        <textarea class="unit-activity" placeholder="Örn: 2. kat kablolama tamamlandı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${escapeHTML(values.faaliyet || '')}</textarea>
       </div>
       <div>
         <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Kullanılan / Gelen Malzeme</label>
-        <textarea class="unit-material" placeholder="Örn: 100m kablo kullanıldı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${values.malzeme || ''}</textarea>
+        <textarea class="unit-material" placeholder="Örn: 100m kablo kullanıldı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${escapeHTML(values.malzeme || '')}</textarea>
       </div>
     </div>
   `;
@@ -445,6 +445,7 @@ function downloadReportPDFDirect(id) {
   const oldWeather = document.getElementById('rep_weather').value;
   const oldSantiye = document.getElementById('rep_santiye').value;
   const oldNotes = document.getElementById('rep_notes').value;
+  const oldMahal = document.getElementById('rep_mahal') ? document.getElementById('rep_mahal').value : '';
   
   const container = document.getElementById('reportUnitsContainer');
   const currentUnitsHTML = container ? container.innerHTML : '';
@@ -453,6 +454,9 @@ function downloadReportPDFDirect(id) {
   document.getElementById('rep_weather').value = r.hava || '';
   document.getElementById('rep_santiye').value = r.santiye || '';
   document.getElementById('rep_notes').value = r.notes || '';
+  if (document.getElementById('rep_mahal')) {
+    document.getElementById('rep_mahal').value = r.mahalId || '';
+  }
   
   if (container) {
     container.innerHTML = '';
@@ -461,10 +465,11 @@ function downloadReportPDFDirect(id) {
         const div = document.createElement('div');
         div.className = 'unit-row-card';
         div.innerHTML = `
-          <input type="text" class="unit-name" value="${u.birimAdi || ''}">
-          <input type="text" class="unit-crew" value="${u.ekip || ''}">
-          <textarea class="unit-activity">${u.faaliyet || ''}</textarea>
-          <textarea class="unit-material">${u.malzeme || ''}</textarea>
+          <input type="hidden" class="unit-mahal" value="${escapeHTML(u.mahalId || '')}">
+          <input type="text" class="unit-name" value="${escapeHTML(u.birimAdi || '')}">
+          <input type="text" class="unit-crew" value="${escapeHTML(u.ekip || '')}">
+          <textarea class="unit-activity">${escapeHTML(u.faaliyet || '')}</textarea>
+          <textarea class="unit-material">${escapeHTML(u.malzeme || '')}</textarea>
         `;
         container.appendChild(div);
       });
@@ -488,12 +493,18 @@ function downloadReportPDFDirect(id) {
   };
   
   html2pdf().set(opt).from(element).save().then(() => {
-    document.getElementById('rep_date').value = oldDate;
-    document.getElementById('rep_weather').value = oldWeather;
-    document.getElementById('rep_mahalId').value = oldMahal;
-    document.getElementById('rep_santiye').value = oldSantiye;
-    document.getElementById('rep_notes').value = oldNotes;
-    if (container) container.innerHTML = currentUnitsHTML;
-    updateReportPreview();
+    try {
+      document.getElementById('rep_date').value = oldDate;
+      document.getElementById('rep_weather').value = oldWeather;
+      document.getElementById('rep_santiye').value = oldSantiye;
+      document.getElementById('rep_notes').value = oldNotes;
+      if (document.getElementById('rep_mahal')) {
+        document.getElementById('rep_mahal').value = oldMahal;
+      }
+      if (container) container.innerHTML = currentUnitsHTML;
+      updateReportPreview();
+    } catch (e) {
+      console.error("PDF restore error:", e);
+    }
   });
 }
