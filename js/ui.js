@@ -910,7 +910,7 @@ function render(){
 
     const prog = getProgressData(it.durum);
     return`<tr class="${od?'overdue':''}">
-      <td style="color:var(--text2);font-weight:600">${i+1}</td>
+      <td style="color:var(--text2);font-weight:600;cursor:pointer;text-align:center;background:var(--primary-color-faded);border-radius:4px;" onclick="toggleDesktopAccordion(event, '${it.id}')" title="Detayları Göster">${i+1}</td>
       <td class="editable-cell" data-id="${it.id}" data-field="otel" title="Çift tıklayıp şantiye adını düzenleyin">
         <div class="cell-text" style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px">${escapedDisplayName}${fileAttachmentLink}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -954,6 +954,31 @@ function render(){
           <button class="btn-quick" style="background:#475569;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px" onclick="generatePDF('${it.id}')" title="PDF İndir">${pdfIcon}</button>
           <button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="openModal('${it.id}')" aria-label="${escapedDisplayName} düzenle">${editIcon}</button>
           <button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="delItem('${it.id}')" aria-label="${escapedDisplayName} sil">${delIcon}</button>
+        </div>
+      </td>
+    </tr>
+    <tr id="desktop-accordion-${it.id}" class="desktop-accordion-row" style="display:none; background:var(--bg2);">
+      <td colspan="8" style="padding:12px 16px;">
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+            <div style="background:var(--card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:10px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Mahal Detayı</div>
+              <div style="font-size:13px; font-weight:600; color:var(--text);">${escapeHTML(getMahalName(it.mahalId))} (${escapeHTML(it.kat || '-')})</div>
+            </div>
+            <div style="background:var(--card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:10px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Teklif Detayları</div>
+              <div style="font-size:13px; font-weight:600; color:var(--text);">Tutar: ${fmtN(it.ttut, it.cur)} (${fmt(it.ttar)})</div>
+            </div>
+            <div style="background:var(--card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:10px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Onay &amp; Fatura</div>
+              <div style="font-size:13px; font-weight:600; color:var(--text);">Onay: ${fmtN(it.otut, it.cur)} / Fatura: ${fmtN(it.ftut, it.cur)}</div>
+            </div>
+            <div style="background:var(--card); padding:12px; border-radius:8px; border:1px solid var(--border);">
+              <div style="font-size:10px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Zaman Akışı</div>
+              <div style="font-size:12px; color:var(--text2);">Bas: ${fmt(it.bas)} - Bit: ${fmt(it.bit)}</div>
+            </div>
+          </div>
+          ${it.note ? `<div style="background:var(--card); padding:12px; border-radius:8px; border:1px solid var(--border); font-size:12px; color:var(--text2);"><strong>Not:</strong> ${escapeHTML(it.note)}</div>` : ''}
         </div>
       </td>
     </tr>`;
@@ -2349,5 +2374,22 @@ window.drop = async function(ev) {
     }
     // Optimistic render
     render();
+  }
+};
+
+window.toggleDesktopAccordion = function(event, id) {
+  if (event) event.stopPropagation();
+  const el = document.getElementById('desktop-accordion-' + id);
+  if (el) {
+    if (el.style.display === 'none') {
+      el.style.display = 'table-row';
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.style.transition = 'opacity 0.25s ease';
+        el.style.opacity = '1';
+      }, 10);
+    } else {
+      el.style.display = 'none';
+    }
   }
 };

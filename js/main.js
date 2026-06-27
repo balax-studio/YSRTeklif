@@ -501,11 +501,13 @@ function updateCalmUIBtnState(isCalm) {
   const btn = document.getElementById('calmToggleBtn');
   if (btn) {
     if (isCalm) {
-      btn.style.color = 'var(--primary)';
-      btn.style.background = 'rgba(var(--primary-rgb), 0.1)';
+      btn.style.color = '#ffffff';
+      btn.style.background = 'var(--primary)';
+      btn.style.borderColor = 'var(--primary)';
     } else {
       btn.style.color = '';
       btn.style.background = '';
+      btn.style.borderColor = '';
     }
   }
 }
