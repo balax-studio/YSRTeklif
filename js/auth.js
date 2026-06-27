@@ -15,7 +15,7 @@ async function doLogin(){
   if (!window.FIREBASE_CONFIG || !db || !storage) {
     const detail = window.FIREBASE_INIT_ERROR || "Firebase kütüphanesi veya depolama alanı başlatılamadı. SDK yükleme veya erişim kısıtlaması olabilir.";
     setTimeout(() => {
-      loginErr.innerHTML = `⚠️ Bağlantı Başarısız!<br><span style="font-size:11px; font-weight:500; color:var(--text2)">Hata Detayı: ${detail}</span>`;
+      loginErr.innerHTML = `<span style="display:inline-flex; align-items:center; gap:6px; color:var(--red); font-weight:600;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Bağlantı Başarısız!</span><br><span style="font-size:11px; font-weight:500; color:var(--text2)">Hata Detayı: ${detail}</span>`;
       btn.disabled = false;
       btn.innerHTML = originalText;
     }, 600);
@@ -36,7 +36,7 @@ async function doLogin(){
     loginErr.textContent='';
     
     // Save session to localStorage for auto login on refresh
-    localStorage.setItem('ysr_session', JSON.stringify({ u: found.u, p: found.p }));
+    localStorage.setItem('ysr_session', JSON.stringify({ u: found.u, p: hashedP }));
     
     // Smooth transition from login to app dashboard
     const loginScr = document.getElementById('loginScreen');

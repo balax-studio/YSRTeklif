@@ -177,6 +177,32 @@ async function saveKesif(){
       return;
     }
     
+    let expectedKat = 'İnşaat';
+    if (currentUser) {
+      const raw = localStorage.getItem('profile_' + currentUser.u);
+      if (raw) {
+        const profile = JSON.parse(raw);
+        const job = (profile.job || '').toLowerCase();
+        if (job.includes('makine') || job.includes('mekanik')) expectedKat = 'Mekanik';
+        else if (job.includes('elektrik')) expectedKat = 'Elektrik';
+        else if (job.includes('inşaat') || job.includes('mimar')) expectedKat = 'İnşaat';
+        else if (job) expectedKat = 'Diğer';
+      }
+    }
+    
+    if (kat !== expectedKat && !window.kesifKatConfirmed) {
+      btn.disabled = false;
+      btn.textContent = editKesifId ? 'Güncelle' : 'Kaydet';
+      if (typeof showAlertModal === 'function') {
+        showAlertModal(`Seçtiğiniz kategori (${kat}), profilinizle eşleşen standart birim ile (${expectedKat}) uyuşmuyor. Yine de kaydetmek istiyor musunuz?`, () => {
+          window.kesifKatConfirmed = true;
+          saveKesif();
+        });
+        return;
+      }
+    }
+    window.kesifKatConfirmed = false;
+    
     const data = {
       mahalId,
       otel,

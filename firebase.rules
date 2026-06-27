@@ -2,10 +2,77 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to all documents for now.
-    // TODO: Refine rules for production.
-    match /{document=**} {
-      allow read, write: if true;
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.u is string
+                            && request.resource.data.p is string
+                            && (request.resource.data.r == 'admin' || request.resource.data.r == 'user')
+                            && (!('name' in request.resource.data) || request.resource.data.name is string)
+                            && (!('job' in request.resource.data) || request.resource.data.job is string)
+                            && (!('bio' in request.resource.data) || request.resource.data.bio is string)
+                            && (!('accent' in request.resource.data) || request.resource.data.accent is string);
+      allow delete: if true;
+    }
+
+    match /mahals/{mahalId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.name is string 
+                            && request.resource.data.name.trim().size() > 0;
+      allow delete: if true;
+    }
+
+    match /items/{itemId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.mahalId is string
+                            && request.resource.data.otel is string
+                            && request.resource.data.kat is string
+                            && request.resource.data.durum is string
+                            && request.resource.data.ttar is string
+                            && request.resource.data.ttut is string
+                            && request.resource.data.cur is string
+                            && request.resource.data.otar is string
+                            && request.resource.data.otut is string
+                            && request.resource.data.bas is string
+                            && request.resource.data.bit is string
+                            && request.resource.data.htut is string
+                            && request.resource.data.fno is string
+                            && request.resource.data.ftut is string
+                            && request.resource.data.ftar is string
+                            && request.resource.data.fileUrl is string
+                            && request.resource.data.fileName is string
+                            && request.resource.data.lastEditedBy is string
+                            && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is timestamp || request.resource.data.createdAt == null);
+      allow delete: if true;
+    }
+
+    match /surveys/{surveyId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.mahalId is string
+                            && request.resource.data.otel is string
+                            && request.resource.data.kat is string
+                            && request.resource.data.durum is string
+                            && request.resource.data.ktar is string
+                            && request.resource.data.sorumlu is string
+                            && request.resource.data.notlar is string
+                            && request.resource.data.lastEditedBy is string
+                            && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is timestamp || request.resource.data.createdAt == null);
+      allow delete: if true;
+    }
+
+    match /reports/{reportId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.tarih is string
+                            && request.resource.data.hava is string
+                            && request.resource.data.mahalId is string
+                            && request.resource.data.mahalIds is list
+                            && request.resource.data.santiye is string
+                            && request.resource.data.notes is string
+                            && request.resource.data.birimler is list
+                            && request.resource.data.yazan is string
+                            && request.resource.data.yazanUnvan is string
+                            && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is timestamp || request.resource.data.createdAt == null);
+      allow delete: if true;
     }
   }
 }

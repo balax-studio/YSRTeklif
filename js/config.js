@@ -33,33 +33,38 @@ const fmt=d=>{
   const[y,m,dd]=pts;
   return `${dd}.${m}.${y}`;
 };
-const fmtN=(n,c)=>(!n&&n!==0||n==='')?'-':`${Number(n).toLocaleString('tr-TR')} ${c||''}`;
+const fmtN=(n,c)=>(!n&&n!==0||n==='')?'-':`${Number(n).toLocaleString('tr-TR')}\u00A0${c||''}`;
 
 // ── Firestore helpers ─────────────────────────────────────────
 const col=name=>db.collection(name);
 
 async function loadAll(){
-  const [uSnap,mSnap,iSnap,sSnap,rSnap]=await Promise.all([
-    col('users').get(),
-    col('mahals').orderBy('name').get(),
-    col('items').orderBy('createdAt','desc').get(),
-    col('surveys').get(),
-    col('reports').get()
-  ]);
-  users=uSnap.docs.map(d=>({id:d.id,...d.data()}));
-  
-  if(!users.length){
-    const passAdmin = await sha256('ysr2024');
-    const passUser = await sha256('ysr123');
-    await col('users').add({u:'admin',p:passAdmin,r:'admin'});
-    await col('users').add({u:'ysr',p:passUser,r:'user'});
-    const snap2=await col('users').get();
-    users=snap2.docs.map(d=>({id:d.id,...d.data()}));
+  try {
+    const [uSnap,mSnap,iSnap,sSnap,rSnap]=await Promise.all([
+      col('users').get(),
+      col('mahals').orderBy('name').get(),
+      col('items').orderBy('createdAt','desc').get(),
+      col('surveys').get(),
+      col('reports').get()
+    ]);
+    users=uSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    if(!users.length){
+      const passAdmin = await sha256('ysr2024');
+      const passUser = await sha256('ysr123');
+      await col('users').add({u:'admin',p:passAdmin,r:'admin'});
+      await col('users').add({u:'ysr',p:passUser,r:'user'});
+      const snap2=await col('users').get();
+      users=snap2.docs.map(d=>({id:d.id,...d.data()}));
+    }
+    mahals=mSnap.docs.map(d=>({id:d.id,...d.data()}));
+    items=iSnap.docs.map(d=>({id:d.id,...d.data()}));
+    surveys=sSnap.docs.map(d=>({id:d.id,...d.data()}));
+    reports=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch (e) {
+    console.error("loadAll error:", e);
+    throw e;
   }
-  mahals=mSnap.docs.map(d=>({id:d.id,...d.data()}));
-  items=iSnap.docs.map(d=>({id:d.id,...d.data()}));
-  surveys=sSnap.docs.map(d=>({id:d.id,...d.data()}));
-  reports=rSnap.docs.map(d=>({id:d.id,...d.data()}));
 }
 
 // ── SHA-256 Hashing for Secure Passwords ──────────────────────

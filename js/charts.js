@@ -39,7 +39,7 @@ function renderCharts() {
       return `
         <div class="stat-lbl" style="transition: opacity 0.3s ease;">${curLabelsApproved[cur]}</div>
         <div class="stat-val" style="transition: opacity 0.3s ease; color:var(--green);">
-          <span>${approvedSums[cur].toLocaleString('tr-TR')} ${cur}</span>
+          <span>${approvedSums[cur].toLocaleString('tr-TR')}\u00A0${cur}</span>
         </div>`;
     };
 
@@ -48,7 +48,7 @@ function renderCharts() {
       return `
         <div class="stat-lbl" style="transition: opacity 0.3s ease;">${curLabelsActive[cur]}</div>
         <div class="stat-val" style="transition: opacity 0.3s ease; color:var(--blue);">
-          <span>${activeSums[cur].toLocaleString('tr-TR')} ${cur}</span>
+          <span>${activeSums[cur].toLocaleString('tr-TR')}\u00A0${cur}</span>
         </div>`;
     };
 

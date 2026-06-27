@@ -1,13 +1,41 @@
 // ── PREMIUM 2026 UX/UI MICRO-DETAILS ─────────────────────────
-// Dynamic Radial-Gradient Card Reflection Glow Tracking
+// Utility: Debounce function for optimizations
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+// Global debounced rendering functions
+const debouncedRender = debounce(() => { if(typeof render === 'function') render(); }, 300);
+const debouncedRenderKesif = debounce(() => { if(typeof renderKesif === 'function') renderKesif(); }, 300);
+const debouncedRenderReports = debounce(() => { if(typeof renderReports === 'function') renderReports(); }, 300);
+window.debouncedRender = debouncedRender;
+window.debouncedRenderKesif = debouncedRenderKesif;
+window.debouncedRenderReports = debouncedRenderReports;
+
+// Dynamic Radial-Gradient Card Reflection Glow Tracking (Optimized with requestAnimationFrame)
+let isTickingMouse = false;
 document.addEventListener('mousemove', e => {
-  const card = e.target.closest('.stat-card, .chart-card, .panel-card');
-  if (card) {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
+  if (!isTickingMouse) {
+    window.requestAnimationFrame(() => {
+      const card = e.target.closest('.stat-card, .chart-card, .panel-card');
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      }
+      isTickingMouse = false;
+    });
+    isTickingMouse = true;
   }
 });
 
@@ -25,16 +53,19 @@ const getDynamicDateBadge = (bas, bit, durum) => {
   const diffTime = bitDate - todayDate;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
+  const clockIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:3px"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+  const hourglassIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:3px"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>`;
+
   if (diffDays < 0) {
-    return `<span class="badge b-3" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">🕒 Gecikti</span>`;
+    return `<span class="badge b-3" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">${clockIcon}Gecikti</span>`;
   } else if (diffDays === 0) {
-    return `<span class="badge b-1" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;animation:calmHeartbeat 1.5s infinite;">⏳ Son 24 Saat</span>`;
+    return `<span class="badge b-1" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;animation:calmHeartbeat 1.5s infinite;">${hourglassIcon}Son 24 Saat</span>`;
   } else if (diffDays === 1) {
-    return `<span class="badge b-1" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">⏳ Son 1 Gün</span>`;
+    return `<span class="badge b-1" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">${hourglassIcon}Son 1 Gün</span>`;
   } else if (diffDays <= 7) {
-    return `<span class="badge b-1" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">⏳ Son ${diffDays} Gün</span>`;
+    return `<span class="badge b-1" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">${hourglassIcon}Son ${diffDays} Gün</span>`;
   } else {
-    return `<span class="badge b-4" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">🕒 Kalan Gün: ${diffDays}</span>`;
+    return `<span class="badge b-4" style="padding:2px 8px;font-size:10px;margin-top:4px;display:inline-flex;">${clockIcon}Kalan Gün: ${diffDays}</span>`;
   }
 };
 
@@ -102,6 +133,36 @@ function triggerConfetti(x, y) {
   }
   
   animate();
+}
+
+// ── UYARI MODALI ──────────────────────────────────────────────
+let activeAlertCallback = null;
+
+function showAlertModal(message, onConfirm) {
+  document.getElementById('alertModalMessage').textContent = message;
+  const bg = document.getElementById('alertModalBg');
+  bg.classList.add('active');
+  
+  activeAlertCallback = onConfirm;
+  
+  const confirmBtn = document.getElementById('alertBtnConfirm');
+  
+  // Create a new fresh copy of the button to remove old event listeners
+  const newConfirmBtn = confirmBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+  
+  newConfirmBtn.addEventListener('click', () => {
+    closeAlertModal();
+    if (activeAlertCallback) {
+      activeAlertCallback();
+      activeAlertCallback = null;
+    }
+  });
+}
+
+function closeAlertModal() {
+  document.getElementById('alertModalBg').classList.remove('active');
+  activeAlertCallback = null;
 }
 
 // ── Tabs ──────────────────────────────────────────────────────
@@ -303,9 +364,10 @@ async function delMahal(id,name){
 
 // ── Kullanıcılar ──────────────────────────────────────────────
 async function renderAdminPanel(){
-  const snap=await col('users').get();
-  users=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const tb=document.getElementById('userTbody');
+  try {
+    const tb=document.getElementById('userTbody');
+    if(!tb) return;
+
   
   tb.innerHTML=users.map(u=>{
     let name = u.name || "—";
@@ -338,6 +400,10 @@ async function renderAdminPanel(){
       </td>
     </tr>`;
   }).join('');
+  } catch(e) {
+    console.error("renderAdminPanel error:", e);
+    showToast("Kullanıcılar yüklenirken hata oluştu.", "error");
+  }
 }
 
 function openUserEditModal(id){
@@ -402,6 +468,17 @@ async function saveUserEdit(){
     }
     
     await col('users').doc(editUserId).update(updates);
+    
+    // Update local users array to prevent redundant fetches
+    Object.assign(it, updates);
+    if (it.u === currentUser.u) {
+      Object.assign(currentUser, updates);
+      if (updates.name || updates.job) {
+        document.getElementById('profNameTitle').textContent = currentUser.name || currentUser.u;
+        document.getElementById('profRoleTitle').textContent = currentUser.job || currentUser.r;
+      }
+    }
+    
     showToast("Kullanıcı başarıyla güncellendi.");
     closeUserEditModal();
     renderAdminPanel();
@@ -417,12 +494,12 @@ async function addUser(){
   const err=document.getElementById('uErr');
   if(!un||!up){err.textContent='Ad ve şifre gerekli';return;}
   try{
-    const snap=await col('users').get();
-    const existing=snap.docs.find(d=>d.data().u===un);
+    const existing=users.find(d=>d.u===un);
     if(existing){err.textContent='Bu kullanıcı zaten var';return;}
     
     const securePassword = await sha256(up);
-    await col('users').add({u:un,p:securePassword,r:ur});
+    const docRef = await col('users').add({u:un,p:securePassword,r:ur});
+    users.push({id: docRef.id, u:un, p:securePassword, r:ur});
     err.textContent='';document.getElementById('nu').value='';document.getElementById('np').value='';
     renderAdminPanel();
   }catch(e){err.textContent='Kullanıcı eklenirken hata: ' + e.message;}
@@ -432,6 +509,7 @@ async function delUser(id,un){
   if(!ok)return;
   try{
     await col('users').doc(id).delete();
+    users = users.filter(x => x.id !== id);
     showToast('Kullanıcı başarıyla silindi.');
     renderAdminPanel();
   }catch(e){showToast('Kullanıcı silinirken hata: ' + e.message, 'error');}
@@ -469,14 +547,16 @@ function updateSortHeadersUI() {
   document.querySelectorAll('th.sortable').forEach(th => {
     th.classList.remove('asc', 'desc');
     const icon = th.querySelector('.sort-icon');
-    if (icon) icon.textContent = '↕';
+    if (icon) icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15l5 5 5-5"/><path d="M7 9l5-5 5 5"/></svg>';
   });
   
   const activeTh = document.getElementById('h_' + sortKey);
   if (activeTh) {
     activeTh.classList.add(sortDir);
     const icon = activeTh.querySelector('.sort-icon');
-    if (icon) icon.textContent = sortDir === 'asc' ? '▲' : '▼';
+    if (icon) icon.innerHTML = sortDir === 'asc' 
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>' 
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
   }
 }
 
@@ -606,15 +686,15 @@ function render(){
       <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
       <td class="editable-cell" data-id="${it.id}" data-field="ttut" title="Çift tıklayıp teklif tutarını düzenleyin">
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
-        <div class="cell-text" style="font-weight:700">${fmtN(it.ttut,it.cur)}</div>
+        <div class="cell-text" style="font-weight:700;">${fmtN(it.ttut,it.cur)}</div>
       </td>
       <td class="editable-cell" data-id="${it.id}" data-field="otut" title="Çift tıklayıp onay tutarını düzenleyin">
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${it.durum === 'Faturalandı' ? 'Fat: ' + (it.fno || fmt(it.ftar)) : fmt(it.otar)}</div>
-        <div class="cell-text" style="font-weight:700">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut,it.cur)}</div>
+        <div class="cell-text" style="font-weight:700;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut,it.cur)}</div>
       </td>
       <td>
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
-        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti">⚠️</span>':''}</div>
+        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
         <div style="margin-bottom:4px;">${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
         ${it.htut ? `<div style="font-size:12px;margin-bottom:4px;color:var(--purple);font-weight:700;"><span style="color:var(--text2)">Hak:</span> ${fmtN(it.htut, it.cur)}</div>` : ''}
         <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
@@ -744,7 +824,7 @@ function updateStats(){
     return `
       <div class="stat-lbl" style="transition: opacity 0.3s ease;">${prefix} ${cur}</div>
       <div class="stat-val" style="transition: opacity 0.3s ease;">
-        <span>${curMap[cur].toLocaleString('tr-TR')} ${cur}</span>
+        <span>${curMap[cur].toLocaleString('tr-TR')}\u00A0${cur}</span>
       </div>`;
   };
 
@@ -1223,7 +1303,15 @@ async function quickAddSave() {
 async function delItem(id){
   const ok = await showConfirm('Teklifi Sil', 'Bu teklifi silmek istediğinize emin misiniz?', true);
   if(!ok)return;
+  const it = items.find(x => x.id === id);
   try{
+    if (it && it.fileUrl) {
+      try {
+        await storage.refFromURL(it.fileUrl).delete();
+      } catch (storageErr) {
+        console.error("Storage file deletion error (ignored):", storageErr);
+      }
+    }
     await col('items').doc(id).delete();
     items=items.filter(x=>x.id!==id);
     showToast('Teklif başarıyla silindi.');
@@ -1708,15 +1796,15 @@ function showStatDetails(type) {
       <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
       <td>
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
-        <div style="font-weight:700">${fmtN(it.ttut,it.cur)}</div>
+        <div style="font-weight:700;">${fmtN(it.ttut,it.cur)}</div>
       </td>
       <td>
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.otar)}</div>
-        <div style="font-weight:700">${fmtN(it.otut,it.cur)}</div>
+        <div style="font-weight:700;">${fmtN(it.otut,it.cur)}</div>
       </td>
       <td>
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
-        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti">⚠️</span>':''}</div>
+        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
         <div>${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
         <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
       </td>

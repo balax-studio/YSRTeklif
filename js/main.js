@@ -31,10 +31,6 @@ function initTheme() {
 
 // ── Extreme Visual Feast & Energy Mode Engine ──────────────────
 let energyMode = 'enabled'; // 'enabled' (Optimization ON) or 'disabled' (Extreme ON)
-let particleAnimationId = null;
-const extremeCanvas = document.getElementById('extremeCanvas');
-const ctx = extremeCanvas ? extremeCanvas.getContext('2d') : null;
-let particles = [];
 const mouse = { x: null, y: null, radius: 150 };
 
 function initEnergyMode() {
@@ -49,7 +45,7 @@ function initEnergyMode() {
       btn.classList.remove('eco-mode-btn');
       btn.title = 'Görsel Şölen Modu (Kapatmak için tıklayın)';
     }
-    startParticles();
+    initAuroraEffect();
     bindExtremeEvents();
   } else {
     document.body.classList.remove('extreme-active');
@@ -58,7 +54,7 @@ function initEnergyMode() {
       btn.classList.remove('extreme-mode-btn');
       btn.title = 'Optimizasyon Modu (Açmak için tıklayın)';
     }
-    stopParticles();
+    stopAuroraEffect();
     unbindExtremeEvents();
   }
 }
@@ -75,103 +71,59 @@ function toggleEnergyMode() {
   initEnergyMode();
 }
 
-// Particles Class & Engine
-class Particle {
-  constructor(w, h) {
-    this.x = Math.random() * w;
-    this.y = Math.random() * h;
-    this.vx = (Math.random() - 0.5) * 1.2;
-    this.vy = (Math.random() - 0.5) * 1.2;
-    this.radius = Math.random() * 3 + 1;
-    this.color = document.documentElement.getAttribute('data-theme') === 'dark' ? 
-      `rgba(99, 102, 241, ${Math.random() * 0.4 + 0.1})` : 
-      `rgba(79, 70, 229, ${Math.random() * 0.2 + 0.05})`;
-  }
-  update(w, h) {
-    this.x += this.vx;
-    this.y += this.vy;
-    if (this.x < 0 || this.x > w) this.vx *= -1;
-    if (this.y < 0 || this.y > h) this.vy *= -1;
+// Ambient Aurora Glassmorphism Engine
+let auroraAnimationId = null;
+let currentAuroraX = window.innerWidth / 2;
+let currentAuroraY = window.innerHeight / 2;
 
-    // Interactive mouse repulsion
-    if (mouse.x !== null && mouse.y !== null) {
-      let dx = mouse.x - this.x;
-      let dy = mouse.y - this.y;
-      let dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < mouse.radius) {
-        let force = (mouse.radius - dist) / mouse.radius;
-        this.x -= dx / dist * force * 3;
-        this.y -= dy / dist * force * 3;
-      }
-    }
-  }
-  draw(c) {
-    c.beginPath();
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    c.fillStyle = this.color;
-    c.fill();
-  }
-}
-
-function resizeCanvas() {
-  if (!extremeCanvas) return;
-  extremeCanvas.width = window.innerWidth;
-  extremeCanvas.height = window.innerHeight;
-}
-
-function animateParticles() {
-  if (!ctx || !extremeCanvas) return;
-  const w = extremeCanvas.width;
-  const h = extremeCanvas.height;
-  ctx.clearRect(0, 0, w, h);
-
-  // Drawing and connecting nodes
-  for (let i = 0; i < particles.length; i++) {
-    particles[i].update(w, h);
-    particles[i].draw(ctx);
+function initAuroraEffect() {
+  let container = document.getElementById('auroraContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'auroraContainer';
+    container.className = 'aurora-container';
     
-    // Draw lines between close particles for digital neural network effect
-    for (let j = i + 1; j < particles.length; j++) {
-      let dx = particles[i].x - particles[j].x;
-      let dy = particles[i].y - particles[j].y;
-      let dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 100) {
-        let alpha = (100 - dist) / 100 * 0.15;
-        ctx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? 
-          `rgba(167, 139, 250, ${alpha})` : 
-          `rgba(99, 102, 241, ${alpha})`;
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.stroke();
-      }
-    }
+    const orb1 = document.createElement('div');
+    orb1.className = 'aurora-orb orb-1';
+    
+    const orb2 = document.createElement('div');
+    orb2.className = 'aurora-orb orb-2';
+    
+    container.appendChild(orb1);
+    container.appendChild(orb2);
+    // Put it at the very bottom
+    document.body.prepend(container);
   }
-  particleAnimationId = requestAnimationFrame(animateParticles);
+  container.style.display = 'block';
+  
+  if (auroraAnimationId) cancelAnimationFrame(auroraAnimationId);
+  auroraLoop();
 }
 
-function startParticles() {
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-  particles = [];
-  const count = Math.min(100, Math.floor((window.innerWidth * window.innerHeight) / 15000));
-  for (let i = 0; i < count; i++) {
-    particles.push(new Particle(extremeCanvas.width, extremeCanvas.height));
+function stopAuroraEffect() {
+  const container = document.getElementById('auroraContainer');
+  if (container) {
+    container.style.display = 'none';
   }
-  if (particleAnimationId) cancelAnimationFrame(particleAnimationId);
-  animateParticles();
+  if (auroraAnimationId) {
+    cancelAnimationFrame(auroraAnimationId);
+    auroraAnimationId = null;
+  }
 }
 
-function stopParticles() {
-  window.removeEventListener('resize', resizeCanvas);
-  if (particleAnimationId) {
-    cancelAnimationFrame(particleAnimationId);
-    particleAnimationId = null;
+function auroraLoop() {
+  if (mouse.x !== null && mouse.y !== null) {
+    currentAuroraX += (mouse.x - currentAuroraX) * 0.04;
+    currentAuroraY += (mouse.y - currentAuroraY) * 0.04;
   }
-  if (ctx && extremeCanvas) {
-    ctx.clearRect(0, 0, extremeCanvas.width, extremeCanvas.height);
+  
+  const container = document.getElementById('auroraContainer');
+  if (container) {
+    container.style.setProperty('--aurora-x', `${currentAuroraX}px`);
+    container.style.setProperty('--aurora-y', `${currentAuroraY}px`);
   }
+  
+  auroraAnimationId = requestAnimationFrame(auroraLoop);
 }
 
 // mousemove events for custom trail & 3D tilt
@@ -192,9 +144,22 @@ function extremeMouseLeave() {
   mouse.y = null;
 }
 
-function cardTiltMove(e) {
+let activeTiltCard = null;
+
+function documentTiltMove(e) {
   if (energyMode === 'enabled') return;
-  const card = e.currentTarget;
+  const card = e.target.closest('.stat-card, .chart-card, .panel-card');
+  
+  if (!card) {
+    if (activeTiltCard) {
+      activeTiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      activeTiltCard.style.boxShadow = '';
+      activeTiltCard = null;
+    }
+    return;
+  }
+  
+  activeTiltCard = card;
   const rect = card.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
@@ -209,37 +174,22 @@ function cardTiltMove(e) {
   card.style.boxShadow = `0 20px 40px rgba(99, 102, 241, 0.3), 0 0 30px rgba(167, 139, 250, 0.2)`;
 }
 
-function cardTiltLeave(e) {
-  const card = e.currentTarget;
-  card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-  card.style.boxShadow = '';
-}
-
 function bindExtremeEvents() {
   window.addEventListener('mousemove', extremeMouseMove);
   window.addEventListener('mouseleave', extremeMouseLeave);
-  
-  // Select cards dynamically and bind hover 3D effects
-  setTimeout(() => {
-    const cards = document.querySelectorAll('.stat-card, .chart-card, .panel-card');
-    cards.forEach(card => {
-      card.addEventListener('mousemove', cardTiltMove);
-      card.addEventListener('mouseleave', cardTiltLeave);
-    });
-  }, 1000); // Wait slightly for DOM loading
+  document.addEventListener('mousemove', documentTiltMove);
 }
 
 function unbindExtremeEvents() {
   window.removeEventListener('mousemove', extremeMouseMove);
   window.removeEventListener('mouseleave', extremeMouseLeave);
+  document.removeEventListener('mousemove', documentTiltMove);
   
-  const cards = document.querySelectorAll('.stat-card, .chart-card, .panel-card');
-  cards.forEach(card => {
-    card.removeEventListener('mousemove', cardTiltMove);
-    card.removeEventListener('mouseleave', cardTiltLeave);
-    card.style.transform = '';
-    card.style.boxShadow = '';
-  });
+  if (activeTiltCard) {
+    activeTiltCard.style.transform = '';
+    activeTiltCard.style.boxShadow = '';
+    activeTiltCard = null;
+  }
 }
 
 // ── Event listeners ───────────────────────────────────────────
@@ -381,8 +331,12 @@ window.addEventListener('load',()=>{
       try {
         const session = JSON.parse(savedSession);
         await loadAll();
-        const found = users.find(x => x.u === session.u && x.p === session.p);
+        const found = users.find(x => x.u === session.u);
+        let isMatch = false;
         if (found) {
+          isMatch = (found.p === session.p) || (await sha256(found.p) === session.p);
+        }
+        if (found && isMatch) {
           currentUser = found;
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('appScreen').style.display = 'flex';
