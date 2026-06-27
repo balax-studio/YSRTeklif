@@ -18,8 +18,8 @@ function logAction(actionType, entity, docId, details) {
     return;
   }
   
-  const user = firebase.auth().currentUser;
-  const userEmail = user ? user.email : 'Bilinmeyen Kullanıcı';
+  const user = typeof currentUser !== 'undefined' ? currentUser : null;
+  const userEmail = user ? (user.u || 'Bilinmeyen Kullanıcı') : 'Bilinmeyen Kullanıcı';
   
   db.collection(LOGS_COLLECTION).add({
     actionType: actionType,

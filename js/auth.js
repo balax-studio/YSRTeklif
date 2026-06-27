@@ -25,7 +25,7 @@ async function doLogin(){
   try{
     await loadAll();
     const hashedP = await sha256(p);
-    const found=users.find(x=>x.u===u&&(x.p===p||x.p===hashedP));
+    const found=users.find(x=>x.u.toLowerCase()===u.toLowerCase()&&(x.p===p||x.p===hashedP));
     if(!found){
       loginErr.textContent='Kullanıcı adı veya şifre hatalı';
       btn.disabled = false;
