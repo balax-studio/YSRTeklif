@@ -211,20 +211,29 @@ function unbindExtremeEvents() {
 }
 
 // ── Event listeners ───────────────────────────────────────────
-document.getElementById('modalBg').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.getElementById('kesifModalBg').addEventListener('click',function(e){if(e.target===this)closeKesifModal();});
-document.getElementById('userEditModalBg').addEventListener('click',function(e){if(e.target===this)closeUserEditModal();});
-document.getElementById('approveModalBg').addEventListener('click',function(e){if(e.target===this)closeApproveModal();});
-document.getElementById('hakedisModalBg').addEventListener('click',function(e){if(e.target===this)closeHakedisModal();});
-document.getElementById('invoiceModalBg').addEventListener('click',function(e){if(e.target===this)closeInvoiceModal();});
-document.getElementById('li_p').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-document.getElementById('li_u').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('li_p').focus();});
+function safeListen(id, eventName, handler) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener(eventName, handler);
+  }
+}
 
-document.getElementById('f_bas').addEventListener('change', function() {
-  document.getElementById('f_bit').min = this.value;
+safeListen('modalBg', 'click', function(e){if(e.target===this)closeModal();});
+safeListen('kesifModalBg', 'click', function(e){if(e.target===this)closeKesifModal();});
+safeListen('userEditModalBg', 'click', function(e){if(e.target===this)closeUserEditModal();});
+safeListen('approveModalBg', 'click', function(e){if(e.target===this)closeApproveModal();});
+safeListen('hakedisModalBg', 'click', function(e){if(e.target===this)closeHakedisModal();});
+safeListen('invoiceModalBg', 'click', function(e){if(e.target===this)closeInvoiceModal();});
+safeListen('li_p', 'keydown', e=>{if(e.key==='Enter')doLogin();});
+safeListen('li_u', 'keydown', e=>{if(e.key==='Enter') { const p = document.getElementById('li_p'); if(p) p.focus(); }});
+
+safeListen('f_bas', 'change', function() {
+  const bit = document.getElementById('f_bit');
+  if (bit) bit.min = this.value;
 });
-document.getElementById('f_bit').addEventListener('change', function() {
-  document.getElementById('f_bas').max = this.value;
+safeListen('f_bit', 'change', function() {
+  const bas = document.getElementById('f_bas');
+  if (bas) bas.max = this.value;
 });
 
 // Double click to inline edit in table

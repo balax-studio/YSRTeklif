@@ -84,11 +84,6 @@ function populateReportMahalDropdown(){
   // Obsolete dropdown but keeping as no-op helper for backwards compatibility
 }
 
-function escapeHTML(str) {
-  if (!str) return '';
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
 function updateReportPreview() {
   const dateInput = document.getElementById('rep_date').value;
   const weatherInput = document.getElementById('rep_weather').value;

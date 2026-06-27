@@ -53,7 +53,13 @@ function getRelativeTime(dateStr) {
   return '';
 }
 
+function escapeHTML(str) {
+  if (!str) return '';
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
 // Expose functions globally
 window.debounce = debounce;
 window.shakeElement = shakeElement;
 window.getRelativeTime = getRelativeTime;
+window.escapeHTML = escapeHTML;
