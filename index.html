@@ -470,8 +470,8 @@
 
             <!-- Dinamik Birimler Bölümü -->
             <div style="margin-top:20px; margin-bottom:20px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h4 style="font-size:14px; font-weight:800; color:var(--text);">Birim / Bölüm Detayları</h4>
+              <div class="report-section-header">
+                <h4 class="report-section-title" style="font-size:14px; font-weight:800; color:var(--text); margin:0;">Birim / Bölüm Detayları</h4>
                 <button class="tb-btn" onclick="addUnitRow()" style="padding:6px 12px; font-size:12px; background:var(--primary); color:white; border:none; display:flex; align-items:center; gap:6px;">
                   <span>➕</span> Birim Ekle
                 </button>
@@ -805,7 +805,7 @@
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobil Alt Menü"></nav>
 
   <!-- MOBILE FAB -->
-  <button class="mobile-fab" id="mobileFab" onclick="openModal(-1)" aria-label="Yeni teklif ekle">+</button>
+  <button class="mobile-fab show" id="mobileFab" onclick="openModal(-1)" aria-label="Yeni teklif ekle">+</button>
 </div>
 
 <!-- TEKLİFLER MODAL -->

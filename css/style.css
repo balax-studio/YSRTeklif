@@ -1356,6 +1356,7 @@
     .form-grid,
     .grid-2-col {
       grid-template-columns: 1fr !important;
+      gap: 16px !important;
     }
     .fg.full {
       grid-column: 1;
@@ -1515,7 +1516,7 @@
     
     /* Floating Action Button (FAB) */
     .mobile-fab {
-      display: flex !important;
+      display: none !important;
       position: fixed;
       bottom: calc(80px + env(safe-area-inset-bottom));
       right: 20px;
@@ -1533,6 +1534,9 @@
       z-index: 999;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .mobile-fab.show {
+      display: flex !important;
     }
     .mobile-fab:active {
       transform: scale(0.9) rotate(90deg);
@@ -1829,6 +1833,33 @@
     0% { transform: translateY(0px) scale(1); }
     50% { transform: translateY(-8px) scale(1.04); }
     100% { transform: translateY(0px) scale(1); }
+  }
+
+  .report-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .report-section-title {
+    flex: 1 1 auto;
+    min-width: 150px;
+  }
+  .report-section-header button {
+    flex: 0 0 auto;
+  }
+  @media (max-width: 480px) {
+    .report-section-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .report-section-header button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   /* REPORTS PAGE LAYOUT */

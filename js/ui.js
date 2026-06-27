@@ -318,7 +318,11 @@ function showTab(t){
   // Mobil FAB görünürlüğü (sadece teklifler sayfasında göster)
   const mFab=document.getElementById('mobileFab');
   if(mFab){
-    mFab.style.display = (t==='teklifler') ? 'flex' : 'none';
+    if (t === 'teklifler') {
+      mFab.classList.add('show');
+    } else {
+      mFab.classList.remove('show');
+    }
   }
 
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
