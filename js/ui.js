@@ -173,6 +173,7 @@ function buildTabs(){
   html+=`<div class="tab" id="t_raporlar" role="tab" tabindex="0" aria-selected="false" onclick="showTab('raporlar')">Raporlar</div>`;
   html+=`<div class="tab" id="t_mahal" role="tab" tabindex="0" aria-selected="false" onclick="showTab('mahal')">İşverenler</div>`;
   html+=`<div class="tab" id="t_hesap" role="tab" tabindex="0" aria-selected="false" onclick="showTab('hesap')">Profilim</div>`;
+  html+=`<div class="tab" id="t_logs" role="tab" tabindex="0" aria-selected="false" onclick="showTab('logs')">İşlem Geçmişi</div>`;
   if(currentUser.r==='admin')html+=`<div class="tab" id="t_admin" role="tab" tabindex="0" aria-selected="false" onclick="showTab('admin')">Kullanıcılar</div>`;
   
   const tabsContainer = document.getElementById('tabsEl');
@@ -214,6 +215,10 @@ function buildTabs(){
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     <span>Profil</span>
   </button>`;
+  mHtml+=`<button class="mobile-nav-item" id="mn_logs" onclick="showTab('logs')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    <span>Geçmiş</span>
+  </button>`;
   if(currentUser.r==='admin') {
     mHtml+=`<button class="mobile-nav-item" id="mn_admin" onclick="showTab('admin')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
@@ -249,6 +254,10 @@ function showTab(t){
 
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page_'+(t==='admin'?'admin':t)).classList.add('active');
+  
+  if(t === 'logs' && typeof renderLogs === 'function') {
+    renderLogs();
+  }
   
   if(t==='analiz') {
     renderCharts();
@@ -669,6 +678,7 @@ function render(){
     const completeIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
     const editIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
     const delIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    const pdfIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
     const invoiceIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
 
     const displayName = it.santiye || it.otel || '-';
@@ -686,17 +696,17 @@ function render(){
       <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
       <td class="editable-cell" data-id="${it.id}" data-field="ttut" title="Çift tıklayıp teklif tutarını düzenleyin">
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
-        <div class="cell-text" style="font-weight:700;">${fmtN(it.ttut,it.cur)}</div>
+        <div class="cell-text" style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
       </td>
       <td class="editable-cell" data-id="${it.id}" data-field="otut" title="Çift tıklayıp onay tutarını düzenleyin">
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${it.durum === 'Faturalandı' ? 'Fat: ' + (it.fno || fmt(it.ftar)) : fmt(it.otar)}</div>
-        <div class="cell-text" style="font-weight:700;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut,it.cur)}</div>
+        <div class="cell-text" style="font-weight:700; white-space:nowrap;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut,it.cur)}</div>
       </td>
       <td>
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
         <div style="margin-bottom:4px;">${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
-        ${it.htut ? `<div style="font-size:12px;margin-bottom:4px;color:var(--purple);font-weight:700;"><span style="color:var(--text2)">Hak:</span> ${fmtN(it.htut, it.cur)}</div>` : ''}
+        ${it.htut ? `<div style="font-size:12px;margin-bottom:4px;color:var(--purple);font-weight:700;white-space:nowrap;"><span style="color:var(--text2)">Hak:</span> ${fmtN(it.htut, it.cur)}</div>` : ''}
         <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
       </td>
       <td style="vertical-align:middle;">
@@ -711,6 +721,7 @@ function render(){
           ${it.durum === 'Tamamlandı' ? `<button class="btn-quick" style="background:var(--purple);color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px" onclick="openHakedisModal(event, '${it.id}')" title="Hakediş Gir">${invoiceIcon} Hakediş Gir</button>` : ''}
           ${it.durum === 'Hakediş Onaylandı' ? `<button class="btn-quick" style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px" onclick="openInvoiceModal(event, '${it.id}')" title="Fatura Ekle">${invoiceIcon} Fatura Ekle</button>` : ''}
           
+          <button class="btn-quick" style="background:#475569;color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:4px" onclick="generatePDF('${it.id}')" title="PDF İndir">${pdfIcon}</button>
           <button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="openModal('${it.id}')" aria-label="${displayName} düzenle">${editIcon}</button>
           <button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;" onclick="delItem('${it.id}')" aria-label="${displayName} sil">${delIcon}</button>
         </div>
@@ -729,6 +740,7 @@ function render(){
       const completeIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
       const editIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
       const delIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+      const pdfIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
       const invoiceIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>`;
 
       const displayName = it.santiye || it.otel || '-';
@@ -749,12 +761,12 @@ function render(){
         <div class="mobile-card-info-row">
           <div class="mobile-card-info-item">
             <span class="mobile-card-info-lbl">Teklif Tutarı</span>
-            <span class="mobile-card-info-val" style="color: var(--primary);">${fmtN(it.ttut, it.cur)}</span>
+            <span class="mobile-card-info-val" style="color: var(--primary); white-space:nowrap;">${fmtN(it.ttut, it.cur)}</span>
             <span style="font-size:10px; color:var(--text3);">${fmt(it.ttar)}</span>
           </div>
           <div class="mobile-card-info-item">
             <span class="mobile-card-info-lbl">${it.durum === 'Faturalandı' ? 'Fatura Tutarı' : 'Onay Tutarı'}</span>
-            <span class="mobile-card-info-val" style="color: var(--green);">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut, it.cur)}</span>
+            <span class="mobile-card-info-val" style="color: var(--green); white-space:nowrap;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut, it.cur)}</span>
             <span style="font-size:10px; color:var(--text3);">${it.durum === 'Faturalandı' ? (it.fno ? '#' + it.fno : fmt(it.ftar)) : fmt(it.otar)}</span>
           </div>
         </div>
@@ -781,6 +793,7 @@ function render(){
             ${it.durum === 'Tamamlandı' ? `<button class="btn-quick" style="background:var(--purple);color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:11px;display:inline-flex;align-items:center;gap:4px" onclick="openHakedisModal(event, '${it.id}')" title="Hakediş Gir">${invoiceIcon} Hakediş Gir</button>` : ''}
             ${it.durum === 'Hakediş Onaylandı' ? `<button class="btn-quick" style="background:var(--green);color:#fff;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:600;font-size:11px;display:inline-flex;align-items:center;gap:4px" onclick="openInvoiceModal(event, '${it.id}')" title="Fatura Ekle">${invoiceIcon} Fatura Ekle</button>` : ''}
             
+            <button class="btn-quick" style="background:#475569;color:#fff;border:none;border-radius:6px;padding:6px 8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;" onclick="generatePDF('${it.id}')" title="PDF İndir">${pdfIcon}</button>
             <button class="btn-edit" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="openModal('${it.id}')" aria-label="${displayName} düzenle">${editIcon}</button>
             <button class="btn-del" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="delItem('${it.id}')" aria-label="${displayName} sil">${delIcon}</button>
           </div>
@@ -1213,11 +1226,13 @@ async function saveItem(){
       await col('items').doc(editIdx).update(data);
       const idx=items.findIndex(x=>x.id===editIdx);
       if(idx>=0)items[idx]={...items[idx],...data};
+      if (typeof logAction === 'function') logAction('Güncelleme', 'Teklif', editIdx, data.otel + ' projesi için teklif güncellendi');
       showToast('Teklif başarıyla güncellendi.');
     } else {
       data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
       const ref=await col('items').add(data);
       items.unshift({id:ref.id,...data});
+      if (typeof logAction === 'function') logAction('Ekleme', 'Teklif', ref.id, data.otel + ' projesi için teklif eklendi');
       showToast('Yeni teklif başarıyla eklendi.');
       
       if (convertingSurveyId) {
@@ -1281,6 +1296,7 @@ async function quickAddSave() {
   try {
     const ref = await col('items').add(data);
     items.unshift({id: ref.id, ...data});
+    if (typeof logAction === 'function') logAction('Hızlı Ekleme', 'Teklif', ref.id, data.otel + ' projesi için teklif hızlı eklendi');
     showToast('Teklif hızlıca eklendi.');
     document.getElementById('qa_otel').value = '';
     document.getElementById('qa_ttut').value = '';
@@ -1314,6 +1330,7 @@ async function delItem(id){
     }
     await col('items').doc(id).delete();
     items=items.filter(x=>x.id!==id);
+    if (typeof logAction === 'function' && it) logAction('Silme', 'Teklif', id, it.otel + ' projesi için teklif silindi');
     showToast('Teklif başarıyla silindi.');
     render();updateStats();checkOverdue();
   }catch(e){showToast('Teklif silinirken hata: ' + e.message, 'error');}
@@ -1332,6 +1349,7 @@ async function quickAction(event, id, nextStat){
     await col('items').doc(id).update(updates);
     const idx = items.findIndex(x => x.id === id);
     if(idx >= 0) items[idx] = { ...items[idx], ...updates };
+    if (typeof logAction === 'function') logAction('Durum Güncelleme', 'Teklif', id, (it ? it.otel : '') + ' durumu ' + nextStat + ' olarak güncellendi');
     showToast('Durum güncellendi: ' + nextStat);
     
     // Confetti blast on click coordinates
@@ -1796,11 +1814,11 @@ function showStatDetails(type) {
       <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
       <td>
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
-        <div style="font-weight:700;">${fmtN(it.ttut,it.cur)}</div>
+        <div style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
       </td>
       <td>
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.otar)}</div>
-        <div style="font-weight:700;">${fmtN(it.otut,it.cur)}</div>
+        <div style="font-weight:700; white-space:nowrap;">${fmtN(it.otut,it.cur)}</div>
       </td>
       <td>
         <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>

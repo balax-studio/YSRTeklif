@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>YSR Teklif Takip</title>
-
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#4f46e5">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2l9 4.9v9.8L12 22l-9-5.3V6.9L12 2z'></path></svg>">
 <!-- Google Fonts - Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -609,6 +611,30 @@
       </div>
     </section>
 
+    <!-- İŞLEM GEÇMİŞİ (AUDIT LOGS) -->
+    <section class="page" id="page_logs" aria-label="İşlem Geçmişi Sayfası">
+      <div class="banner" role="alert" style="margin-bottom: 24px; background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary); padding: 16px; border-radius: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span style="color: var(--primary); font-weight: 600;">Son Hareketler (İşlem Geçmişi)</span>
+        <div style="font-size: 13px; color: var(--text2); margin-top: 4px;">Sistemde yapılan ekleme, silme, güncelleme ve hızlı işlemlerin kayıtları.</div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th style="width: 150px;">Tarih / Saat</th>
+              <th style="width: 200px;">Kullanıcı</th>
+              <th style="width: 120px;">İşlem Türü</th>
+              <th>Detaylar</th>
+            </tr></thead>
+            <tbody id="logsTbody">
+              <!-- Logs will be rendered here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- KULLANICILAR (sadece admin) -->
     <section class="page" id="page_admin" aria-label="Kullanıcı Yönetimi Sayfası">
       <div class="panel-card">
@@ -1095,13 +1121,32 @@ window.triggerConfetti = function(x, y) {
   </div>
 </div>
 
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <!-- Modular Javascript files (Sequential to avoid CORS file:// errors) -->
+<script src="js/logs.js?v=1.0.3"></script>
 <script src="js/config.js?v=1.0.3"></script>
 <script src="js/ui.js?v=1.0.3"></script>
 <script src="js/auth.js?v=1.0.3"></script>
 <script src="js/kesifler.js?v=1.0.3"></script>
 <script src="js/reports.js?v=1.0.3"></script>
 <script src="js/charts.js?v=1.0.3"></script>
+<script src="js/pdf.js?v=1.0.3"></script>
+<script src="js/storage.js?v=1.0.3"></script>
+<script src="js/logs.js?v=1.0.3"></script>
 <script src="js/main.js?v=1.0.3"></script>
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('Service Worker registered', reg))
+        .catch(err => console.error('Service Worker registration failed', err));
+    });
+  }
+</script>
 </body>
 </html>
