@@ -882,7 +882,7 @@
     display: flex;
   }
   .modal {
-    background: var(--bg-card);
+    background: var(--card);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 12px;
