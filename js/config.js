@@ -7,6 +7,16 @@ try {
   firebase.initializeApp(window.FIREBASE_CONFIG);
   db = firebase.firestore();
   storage = firebase.storage();
+  
+  // Enable offline persistence for Firestore
+  db.enablePersistence({ synchronizeTabs: true })
+    .catch((err) => {
+      if (err.code === 'failed-precondition') {
+        console.warn("Multiple tabs open, Firestore offline persistence enabled only in first tab.");
+      } else if (err.code === 'unimplemented') {
+        console.warn("The current browser does not support all of the features required to enable Firestore persistence.");
+      }
+    });
 } catch(e) {
   console.error("Firebase Initialization Error:", e);
   window.FIREBASE_INIT_ERROR = e.message;

@@ -2083,3 +2083,59 @@
   :root[data-theme="dark"] .aurora-orb.orb-2 {
     background: radial-gradient(circle, rgba(167,139,250,0.15) 0%, rgba(167,139,250,0) 70%);
   }
+
+  /* Offline Banner */
+  .offline-banner {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ef4444;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 13px;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown {
+    from { top: 40px; opacity: 0; }
+    to { top: 70px; opacity: 1; }
+  }
+
+  /* Skeleton Shimmer Loaders */
+  .skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, var(--bg-hover) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .skeleton-text {
+    width: 80%;
+    height: 12px;
+    margin-bottom: 6px;
+  }
+  .skeleton-title {
+    width: 50%;
+    height: 18px;
+    margin-bottom: 12px;
+  }
+  .skeleton-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
