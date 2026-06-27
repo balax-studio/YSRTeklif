@@ -63,6 +63,11 @@ async function doLogin(){
       appScr.style.transform = 'scale(1)';
       appScr.style.filter = 'blur(0)';
       
+      setTimeout(() => {
+        appScr.style.transform = '';
+        appScr.style.filter = '';
+      }, 850);
+      
       document.getElementById('topbarUser').textContent=currentUser.u+(currentUser.r==='admin'?' · Admin':'');
       buildTabs();populateMahalFilter();render();updateSortHeadersUI();updateStats();checkOverdue();loadProfile();
     }, 600);

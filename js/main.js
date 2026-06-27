@@ -341,8 +341,8 @@ window.addEventListener('load',()=>{
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('appScreen').style.display = 'flex';
           document.getElementById('appScreen').style.opacity = '1';
-          document.getElementById('appScreen').style.transform = 'scale(1)';
-          document.getElementById('appScreen').style.filter = 'blur(0)';
+          document.getElementById('appScreen').style.transform = '';
+          document.getElementById('appScreen').style.filter = '';
           document.getElementById('topbarUser').textContent = currentUser.u + (currentUser.r === 'admin' ? ' · Admin' : '');
           buildTabs(); populateMahalFilter(); render(); updateSortHeadersUI(); updateStats(); checkOverdue(); loadProfile();
           autoLoginSuccess = true;
