@@ -1562,6 +1562,23 @@
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
     }
+
+    /* Raporlar sayfasi mobil gelistirmeleri */
+    .pdf-preview-container {
+      display: none !important;
+    }
+    .panel-card {
+      padding: 16px !important;
+    }
+    .report-section-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .report-section-header button {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   /* 2026 UX CUSTOM TOAST NOTIFICATION SYSTEM */
@@ -1849,17 +1866,6 @@
   }
   .report-section-header button {
     flex: 0 0 auto;
-  }
-  @media (max-width: 480px) {
-    .report-section-header {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-    .report-section-header button {
-      width: 100%;
-      justify-content: center;
-    }
   }
 
   /* REPORTS PAGE LAYOUT */

@@ -452,19 +452,19 @@
               <button class="tb-btn" onclick="clearReportForm()" id="btnResetReport" style="padding: 4px 10px; font-size:12px; display:none;">Yeni Rapor</button>
             </div>
             
-            <div class="grid-2-col" style="display:grid; align-items:start;">
-              <div>
-                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Tarih</label>
+            <div class="grid-2-col" style="display:grid; align-items:start; margin-bottom:16px;">
+              <div class="fg">
+                <label>Tarih</label>
                 <input type="date" id="rep_date" oninput="updateReportPreview()" style="width:100%;">
               </div>
-              <div>
-                <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Hava Durumu</label>
+              <div class="fg">
+                <label>Hava Durumu</label>
                 <input type="text" id="rep_weather" placeholder="Örn: Güneşli, 24°C" oninput="updateReportPreview()" style="width:100%;">
               </div>
             </div>
 
             <div class="fg" style="margin-bottom:16px;">
-              <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Şantiye / Proje Adı</label>
+              <label>Şantiye / Proje Adı</label>
               <input type="text" id="rep_santiye" placeholder="Örn: Blok A / Bodrum Kat" oninput="updateReportPreview()" style="width:100%;">
             </div>
 
