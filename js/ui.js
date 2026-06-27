@@ -48,6 +48,7 @@ window.debouncedRenderReports = debouncedRenderReports;
 // Dynamic Radial-Gradient Card Reflection Glow Tracking (Optimized with requestAnimationFrame)
 let isTickingMouse = false;
 document.addEventListener('mousemove', e => {
+  if (window.energyMode === 'enabled') return;
   if (!isTickingMouse) {
     window.requestAnimationFrame(() => {
       const card = e.target.closest('.stat-card, .chart-card, .panel-card');
@@ -96,6 +97,7 @@ const getDynamicDateBadge = (bas, bit, durum) => {
 
 // 2D HTML5 Confetti Spark Particle Blast Engine
 function triggerConfetti(x, y) {
+  if (window.energyMode === 'enabled') return;
   const canvas = document.createElement('canvas');
   canvas.style.position = 'fixed';
   canvas.style.top = '0';

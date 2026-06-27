@@ -1096,6 +1096,7 @@ window.getDynamicDateBadge = function(bas, bit, durum) {
 
 // 2D HTML5 Confetti Spark Particle Blast Engine
 window.triggerConfetti = function(x, y) {
+  if (window.energyMode === 'enabled') return;
   const canvas = document.createElement('canvas');
   canvas.style.position = 'fixed';
   canvas.style.top = '0';
