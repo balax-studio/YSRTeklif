@@ -358,13 +358,25 @@
     gap: 16px;
   }
   .topbar-logo {
-    font-size: 23px;
-    font-weight: 850;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Minimal 3D depth */
+  }
+  .topbar-logo span {
     color: var(--primary);
-    letter-spacing: -0.04em;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: var(--card);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.5); /* Premium badge effect */
+  }
+  :root[data-theme="dark"] .topbar-logo span {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .topbar-user {
     font-size: 11px;

@@ -663,6 +663,38 @@ function updateSortHeadersUI() {
   }
 }
 
+// ── İlerleme Göstergesi (Stepper) ─────────────────────────────
+function getStepperHtml(durum) {
+  const states = ['Gönderilecek', 'Gönderildi', 'Onaylandı', 'İş Yapım Aşamasında', 'Tamamlandı', 'Hakediş Onaylandı', 'Faturalandı'];
+  let idx = states.indexOf(durum);
+  if (durum === 'Reddedildi' || durum === 'İptal') {
+    return `<div style="display:flex; gap:4px; margin-top:4px; justify-content:center;"><span style="width:6px; height:6px; border-radius:50%; background:var(--red);"></span></div>`;
+  }
+  if (idx === -1) return '';
+  
+  let stepIdx = 0;
+  if (idx <= 1) stepIdx = 0; 
+  else if (idx === 2) stepIdx = 1; 
+  else if (idx === 3) stepIdx = 2; 
+  else if (idx === 4) stepIdx = 3; 
+  else if (idx >= 5) stepIdx = 4; 
+  
+  let html = `<div class="stepper-dots" style="display:flex; gap:4px; margin-top:4px; justify-content:center;" title="${durum}">`;
+  for(let i=0; i<5; i++) {
+    const isPast = i < stepIdx;
+    const isCurrent = i === stepIdx;
+    if (isPast) {
+      html += `<span style="width:6px; height:6px; border-radius:50%; background:var(--green); opacity:0.8;"></span>`;
+    } else if (isCurrent) {
+      html += `<span style="width:6px; height:6px; border-radius:50%; background:var(--primary); box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--primary);"></span>`;
+    } else {
+      html += `<span style="width:6px; height:6px; border-radius:50%; border:1px solid var(--border); box-sizing:border-box;"></span>`;
+    }
+  }
+  html += `</div>`;
+  return html;
+}
+
 // ── Render ────────────────────────────────────────────────────
 function getMahalName(id){const m=mahals.find(x=>x.id===id);return m?m.name:id||'-';}
 
@@ -794,7 +826,7 @@ function render(){
     const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-block;" onclick="event.stopPropagation();">📎</a>` : '';
 
     const prog = getProgressData(it.durum);
-    return`<tr class="${od?'overdue':''}" style="background-image: linear-gradient(to right, ${prog.color} ${prog.pct}%, transparent ${prog.pct}%); background-size: 100% 3px; background-position: bottom left; background-repeat: no-repeat;">
+    return`<tr class="${od?'overdue':''}">
       <td style="color:var(--text2);font-weight:600">${i+1}</td>
       <td class="editable-cell" data-id="${it.id}" data-field="otel" title="Çift tıklayıp şantiye adını düzenleyin">
         <div class="cell-text" style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px">${displayName}${fileAttachmentLink}</div>
@@ -803,7 +835,12 @@ function render(){
           <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat||'-'}</span>
         </div>
       </td>
-      <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
+      <td>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;">
+          <span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span>
+          ${getStepperHtml(it.durum)}
+        </div>
+      </td>
       <td class="editable-cell" data-id="${it.id}" data-field="ttut" title="Çift tıklayıp teklif tutarını düzenleyin">
         <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
         <div class="cell-text" style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
@@ -857,7 +894,7 @@ function render(){
       const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-block;" onclick="event.stopPropagation();">📎</a>` : '';
 
       const prog = getProgressData(it.durum);
-      return `<div class="mobile-card ${od ? 'overdue' : ''}" style="background-image: linear-gradient(to right, ${prog.color} ${prog.pct}%, transparent ${prog.pct}%); background-size: 100% 3px; background-position: bottom left; background-repeat: no-repeat;">
+      return `<div class="mobile-card ${od ? 'overdue' : ''}">
         <div class="mobile-card-header">
           <div>
             <div class="mobile-card-title">${displayName}${fileAttachmentLink}</div>
@@ -866,7 +903,10 @@ function render(){
               <span class="badge ${CAT_CLS[it.kat] || 'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat || '-'}</span>
             </div>
           </div>
-          <span class="badge ${STAT_CLS[si] || 'b-0'}" style="font-size:11px; padding:4px 8px;">${it.durum || '-'}</span>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+            <span class="badge ${STAT_CLS[si] || 'b-0'}" style="font-size:11px; padding:4px 8px;">${it.durum || '-'}</span>
+            ${getStepperHtml(it.durum)}
+          </div>
         </div>
 
         <div class="mobile-card-info-row">
