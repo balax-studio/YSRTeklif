@@ -70,6 +70,7 @@ async function doLogin(){
       
       document.getElementById('topbarUser').textContent=currentUser.u+(currentUser.r==='admin'?' · Admin':'');
       buildTabs();populateMahalFilter();render();updateSortHeadersUI();updateStats();checkOverdue();loadProfile();
+      startPresenceHeartbeat();
     }, 600);
   }catch(e){
     loginErr.textContent='Bağlantı hatası: '+e.message;
@@ -78,7 +79,11 @@ async function doLogin(){
     btn.innerHTML = originalText;
   }
 }
-function doLogout(){
+async function doLogout(){
+  if (currentUser && currentUser.id) {
+    await updateUserPresence('offline');
+  }
+  stopPresenceHeartbeat();
   currentUser=null;items=[];mahals=[];users=[];
   localStorage.removeItem('ysr_session'); // Clear session
   const loginScr = document.getElementById('loginScreen');
@@ -217,3 +222,42 @@ function changeAccentColor(color, isInit = false) {
     saveProfile();
   }
 }
+
+let presenceInterval = null;
+
+async function updateUserPresence(status = 'online') {
+  if (!currentUser || !currentUser.id) return;
+  try {
+    await col('users').doc(currentUser.id).update({
+      status: status,
+      lastActive: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) {
+    console.error("Firebase presence sync failed", e);
+  }
+}
+
+function startPresenceHeartbeat() {
+  stopPresenceHeartbeat();
+  updateUserPresence('online');
+  presenceInterval = setInterval(() => {
+    if (navigator.onLine) {
+      updateUserPresence('online');
+    }
+  }, 60000);
+}
+
+function stopPresenceHeartbeat() {
+  if (presenceInterval) {
+    clearInterval(presenceInterval);
+    presenceInterval = null;
+  }
+}
+
+window.addEventListener('beforeunload', () => {
+  if (currentUser && currentUser.id) {
+    col('users').doc(currentUser.id).update({
+      status: 'offline'
+    });
+  }
+});

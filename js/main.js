@@ -372,6 +372,7 @@ window.addEventListener('load',()=>{
           document.getElementById('appScreen').style.filter = '';
           document.getElementById('topbarUser').textContent = currentUser.u + (currentUser.r === 'admin' ? ' · Admin' : '');
           buildTabs(); populateMahalFilter(); render(); updateSortHeadersUI(); updateStats(); checkOverdue(); loadProfile();
+          if (typeof startPresenceHeartbeat === 'function') startPresenceHeartbeat();
           autoLoginSuccess = true;
         }
       } catch (err) {

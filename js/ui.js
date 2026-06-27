@@ -444,34 +444,68 @@ async function renderAdminPanel(){
     });
 
     if(tb) {
-      tb.innerHTML=itemsHtml.map(item=>`<tr>
-        <td>${item.u.u}</td>
-        <td>${item.u.r==='admin'?'Admin':'Kullanıcı'}</td>
-        <td style="font-weight:700;">${item.name}</td>
-        <td style="color:var(--text2); font-weight:600;">${item.job}</td>
-        <td>
-          <div style="display:flex; gap:6px;">
-            <button class="btn-edit" onclick="openUserEditModal('${item.u.id}')" aria-label="${item.u.u} kullanıcısını düzenle">Düzenle</button>
-            ${item.u.u!=='admin'?`<button class="btn-del" onclick="delUser('${item.u.id}','${item.u.u}')" aria-label="${item.u.u} kullanıcısını sil">Sil</button>`:'—'}
-          </div>
-        </td>
-      </tr>`).join('');
+      tb.innerHTML=itemsHtml.map(item=>{
+        let isOnline = false;
+        if (item.u.status === 'online') {
+          if (item.u.lastActive) {
+            const lastActiveDate = item.u.lastActive.toDate ? item.u.lastActive.toDate() : new Date(item.u.lastActive);
+            const diffMins = (new Date() - lastActiveDate) / 60000;
+            if (diffMins < 5) isOnline = true;
+          } else {
+            isOnline = true;
+          }
+        }
+        
+        const statusHtml = isOnline 
+          ? `<span style="display:inline-flex; align-items:center; gap:6px; color:#10b981; font-weight:600;"><span class="user-status-dot online"></span> Çevrim içi</span>`
+          : `<span style="display:inline-flex; align-items:center; gap:6px; color:var(--text3); font-weight:500;"><span class="user-status-dot offline"></span> Çevrim dışı</span>`;
+
+        return `<tr>
+          <td>${item.u.u}</td>
+          <td>${item.u.r==='admin'?'Admin':'Kullanıcı'}</td>
+          <td style="font-weight:700;">${item.name}</td>
+          <td style="color:var(--text2); font-weight:600;">${item.job}</td>
+          <td>${statusHtml}</td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-edit" onclick="openUserEditModal('${item.u.id}')" aria-label="${item.u.u} kullanıcısını düzenle">Düzenle</button>
+              ${item.u.u!=='admin'?`<button class="btn-del" onclick="delUser('${item.u.id}','${item.u.u}')" aria-label="${item.u.u} kullanıcısını sil">Sil</button>`:'—'}
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
     }
 
     if(mobList) {
-      mobList.innerHTML=itemsHtml.map(item=>`<div class="mobile-card" style="padding:14px; gap:8px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-weight:700; font-size:14px;">${item.name}</span>
-          <span class="badge ${item.u.r==='admin'?'b-2':'b-0'}" style="font-size:10px; padding:2px 8px;">${item.u.r==='admin'?'Admin':'Kullanıcı'}</span>
-        </div>
-        <div style="font-size:12px; color:var(--text2); font-weight:600;">
-          Kullanıcı Adı: <span style="color:var(--text);">${item.u.u}</span> | Meslek: <span style="color:var(--text);">${item.job}</span>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:4px;">
-          <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openUserEditModal('${item.u.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
-          ${item.u.u!=='admin'?`<button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delUser('${item.u.id}','${item.u.u}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>`:''}
-        </div>
-      </div>`).join('');
+      mobList.innerHTML=itemsHtml.map(item=>{
+        let isOnline = false;
+        if (item.u.status === 'online') {
+          if (item.u.lastActive) {
+            const lastActiveDate = item.u.lastActive.toDate ? item.u.lastActive.toDate() : new Date(item.u.lastActive);
+            const diffMins = (new Date() - lastActiveDate) / 60000;
+            if (diffMins < 5) isOnline = true;
+          } else {
+            isOnline = true;
+          }
+        }
+
+        return `<div class="mobile-card" style="padding:14px; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:700; font-size:14px; display:inline-flex; align-items:center; gap:8px;">
+              ${item.name}
+              <span class="user-status-dot ${isOnline ? 'online' : 'offline'}" style="margin:0; width:6px; height:6px;"></span>
+            </span>
+            <span class="badge ${item.u.r==='admin'?'b-2':'b-0'}" style="font-size:10px; padding:2px 8px;">${item.u.r==='admin'?'Admin':'Kullanıcı'}</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2); font-weight:600;">
+            Kullanıcı Adı: <span style="color:var(--text);">${item.u.u}</span> | Meslek: <span style="color:var(--text);">${item.job}</span>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="openUserEditModal('${item.u.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg> Düzenle</button>
+            ${item.u.u!=='admin'?`<button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px; display:inline-flex; align-items:center; justify-content:center; gap:4px;" onclick="delUser('${item.u.id}','${item.u.u}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Sil</button>`:''}
+          </div>
+        </div>`;
+      }).join('');
     }
   } catch(e) {
     console.error("renderAdminPanel error:", e);
@@ -1032,13 +1066,17 @@ function updateStats(){
     }
   });
 
-  resetStatTimer();
-  
   function resetStatTimer() {
     if (statCurrencyInterval) clearInterval(statCurrencyInterval);
     statCurrencyInterval = setInterval(() => {
       cycleCurrency(1);
     }, 10000);
+  }
+
+  resetStatTimer();
+
+  if (document.getElementById('page_admin') && document.getElementById('page_admin').classList.contains('active')) {
+    try { renderAdminPanel(); } catch(e){}
   }
 }
 

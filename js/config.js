@@ -89,24 +89,20 @@ function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
 
 async function loadAll(){
   try {
-    const uSnap = await col('users').get();
-    users = uSnap.docs.map(d=>({id:d.id,...d.data()}));
-    
-    if(!users.length){
-      const passAdmin = await sha256('ysr2024');
-      const passUser = await sha256('ysr123');
-      await col('users').add({u:'admin',p:passAdmin,r:'admin'});
-      await col('users').add({u:'ysr',p:passUser,r:'user'});
-      const snap2 = await col('users').get();
-      users = snap2.docs.map(d=>({id:d.id,...d.data()}));
-    }
-    
     await Promise.all([
+      setupSnapshot('users', null, null, d => { users = d; }),
       setupSnapshot('mahals', 'name', 'asc', d => { mahals = d; }),
       setupSnapshot('items', 'createdAt', 'desc', d => { items = d; }),
       setupSnapshot('surveys', null, null, d => { surveys = d; }),
       setupSnapshot('reports', null, null, d => { reports = d; })
     ]);
+    
+    if(!users.length){
+      const passAdmin = await sha256('ysr2024');
+      const passUser = await sha256('ysr123');
+      await col('users').add({u:'admin',p:passAdmin,r:'admin',status:'offline'});
+      await col('users').add({u:'ysr',p:passUser,r:'user',status:'offline'});
+    }
   } catch (e) {
     console.error("loadAll error:", e);
     throw e;
