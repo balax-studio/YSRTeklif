@@ -367,7 +367,6 @@ function renderMahalPanel(){
     </div>`).join('');
   }
 }
-}
 async function editMahal(id, currentName) {
   const newName = await showPrompt("İşveren Adını Düzenle", currentName);
   if (newName === null) return;
