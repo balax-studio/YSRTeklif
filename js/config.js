@@ -23,7 +23,7 @@ try {
 }
 
 // ── State ─────────────────────────────────────────────────────
-let items=[], mahals=[], users=[], surveys=[], reports=[], currentUser=null, editIdx=-1, sortKey='ttar', sortDir='desc', editKesifId=null, convertingSurveyId=null, editUserId=null, editReportId=null;
+let editIdx=-1, sortKey='ttar', sortDir='desc', editKesifId=null, convertingSurveyId=null, editUserId=null, editReportId=null;
 let catChartInstance = null;
 let statusChartInstance = null;
 let mahalCategoryChartInstance = null;
