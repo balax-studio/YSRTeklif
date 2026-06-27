@@ -37,7 +37,7 @@ function renderKesif(){
     return `<tr>
       <td style="color:var(--text2);font-weight:600">${i+1}</td>
       <td><span class="mahal-tag">${getMahalName(it.mahalId)}</span></td>
-      <td style="font-weight:700;">${it.santiye || it.otel || '-'}</td>
+      <td style="font-weight:700; max-width:220px; white-space:normal; line-height:1.3;">${it.santiye || it.otel || '-'}</td>
       <td><span class="badge ${CAT_CLS[it.kat]||'b-diger'}">${it.kat||'-'}</span></td>
       <td>${fmt(it.ktar)}</td>
       <td style="font-weight:600;">${it.sorumlu||'-'}</td>
