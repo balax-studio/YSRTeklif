@@ -93,22 +93,30 @@
 
 <!-- LOGIN -->
 <div id="loginScreen" style="display: none;">
-  <div class="login-card" role="form" aria-labelledby="loginTitle">
-    <div class="login-logo">
-      <div class="L1" id="loginTitle">YSR Construction</div>
-      <div class="L2">Teklif Takip Sistemi</div>
-      <div class="divider"></div>
+  <div class="login-card-outer">
+    <div class="login-card" role="form" aria-labelledby="loginTitle">
+      <div class="login-logo">
+        <span class="eyebrow-tag">GÜVENLİ SİSTEM GİRİŞİ</span>
+        <h1 class="L1" id="loginTitle">YSR Construction</h1>
+        <div class="L2">Teklif Takip Sistemi</div>
+        <div class="divider"></div>
+      </div>
+      <div class="form-group">
+        <label for="li_u">Kullanıcı Adı</label>
+        <input id="li_u" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" placeholder="Kullanıcı adınızı girin">
+      </div>
+      <div class="form-group">
+        <label for="li_p">Şifre</label>
+        <input id="li_p" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <div class="login-err" id="loginErr" role="alert" aria-live="polite"></div>
+      <button class="login-btn" onclick="doLogin()" aria-label="Sisteme Giriş Yap">
+        <span>Giriş Yap</span>
+        <span class="btn-icon-wrapper">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </span>
+      </button>
     </div>
-    <div class="form-group">
-      <label for="li_u">Kullanıcı Adı</label>
-      <input id="li_u" type="text" autocomplete="username" autocapitalize="none" autocorrect="off">
-    </div>
-    <div class="form-group">
-      <label for="li_p">Şifre</label>
-      <input id="li_p" type="password" autocomplete="current-password">
-    </div>
-    <div class="login-err" id="loginErr" role="alert" aria-live="polite"></div>
-    <button class="login-btn" onclick="doLogin()" aria-label="Sisteme Giriş Yap">Giriş Yap</button>
   </div>
 </div>
 

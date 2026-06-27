@@ -184,23 +184,45 @@
     100% { transform: scale(1.1) translate(15px, 15px); }
   }
 
-  .login-card {
-    background: rgba(var(--card-rgb), 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
+  .login-card-outer {
+    background: rgba(var(--card-rgb), 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(var(--card-rgb), 0.08);
+    border-radius: 28px;
+    padding: 10px;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     box-shadow: var(--shadow-lg);
     z-index: 10;
     transform: translateY(0);
-    animation: loginEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: loginEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
   @keyframes loginEnter {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .login-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  }
+
+  .eyebrow-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--primary);
+    background: var(--primary-bg);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
   }
 
   /* Staggered entrance for login page items */
@@ -208,7 +230,7 @@
     animation: loginStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: 0.15s;
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
   }
   .form-group:nth-of-type(1) {
     animation: loginStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -221,6 +243,40 @@
   .login-btn {
     animation: loginStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: 0.45s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    border-radius: 100px !important;
+    padding: 8px 8px 8px 24px !important;
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .login-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(0.985);
+  }
+  .login-btn:active {
+    transform: scale(0.96);
+  }
+  .btn-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .login-btn:hover .btn-icon-wrapper {
+    transform: translateX(4px);
   }
 
   @keyframes loginStagger {
