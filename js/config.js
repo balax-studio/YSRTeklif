@@ -38,29 +38,65 @@ const fmtN=(n,c)=>(!n&&n!==0||n==='')?'-':`${Number(n).toLocaleString('tr-TR')}\
 // ── Firestore helpers ─────────────────────────────────────────
 const col=name=>db.collection(name);
 
+function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
+  return new Promise((resolve, reject) => {
+    let query = col(colName);
+    if (orderByField) query = query.orderBy(orderByField, orderByDir);
+    let isFirst = true;
+    query.onSnapshot(snap => {
+      const data = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      onUpdate(data);
+      if (isFirst) {
+        isFirst = false;
+        resolve();
+      } else {
+        // Trigger UI updates safely if the functions exist
+        if (typeof render === 'function') {
+          try { render(); updateStats(); checkOverdue(); } catch(e){}
+        }
+        if (typeof populateMahalFilter === 'function') {
+           try { populateMahalFilter(); } catch(e){}
+        }
+        if (typeof renderKesifler === 'function') {
+           try { renderKesifler(); } catch(e){}
+        }
+        if (typeof renderReports === 'function') {
+           try { renderReports(); } catch(e){}
+        }
+        if (typeof renderCharts === 'function') {
+           try { 
+             const analizPage = document.getElementById('page_analiz');
+             if(analizPage && analizPage.classList.contains('active')) renderCharts();
+           } catch(e){}
+        }
+      }
+    }, err => {
+      console.error(colName, "snapshot error:", err);
+      if (isFirst) reject(err);
+    });
+  });
+}
+
 async function loadAll(){
   try {
-    const [uSnap,mSnap,iSnap,sSnap,rSnap]=await Promise.all([
-      col('users').get(),
-      col('mahals').orderBy('name').get(),
-      col('items').orderBy('createdAt','desc').get(),
-      col('surveys').get(),
-      col('reports').get()
-    ]);
-    users=uSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const uSnap = await col('users').get();
+    users = uSnap.docs.map(d=>({id:d.id,...d.data()}));
     
     if(!users.length){
       const passAdmin = await sha256('ysr2024');
       const passUser = await sha256('ysr123');
       await col('users').add({u:'admin',p:passAdmin,r:'admin'});
       await col('users').add({u:'ysr',p:passUser,r:'user'});
-      const snap2=await col('users').get();
-      users=snap2.docs.map(d=>({id:d.id,...d.data()}));
+      const snap2 = await col('users').get();
+      users = snap2.docs.map(d=>({id:d.id,...d.data()}));
     }
-    mahals=mSnap.docs.map(d=>({id:d.id,...d.data()}));
-    items=iSnap.docs.map(d=>({id:d.id,...d.data()}));
-    surveys=sSnap.docs.map(d=>({id:d.id,...d.data()}));
-    reports=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    await Promise.all([
+      setupSnapshot('mahals', 'name', 'asc', d => { mahals = d; }),
+      setupSnapshot('items', 'createdAt', 'desc', d => { items = d; }),
+      setupSnapshot('surveys', null, null, d => { surveys = d; }),
+      setupSnapshot('reports', null, null, d => { reports = d; })
+    ]);
   } catch (e) {
     console.error("loadAll error:", e);
     throw e;

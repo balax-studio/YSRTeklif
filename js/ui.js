@@ -1360,22 +1360,17 @@ async function saveItem(){
     const isEdit=(editIdx!==null&&editIdx!==-1&&typeof editIdx==='string');
     if(isEdit){
       await col('items').doc(editIdx).update(data);
-      const idx=items.findIndex(x=>x.id===editIdx);
-      if(idx>=0)items[idx]={...items[idx],...data};
       if (typeof logAction === 'function') logAction('Güncelleme', 'Teklif', editIdx, data.otel + ' projesi için teklif güncellendi');
       showToast('Teklif başarıyla güncellendi.');
     } else {
       data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
-      const ref=await col('items').add(data);
-      items.unshift({id:ref.id,...data});
-      if (typeof logAction === 'function') logAction('Ekleme', 'Teklif', ref.id, data.otel + ' projesi için teklif eklendi');
+      await col('items').add(data);
+      if (typeof logAction === 'function') logAction('Ekleme', 'Teklif', 'new', data.otel + ' projesi için teklif eklendi');
       showToast('Yeni teklif başarıyla eklendi.');
       
       if (convertingSurveyId) {
         try {
           await col('surveys').doc(convertingSurveyId).update({ durum: 'Teklife Dönüştü' });
-          const sIdx = surveys.findIndex(x => x.id === convertingSurveyId);
-          if (sIdx >= 0) surveys[sIdx].durum = 'Teklife Dönüştü';
           convertingSurveyId = null;
         } catch (e) {
           console.error("Survey status update failed:", e);
@@ -1383,7 +1378,7 @@ async function saveItem(){
       }
     }
     window.currentFormState = "";
-    closeModal();render();updateStats();checkOverdue();
+    closeModal();
   }catch(e){
     showToast('Teklif kaydedilirken bir hata oluştu: ' + e.message, 'error');
   }finally{
@@ -1432,7 +1427,6 @@ async function quickAddSave() {
   
   try {
     const ref = await col('items').add(data);
-    items.unshift({id: ref.id, ...data});
     if (typeof logAction === 'function') logAction('Hızlı Ekleme', 'Teklif', ref.id, data.otel + ' projesi için teklif hızlı eklendi');
     showToast('Teklif hızlıca eklendi.');
     document.getElementById('qa_otel').value = '';
@@ -1445,9 +1439,6 @@ async function quickAddSave() {
     if (activeCat) document.getElementById('qa_kat').value = activeCat;
     
     triggerConfetti(window.innerWidth / 2, window.innerHeight / 2);
-    render();
-    updateStats();
-    checkOverdue();
   } catch(e) {
     showToast('Teklif eklenirken hata: ' + e.message, 'error');
   }
@@ -1466,10 +1457,8 @@ async function delItem(id){
       }
     }
     await col('items').doc(id).delete();
-    items=items.filter(x=>x.id!==id);
     if (typeof logAction === 'function' && it) logAction('Silme', 'Teklif', id, it.otel + ' projesi için teklif silindi');
     showToast('Teklif başarıyla silindi.');
-    render();updateStats();checkOverdue();
   }catch(e){showToast('Teklif silinirken hata: ' + e.message, 'error');}
 }
 
@@ -1484,8 +1473,6 @@ async function quickAction(event, id, nextStat){
     if (nextStat === 'Tamamlandı' && !it.bit) updates.bit = today();
     
     await col('items').doc(id).update(updates);
-    const idx = items.findIndex(x => x.id === id);
-    if(idx >= 0) items[idx] = { ...items[idx], ...updates };
     if (typeof logAction === 'function') logAction('Durum Güncelleme', 'Teklif', id, (it ? it.otel : '') + ' durumu ' + nextStat + ' olarak güncellendi');
     showToast('Durum güncellendi: ' + nextStat);
     
@@ -1493,8 +1480,6 @@ async function quickAction(event, id, nextStat){
     const cx = event ? event.clientX : window.innerWidth / 2;
     const cy = event ? event.clientY : window.innerHeight / 2;
     triggerConfetti(cx, cy);
-    
-    render();updateStats();checkOverdue();
   } catch(e) {
     showToast('Durum güncellenirken hata: ' + e.message, 'error');
   }
@@ -1533,16 +1518,12 @@ function quickApprove(event, id){
       if (!it.otar) updates.otar = today(); // Otomatik onay tarihi
       
       await col('items').doc(currentApproveId).update(updates);
-      const idx = items.findIndex(x => x.id === currentApproveId);
-      if(idx >= 0) items[idx] = { ...items[idx], ...updates };
       
       showToast('Teklif başarıyla onaylandı.');
       closeApproveModal();
       
       // Center of screen confetti blast for modal approvals
       triggerConfetti(window.innerWidth / 2, window.innerHeight / 2);
-      
-      render(); updateStats(); checkOverdue();
     } catch(e) {
       showToast('Onay işlemi sırasında hata: ' + e.message, 'error');
     } finally {
@@ -1594,13 +1575,11 @@ function openHakedisModal(event, id) {
       };
       
       await col('items').doc(currentHakedisId).update(updates);
-      const idx = items.findIndex(x => x.id === currentHakedisId);
-      if (idx >= 0) items[idx] = { ...items[idx], ...updates };
+      if (typeof logAction === 'function') logAction('Güncelleme', 'Hakediş', currentHakedisId, it.otel + ' hakediş durumu güncellendi');
       
       showToast('Hakediş başarıyla girildi.');
       closeHakedisModal();
       triggerConfetti(window.innerWidth / 2, window.innerHeight / 2);
-      render(); updateStats(); checkOverdue();
     } catch(e) {
       showToast('Hakediş kaydedilirken hata: ' + e.message, 'error');
     } finally {
