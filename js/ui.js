@@ -78,32 +78,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ── SMART TITLE CASE (Akıllı Büyük Harf Formatter) ─────────────────────────
-document.addEventListener('input', function(e) {
-  if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
-    // Exclude specific fields where title case is not desired
-    const excludeIds = ['srch', 'srchKesif', 'srchReport', 'invoice_fno', 'f_fno', 'li_u', 'nu', 'fe_username', 'promptInput'];
-    if (e.target.id && excludeIds.includes(e.target.id)) return;
-    
-    const start = e.target.selectionStart;
-    const end = e.target.selectionEnd;
-    const oldVal = e.target.value;
-    
-    const newVal = oldVal.replace(/([^\W_]+[^\s-]*) */g, function(txt) {
-      // Keep short uppercase acronyms intact (like KDV, AVM)
-      if (txt.trim() === txt.trim().toUpperCase() && txt.trim().length > 1 && txt.trim().length <= 4) {
-        return txt;
-      }
-      return txt.charAt(0).toLocaleUpperCase('tr-TR') + txt.substring(1).toLocaleLowerCase('tr-TR');
-    });
-    
-    if (oldVal !== newVal) {
-      e.target.value = newVal;
-      // Restore cursor to avoid jumping to the end
-      if (start !== null) e.target.setSelectionRange(start, end);
-    }
-  }
-});
+// SMART TITLE CASE Removed by User Request
 
 
 // Global debounced rendering functions
@@ -1992,28 +1967,4 @@ function showStatDetails(type) {
   }).join('');
 }
 
-// ── OTOMATİK İLK HARF BÜYÜTME (TITLE CASE TR) ─────────────
-function toTitleCaseTR(str) {
-  if (!str) return '';
-  return str.split(' ').map(word => {
-    if (word.length === 0) return '';
-    return word.charAt(0).toLocaleUpperCase('tr-TR') + word.slice(1).toLocaleLowerCase('tr-TR');
-  }).join(' ');
-}
-
-// Tüm text inputları için global blur event listener (Kullanıcı inputtan çıkınca devreye girer)
-document.addEventListener('blur', function(e) {
-  if (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'search')) {
-    // Giriş (login) ve şifre inputlarında otomatik büyük harf yapma
-    if (e.target.id === 'li_u' || e.target.id === 'li_p') return;
-    
-    const oldVal = e.target.value;
-    const newVal = toTitleCaseTR(oldVal);
-    if (oldVal !== newVal) {
-      e.target.value = newVal;
-      // Sistemdeki diğer onchange ve oninput fonksiyonlarının da haberdar olması için tetikleme
-      e.target.dispatchEvent(new Event('change', { bubbles: true }));
-      e.target.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-  }
-}, true); // Capture phase (Tüm elementlerde kesin çalışması için)
+// OTOMATİK İLK HARF BÜYÜTME Removed by User Request
