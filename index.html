@@ -207,9 +207,15 @@
         </svg>
         <span>YSR Teklif</span>
       </span>
-      <span class="topbar-user" id="topbarUser"></span>
+      <div class="dynamic-island">
+        <span class="topbar-user" id="topbarUser"></span>
+        <div id="scrolledTabs" class="scrolled-tabs" aria-hidden="true"></div>
+      </div>
     </div>
     <nav class="topbar-right" aria-label="Üst Menü">
+      <button class="tb-btn" id="calmToggleBtn" onclick="toggleCalmUI()" title="Sakin Arayüz (Calm UI) Modu" aria-label="Odak modunu aç veya kapat" style="padding: 10px; display:inline-flex; align-items:center; justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+      </button>
       <button class="tb-btn" id="energyToggleBtn" onclick="toggleEnergyMode()" title="Optimizasyon / Güç Modu" aria-label="Optimizasyon modunu aç veya kapat" style="padding: 10px; display:inline-flex; align-items:center; justify-content:center;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
       </button>
@@ -337,11 +343,15 @@
           <option>Gönderilecek</option><option>Gönderildi</option><option>Onaylandı</option>
           <option>Reddedildi</option><option>İş Yapım Aşamasında</option><option>Tamamlandı</option><option>Hakediş Onaylandı</option><option>Faturalandı</option>
         </select>
+        <button class="tb-btn" onclick="toggleKanban()" id="btnKanbanToggle" aria-label="Kanban Görünümü Aç/Kapat" style="margin-left:auto; padding:8px 12px; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          <span id="kanbanToggleText">Kanban</span>
+        </button>
       </div>
       
 
       
-      <div class="table-wrap">
+      <div class="table-wrap" id="tableWrap">
         <div class="table-scroll">
           <table>
             <thead><tr>
@@ -360,6 +370,9 @@
       </div>
       <!-- MOBİL GÖRÜNÜM İÇİN KART LİSTESİ -->
       <div class="mobile-list-wrap" id="mobileListWrap"></div>
+      
+      <!-- KANBAN GÖRÜNÜMÜ -->
+      <div id="kanbanWrap" class="kanban-wrap" style="display:none;"></div>
     </section>
 
     <!-- DETAYLI ANALİZ -->
@@ -481,12 +494,43 @@
               </div>
             </div>
 
-            <div style="margin-bottom:20px;">
+            <div style="margin-bottom:20px; position:relative;">
               <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Genel Notlar / Açıklamalar</label>
-              <textarea id="rep_notes" placeholder="Gün sonu genel değerlendirmesi, varsa iş kazaları, duruşlar veya önemli notlar..." oninput="updateReportPreview()" style="width:100%; height:80px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); padding:10px; font-family:inherit; font-size:14px;"></textarea>
+              <textarea id="rep_notes" placeholder="Gün sonu genel değerlendirmesi, varsa iş kazaları, duruşlar veya önemli notlar..." oninput="updateReportPreview(); saveDraft('report')" style="width:100%; height:80px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); padding:10px; padding-right: 40px; font-family:inherit; font-size:14px;"></textarea>
+              <button class="tb-btn" onclick="toggleVoiceDictation('rep_notes')" id="btnVoiceDict_rep_notes" aria-label="Sesle Yazdır" title="Sesli Dikte" style="position:absolute; right:8px; top:32px; padding:6px; background:transparent; border:none; cursor:pointer; color:var(--text3);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+              </button>
             </div>
 
             <button class="tb-btn" onclick="saveReport()" id="btnSaveReport" style="width:100%; font-size:15px; font-weight:700; padding:12px; border-radius:8px; background:var(--primary); color:white; border:none; display:inline-flex; align-items:center; justify-content:center; gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>Raporu Kaydet</button>
+          </div>
+          
+          <!-- Alt Panel: Kayıtlı Raporlar Listesi -->
+          <div class="panel-card" style="margin-top: 10px; flex: 1; display:flex; flex-direction:column;">
+            <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <span style="display:inline-flex; align-items:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>Günlük Rapor Arşivi</span>
+              <input type="text" id="srchReport" placeholder="Rapor ara..." oninput="debouncedRenderReports()" style="width:180px; padding:6px 12px; font-size:13px;">
+            </div>
+            <div class="table-wrap">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tarih</th>
+                      <th>Şantiye / İşveren</th>
+                      <th>Hava</th>
+                      <th>Birimler</th>
+                      <th>Hazırlayan</th>
+                      <th style="text-align:right;">İşlemler</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportsTbody">
+                    <!-- Rapor satırları -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mobile-list-wrap" id="mobileReportsWrap"></div>
           </div>
         </div>
 
@@ -563,35 +607,7 @@
           </div>
       </div>
 
-      <!-- Alt Panel: Kayıtlı Raporlar Listesi -->
-      <div style="display: flex; flex-direction: column; gap: 24px; margin-top: 24px;">
-        <div class="panel-card">
-          <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <span style="display:inline-flex; align-items:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>Günlük Rapor Arşivi</span>
-            <input type="text" id="srchReport" placeholder="Rapor ara..." oninput="debouncedRenderReports()" style="width:180px; padding:6px 12px; font-size:13px;">
-          </div>
-          <div class="table-wrap">
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Tarih</th>
-                    <th>Şantiye / İşveren</th>
-                    <th>Hava</th>
-                    <th>Birimler</th>
-                    <th>Hazırlayan</th>
-                    <th style="text-align:right;">İşlemler</th>
-                  </tr>
-                </thead>
-                <tbody id="reportsTbody">
-                  <!-- Rapor satırları -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="mobile-list-wrap" id="mobileReportsWrap"></div>
-        </div>
-      </div>
+
     </section>
 
     <!-- MAHALLER -->
@@ -1223,6 +1239,33 @@ window.triggerConfetti = function(x, y) {
 <!-- PDF Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Command Palette (Ctrl+K) -->
+  <div class="cmd-palette-overlay" id="cmdPalette" style="display:none;" onclick="closeCmdPalette(event)">
+    <div class="cmd-palette" onclick="event.stopPropagation()">
+      <div class="cmd-palette-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="cmdSearchInput" placeholder="Bir eylem arayın veya komut girin..." oninput="handleCmdSearch(this.value)">
+        <span class="cmd-hint">ESC ile kapat</span>
+      </div>
+      <div class="cmd-palette-body" id="cmdResults">
+        <div class="cmd-group-title">Hızlı İşlemler</div>
+        <div class="cmd-item" onclick="executeCmd('new_proposal')" title="Yeni bir teklif formu açar">
+          <div class="cmd-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>
+          <div class="cmd-text">Yeni Teklif Ekle</div>
+          <div class="cmd-shortcut">Alt+N</div>
+        </div>
+        <div class="cmd-item" onclick="executeCmd('new_report')" title="Yeni bir günlük rapor oluşturur">
+          <div class="cmd-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
+          <div class="cmd-text">Günlük Rapor Oluştur</div>
+        </div>
+        <div class="cmd-item" onclick="executeCmd('go_dashboard')" title="Ana dashboard sayfasına döner">
+          <div class="cmd-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+          <div class="cmd-text">Panele Git (Dashboard)</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <!-- Modular Javascript files (Sequential to avoid CORS file:// errors) -->
 <script src="js/utils.js?v=1.0.3"></script>

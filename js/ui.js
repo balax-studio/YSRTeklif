@@ -26,6 +26,12 @@ document.addEventListener('keydown', (e) => {
     const srch = document.getElementById('srch');
     if (srch) srch.focus();
   }
+  
+  // Ctrl+K to open Command Palette
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    if (typeof openCmdPalette === 'function') openCmdPalette();
+  }
 });
 
 // SMART TITLE CASE Removed by User Request
@@ -246,6 +252,36 @@ function buildTabs(){
   }
   const mNav = document.getElementById('mobileNav');
   if(mNav) mNav.innerHTML = mHtml;
+
+  // Desktop scrolled tabs (topbar sticky)
+  let stHtml=`<button class="scrolled-tab-item active" id="st_teklifler" onclick="showTab('teklifler')" data-tooltip="Teklifler">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+  </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_kesifler" onclick="showTab('kesifler')" data-tooltip="Keşifler">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+  </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_analiz" onclick="showTab('analiz')" data-tooltip="Analiz">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+  </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_raporlar" onclick="showTab('raporlar')" data-tooltip="Raporlar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+  </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_mahal" onclick="showTab('mahal')" data-tooltip="İşverenler">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+  </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_hesap" onclick="showTab('hesap')" data-tooltip="Profil">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_logs" onclick="showTab('logs')" data-tooltip="Geçmiş">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+  </button>`;
+  if(currentUser.r==='admin') {
+    stHtml+=`<button class="scrolled-tab-item" id="st_admin" onclick="showTab('admin')" data-tooltip="Kullanıcılar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    </button>`;
+  }
+  const sTabs = document.getElementById('scrolledTabs');
+  if(sTabs) sTabs.innerHTML = stHtml;
 }
 function showTab(t){
   if (t === 'admin' && (!currentUser || currentUser.r !== 'admin')) {
@@ -270,6 +306,13 @@ function showTab(t){
   });
   const mEl=document.getElementById('mn_'+t);
   if(mEl) mEl.classList.add('active');
+  
+  // Scrolled-tab elemanlarını aktif yap
+  document.querySelectorAll('.scrolled-tab-item').forEach(b=>{
+    b.classList.remove('active');
+  });
+  const stEl=document.getElementById('st_'+t);
+  if(stEl) stEl.classList.add('active');
   
   // Mobil FAB görünürlüğü (sadece teklifler sayfasında göster)
   const mFab=document.getElementById('mobileFab');
@@ -381,14 +424,7 @@ async function editMahal(id, currentName) {
   }
   try {
     await col('mahals').doc(id).update({ name: trimmed });
-    const mIdx = mahals.findIndex(m => m.id === id);
-    if (mIdx >= 0) mahals[mIdx].name = trimmed;
-    mahals.sort((a,b) => a.name.localeCompare(b.name, 'tr'));
-    
     showToast("İşveren adı güncellendi.");
-    renderMahalPanel();
-    populateMahalFilter();
-    render();
   } catch (e) {
     showToast("İşveren güncellenirken hata: " + e.message, "error");
   }
@@ -399,11 +435,8 @@ async function addMahal(){
   if(!v){err.textContent='İşveren adı boş olamaz';return;}
   if(mahals.find(m=>m.name===v)){err.textContent='Bu işveren zaten var';return;}
   try{
-    const ref=await col('mahals').add({name:v});
-    mahals.push({id:ref.id,name:v});
-    mahals.sort((a,b) => a.name.localeCompare(b.name, 'tr'));
+    await col('mahals').add({name:v});
     document.getElementById('new_mahal').value='';err.textContent='';
-    renderMahalPanel();populateMahalFilter();
   }catch(e){err.textContent='İşveren eklenirken hata: ' + e.message;}
 }
 async function delMahal(id,name){
@@ -417,9 +450,7 @@ async function delMahal(id,name){
   }
   try{
     await col('mahals').doc(id).delete();
-    mahals=mahals.filter(m=>m.id!==id);
     showToast('İşveren başarıyla silindi.');
-    renderMahalPanel();populateMahalFilter();
   }catch(e){showToast('İşveren silinirken hata: ' + e.message, 'error');}
 }
 
@@ -819,6 +850,46 @@ function render(){
     return;
   }
   
+  const kanbanWrap = document.getElementById('kanbanWrap');
+  const tableWrap = document.getElementById('tableWrap');
+  
+  if (window.kanbanMode) {
+    if (tableWrap) tableWrap.style.display = 'none';
+    if (mobList) mobList.style.display = 'none';
+    if (kanbanWrap) {
+      kanbanWrap.style.display = 'flex';
+      let html = '';
+      STAT_NAMES.forEach(stat => {
+        const colItems = f.filter(it => it.durum === stat);
+        html += `<div class="kanban-col" data-status="${stat}" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+          <div class="kanban-col-header">
+            <span>${stat}</span>
+            <span class="kanban-col-count">${colItems.length}</span>
+          </div>
+          <div class="kanban-cards">
+            ${colItems.map(it => `
+              <div class="kanban-card" id="kanban-card-${it.id}" draggable="true" ondragstart="drag(event)" ondragend="dragEnd(event)" onclick="openModal('${it.id}')">
+                <div class="kanban-card-title">${escapeHTML(it.santiye || it.otel || '-')}</div>
+                <div class="kanban-card-info" style="color:var(--primary); font-weight:700;">${fmtN(it.ttut, it.cur)}</div>
+                <div class="kanban-card-info">${escapeHTML(getMahalName(it.mahalId))}</div>
+                <div class="kanban-card-footer">
+                  <span style="font-weight:600; color:var(--text3);">${getRelativeTime(it.bas)}</span>
+                  <span class="mahal-tag">${escapeHTML(it.kat || '-')}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      });
+      kanbanWrap.innerHTML = html;
+    }
+    return;
+  } else {
+    if (tableWrap) tableWrap.style.display = 'block';
+    if (mobList) mobList.style.display = '';
+    if (kanbanWrap) kanbanWrap.style.display = 'none';
+  }
+
   tb.innerHTML=f.map((it,i)=>{
     const od=isOD(it);
     const si=STAT_NAMES.indexOf(it.durum);
@@ -908,7 +979,7 @@ function render(){
 
       const prog = getProgressData(it.durum);
       return `<div class="mobile-card ${od ? 'overdue' : ''}">
-        <div class="mobile-card-header">
+        <div class="mobile-card-header" onclick="toggleAccordion('${it.id}')" style="cursor:pointer;">
           <div>
             <div class="mobile-card-title">${escapedDisplayName}${fileAttachmentLink}</div>
             <div class="mobile-card-tags" style="margin-top:6px;">
@@ -917,12 +988,15 @@ function render(){
             </div>
           </div>
           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
-            <span class="badge ${STAT_CLS[si] || 'b-0'}" style="font-size:11px; padding:4px 8px;">${it.durum || '-'}</span>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span class="badge ${STAT_CLS[si] || 'b-0'}" style="font-size:11px; padding:4px 8px;">${it.durum || '-'}</span>
+              <svg id="mobile-accordion-icon-${it.id}" class="mobile-accordion-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
             ${getStepperHtml(it.durum)}
           </div>
         </div>
 
-        <div class="mobile-card-info-row">
+        <div id="mobile-accordion-${it.id}" class="mobile-accordion-content">        <div class="mobile-card-info-row">
           <div class="mobile-card-info-item">
             <span class="mobile-card-info-lbl">Teklif Tutarı</span>
             <span class="mobile-card-info-val" style="color: var(--primary); white-space:nowrap;">${fmtN(it.ttut, it.cur)}</span>
@@ -961,11 +1035,23 @@ function render(){
             <button class="btn-edit" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="openModal('${it.id}')" aria-label="${escapedDisplayName} düzenle">${editIcon}</button>
             <button class="btn-del" style="display:inline-flex;align-items:center;padding:6px 8px; border-radius:6px;" onclick="delItem('${it.id}')" aria-label="${escapedDisplayName} sil">${delIcon}</button>
           </div>
+          </div>
         </div>
       </div>`;
     }).join('');
   }
 }
+
+window.toggleAccordion = function(id) {
+  const content = document.getElementById('mobile-accordion-' + id);
+  const icon = document.getElementById('mobile-accordion-icon-' + id);
+  if(content) {
+    content.classList.toggle('open');
+    if(icon) {
+      icon.classList.toggle('open');
+    }
+  }
+};
 
 let currentStatCurrencyIdx = 0;
 let statCurrencyInterval = null;
@@ -1234,13 +1320,7 @@ async function addMahalFromModal() {
   
   try {
     const ref = await col('mahals').add({name: v});
-    const newMahal = {id: ref.id, name: v};
-    mahals.push(newMahal);
-    mahals.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
-    
-    populateMahalFilter(); // Genel filtre listesini yenile
     populateModalMahal(ref.id); // Dropdown'a ekle ve hemen otomatik seç!
-    
     toggleNewMahal();
     input.value = '';
     showToast('Mahal başarıyla eklendi.');
@@ -1335,11 +1415,6 @@ async function saveItem(){
         mahalId = ex.id;
       } else {
         const ref = await col('mahals').add({name: newMahalVal});
-        const newMahal = {id: ref.id, name: newMahalVal};
-        mahals.push(newMahal);
-        mahals.sort((a,b) => (a.name || '').localeCompare(b.name || '', 'tr'));
-        populateMahalFilter();
-        populateModalMahal(ref.id);
         mahalId = ref.id;
       }
       newMahalInput.value = '';
@@ -2046,3 +2121,233 @@ function showStatDetails(type) {
 }
 
 // OTOMATİK İLK HARF BÜYÜTME Removed by User Request
+
+// ── Command Palette (Ctrl+K) ──────────────────────────────────
+window.openCmdPalette = function() {
+  const palette = document.getElementById('cmdPalette');
+  const input = document.getElementById('cmdSearchInput');
+  if (palette) {
+    palette.style.display = 'flex';
+    setTimeout(() => {
+      palette.classList.add('active');
+      if (input) {
+        input.value = '';
+        if (typeof handleCmdSearch === 'function') handleCmdSearch('');
+        input.focus();
+      }
+    }, 10);
+  }
+};
+
+window.closeCmdPalette = function(e) {
+  if (e && e.target && e.target.closest('.cmd-palette') && !e.target.closest('.cmd-item')) return;
+  const palette = document.getElementById('cmdPalette');
+  if (palette) {
+    palette.classList.remove('active');
+    setTimeout(() => {
+      palette.style.display = 'none';
+    }, 300);
+  }
+};
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const palette = document.getElementById('cmdPalette');
+    if (palette && palette.style.display === 'flex') {
+      closeCmdPalette();
+    }
+  } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    openCmdPalette();
+  }
+});
+
+window.handleCmdSearch = function(val) {
+  const items = document.querySelectorAll('.cmd-item');
+  const term = val.toLowerCase();
+  items.forEach(item => {
+    const text = item.querySelector('.cmd-text').textContent.toLowerCase();
+    if (text.includes(term)) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+};
+
+window.executeCmd = function(action) {
+  closeCmdPalette();
+  if (action === 'new_proposal') {
+    if (typeof showTab === 'function') showTab('teklifler');
+    if (typeof openModal === 'function') openModal();
+  } else if (action === 'new_report') {
+    if (typeof showTab === 'function') showTab('raporlar');
+    if (typeof openRaporModal === 'function') openRaporModal();
+  } else if (action === 'go_dashboard') {
+    if (typeof showTab === 'function') showTab('analiz');
+  }
+};
+
+// ── Voice Dictation (Sesle Veri Girişi) ────────────────────────
+window.toggleVoiceDictation = function(targetId) {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert("Tarayıcınız sesle yazdırmayı desteklemiyor.");
+    return;
+  }
+  
+  const targetInput = document.getElementById(targetId);
+  const btn = document.getElementById('btnVoiceDict_' + targetId);
+  if (!targetInput) return;
+
+  if (window.activeDictation) {
+    window.activeDictation.stop();
+    window.activeDictation = null;
+    if (btn) btn.style.color = "var(--text3)";
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'tr-TR';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+
+  if (btn) {
+    btn.style.color = "var(--danger)";
+  }
+
+  let finalTranscript = targetInput.value;
+  if (finalTranscript && !finalTranscript.endsWith(' ')) {
+    finalTranscript += ' ';
+  }
+
+  recognition.onresult = (event) => {
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript + ' ';
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+    targetInput.value = finalTranscript + interimTranscript;
+    if (typeof updateReportPreview === 'function') updateReportPreview();
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error", event.error);
+    window.activeDictation = null;
+    if (btn) btn.style.color = "var(--text3)";
+  };
+
+  recognition.onend = () => {
+    window.activeDictation = null;
+    if (btn) btn.style.color = "var(--text3)";
+  };
+
+  recognition.start();
+  window.activeDictation = recognition;
+};
+
+// ── Offline-first & Auto-save (Otomatik Taslak) ────────────────
+window.saveDraft = function(formId) {
+  if (formId === 'report') {
+    const draft = {
+      notes: document.getElementById('rep_notes')?.value || ''
+    };
+    localStorage.setItem('draft_report', JSON.stringify(draft));
+  }
+};
+
+window.loadDraft = function(formId) {
+  if (formId === 'report') {
+    const draftData = localStorage.getItem('draft_report');
+    if (draftData) {
+      try {
+        const draft = JSON.parse(draftData);
+        if (draft.notes) {
+          const notesEl = document.getElementById('rep_notes');
+          if (notesEl) {
+            notesEl.value = draft.notes;
+            if (typeof updateReportPreview === 'function') updateReportPreview();
+          }
+        }
+      } catch (e) {
+        console.error("Error loading draft", e);
+      }
+    }
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadDraft('report');
+});
+
+// ── Kanban / Sürükle Bırak ────────────────────────────────────
+window.kanbanMode = false;
+
+window.toggleKanban = function() {
+  window.kanbanMode = !window.kanbanMode;
+  const toggleText = document.getElementById('kanbanToggleText');
+  if (toggleText) {
+    toggleText.textContent = window.kanbanMode ? 'Liste Görünümü' : 'Kanban';
+  }
+  if (typeof render === 'function') render();
+};
+
+window.allowDrop = function(ev) {
+  ev.preventDefault();
+  ev.currentTarget.classList.add('drag-over');
+};
+
+window.dragLeave = function(ev) {
+  ev.currentTarget.classList.remove('drag-over');
+};
+
+window.drag = function(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+  ev.target.classList.add('dragging');
+};
+
+window.dragEnd = function(ev) {
+  ev.target.classList.remove('dragging');
+};
+
+window.drop = async function(ev) {
+  ev.preventDefault();
+  ev.currentTarget.classList.remove('drag-over');
+  
+  const data = ev.dataTransfer.getData("text");
+  const el = document.getElementById(data);
+  if (!el) return;
+  
+  const newStatus = ev.currentTarget.getAttribute('data-status');
+  if (!newStatus) return;
+  
+  const idStr = data.replace('kanban-card-', '');
+  
+  // Find item and update locally
+  const item = items.find(i => i.id === idStr);
+  if (item) {
+    item.durum = newStatus;
+    // Update remote
+    try {
+      if (window.db) {
+        import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js").then(async (mod) => {
+          const { doc, updateDoc } = mod;
+          const ref = doc(window.db, "teklifler", idStr);
+          await updateDoc(ref, { durum: newStatus, lastEditedBy: (window.currentUser && window.currentUser.email) ? window.currentUser.email : 'system' });
+          if (typeof fetchItems === 'function') fetchItems();
+        }).catch(err => {
+          console.error("Kanban update remote failed", err);
+          render();
+        });
+      }
+    } catch(e) {
+      console.error(e);
+      render();
+    }
+    // Optimistic render
+    render();
+  }
+};

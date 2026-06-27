@@ -75,6 +75,12 @@ function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
         if (typeof populateMahalFilter === 'function') {
            try { populateMahalFilter(); } catch(e){}
         }
+        if (typeof renderMahalPanel === 'function') {
+           try { renderMahalPanel(); } catch(e){}
+        }
+        if (typeof populateModalMahal === 'function') {
+           try { populateModalMahal(); } catch(e){}
+        }
         if (typeof renderKesifler === 'function') {
            try { renderKesifler(); } catch(e){}
         }

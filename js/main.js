@@ -447,3 +447,18 @@ function updateOnlineStatus() {
 }
 // Run once on load to set initial state
 updateOnlineStatus();
+
+window.addEventListener('scroll', () => {
+  const topbar = document.querySelector('.topbar');
+  const tabsEl = document.getElementById('tabsEl');
+  if (topbar && tabsEl) {
+    const tabsRect = tabsEl.getBoundingClientRect();
+    const topbarRect = topbar.getBoundingClientRect();
+    // Trigger when the bottom of tabsEl starts going under the topbar
+    if (tabsRect.bottom <= topbarRect.bottom + 10) {
+      topbar.classList.add('scrolled');
+    } else {
+      topbar.classList.remove('scrolled');
+    }
+  }
+});
