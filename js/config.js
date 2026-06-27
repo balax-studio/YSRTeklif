@@ -138,6 +138,13 @@ async function sha256(message) {
 
 // ── Custom Alert & Confirm Systems ────────────────────────────
 function showToast(message, type = 'success') {
+  if (document.body.classList.contains('calm-ui') && type !== 'error') {
+    window.calmToastQueue = window.calmToastQueue || [];
+    window.calmToastQueue.push({ message, type });
+    updateCalmBadge();
+    return;
+  }
+
   const container = document.getElementById('toastContainer');
   if (!container) return;
   
@@ -234,4 +241,35 @@ function showPrompt(title, defaultValue = '') {
     btnCancel.onclick = () => cleanUp(null);
     bg.onclick = (e) => { if (e.target === bg) cleanUp(null); };
   });
+}
+
+function updateCalmBadge() {
+  const btn = document.getElementById('calmToggleBtn');
+  if (!btn) return;
+  const count = window.calmToastQueue ? window.calmToastQueue.length : 0;
+  let badge = document.getElementById('calmBadge');
+  if (count > 0) {
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.id = 'calmBadge';
+      badge.style.position = 'absolute';
+      badge.style.top = '-2px';
+      badge.style.right = '-2px';
+      badge.style.background = 'var(--primary)';
+      badge.style.color = '#ffffff';
+      badge.style.borderRadius = '50%';
+      badge.style.width = '16px';
+      badge.style.height = '16px';
+      badge.style.fontSize = '9px';
+      badge.style.fontWeight = '700';
+      badge.style.display = 'flex';
+      badge.style.alignItems = 'center';
+      badge.style.justifyContent = 'center';
+      btn.style.position = 'relative';
+      btn.appendChild(badge);
+    }
+    badge.textContent = count;
+  } else {
+    if (badge) badge.remove();
+  }
 }

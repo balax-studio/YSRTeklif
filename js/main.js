@@ -464,12 +464,35 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// ── Sakin Arayüz (Calm UI / Odak Modu) Logic ─────────────────
 function toggleCalmUI() {
   const isCalm = document.body.classList.toggle('calm-ui');
   localStorage.setItem('calmUI', isCalm ? 'enabled' : 'disabled');
-  if (typeof showToast === 'function') {
-    showToast(isCalm ? 'Sakin Arayüz (Odak Modu) Aktif' : 'Sakin Arayüz Kapatıldı', 'info');
+  
+  if (isCalm) {
+    if (typeof showToast === 'function') {
+      showToast('Sakin Arayüz (Odak Modu) Aktif', 'info');
+    }
+  } else {
+    // Flush queued toasts when exiting Focus Mode
+    if (window.calmToastQueue && window.calmToastQueue.length > 0) {
+      const q = window.calmToastQueue;
+      window.calmToastQueue = [];
+      if (typeof updateCalmBadge === 'function') updateCalmBadge();
+      
+      // Show a summary of notifications missed
+      if (typeof showToast === 'function') {
+        showToast(`Odak modunda ${q.length} bildirim birikti:`, 'info');
+        q.forEach((item, idx) => {
+          setTimeout(() => {
+            showToast(item.message, item.type);
+          }, (idx + 1) * 300);
+        });
+      }
+    } else {
+      if (typeof showToast === 'function') {
+        showToast('Sakin Arayüz Kapatıldı', 'info');
+      }
+    }
   }
   updateCalmUIBtnState(isCalm);
 }
