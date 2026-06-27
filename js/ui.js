@@ -12,6 +12,100 @@ const debounce = (func, wait) => {
   };
 };
 
+function shakeElement(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('shake-error');
+    void el.offsetWidth;
+    el.classList.add('shake-error');
+    setTimeout(() => el.classList.remove('shake-error'), 400);
+  }
+}
+
+function getRelativeTime(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date)) return '';
+  const now = new Date();
+  const diffInMs = date - now;
+  const isFuture = diffInMs > 0;
+  const absDiffMs = Math.abs(diffInMs);
+  
+  const diffInMins = Math.floor(absDiffMs / 60000);
+  const diffInHours = Math.floor(absDiffMs / 3600000);
+  const diffInDays = Math.floor(absDiffMs / 86400000);
+
+  if (diffInMins < 1) return 'Az önce';
+  if (isFuture) {
+    if (diffInMins < 60) return `${diffInMins} dk sonra`;
+    if (diffInHours < 24) return `${diffInHours} saat sonra`;
+    if (diffInDays === 1) return 'Yarın';
+    if (diffInDays < 7) return `${diffInDays} gün sonra`;
+  } else {
+    if (diffInMins < 60) return `${diffInMins} dk önce`;
+    if (diffInHours < 24) return `${diffInHours} saat önce`;
+    if (diffInDays === 1) return 'Dün';
+    if (diffInDays < 7) return `${diffInDays} gün önce`;
+  }
+  return '';
+}
+
+window.currentFormState = "";
+function getFormState(containerId) {
+  const container = document.getElementById(containerId);
+  if(!container) return "";
+  const inputs = container.querySelectorAll('input, select, textarea');
+  const obj = {};
+  inputs.forEach(i => { if(i.id) obj[i.id] = i.value; });
+  return JSON.stringify(obj);
+}
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const modalBg = document.getElementById('modalBg');
+    const kesifModalBg = document.getElementById('kesifModalBg');
+    if (modalBg && modalBg.classList.contains('open')) {
+      if (typeof saveItem === 'function') saveItem();
+    } else if (kesifModalBg && kesifModalBg.classList.contains('open')) {
+      if (typeof saveKesif === 'function') saveKesif();
+    }
+  }
+  
+  if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    const srch = document.getElementById('srch');
+    if (srch) srch.focus();
+  }
+});
+
+// ── SMART TITLE CASE (Akıllı Büyük Harf Formatter) ─────────────────────────
+document.addEventListener('input', function(e) {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+    // Exclude specific fields where title case is not desired
+    const excludeIds = ['srch', 'srchKesif', 'srchReport', 'invoice_fno', 'f_fno', 'li_u', 'nu', 'fe_username', 'promptInput'];
+    if (e.target.id && excludeIds.includes(e.target.id)) return;
+    
+    const start = e.target.selectionStart;
+    const end = e.target.selectionEnd;
+    const oldVal = e.target.value;
+    
+    const newVal = oldVal.replace(/([^\W_]+[^\s-]*) */g, function(txt) {
+      // Keep short uppercase acronyms intact (like KDV, AVM)
+      if (txt.trim() === txt.trim().toUpperCase() && txt.trim().length > 1 && txt.trim().length <= 4) {
+        return txt;
+      }
+      return txt.charAt(0).toLocaleUpperCase('tr-TR') + txt.substring(1).toLocaleLowerCase('tr-TR');
+    });
+    
+    if (oldVal !== newVal) {
+      e.target.value = newVal;
+      // Restore cursor to avoid jumping to the end
+      if (start !== null) e.target.setSelectionRange(start, end);
+    }
+  }
+});
+
+
 // Global debounced rendering functions
 const debouncedRender = debounce(() => { if(typeof render === 'function') render(); }, 300);
 const debouncedRenderKesif = debounce(() => { if(typeof renderKesif === 'function') renderKesif(); }, 300);
@@ -633,6 +727,21 @@ function render(){
     return 0;
   });
 
+  const getProgressData = (durum) => {
+    switch(durum) {
+      case 'Gönderilecek': return { pct: 10, color: 'var(--text3)' };
+      case 'Gönderildi': return { pct: 25, color: 'var(--primary)' };
+      case 'Onaylandı': return { pct: 50, color: 'var(--green)' };
+      case 'İş Yapım Aşamasında': return { pct: 75, color: 'var(--purple)' };
+      case 'Tamamlandı': return { pct: 85, color: 'var(--purple)' };
+      case 'Hakediş Onaylandı': return { pct: 95, color: 'var(--green)' };
+      case 'Faturalandı': return { pct: 100, color: 'var(--green)' };
+      case 'Reddedildi':
+      case 'İptal': return { pct: 100, color: 'var(--red)' };
+      default: return { pct: 0, color: 'transparent' };
+    }
+  };
+
   const tb=document.getElementById('tbody');
   const mobList = document.getElementById('mobileListWrap');
   
@@ -684,7 +793,8 @@ function render(){
     const displayName = it.santiye || it.otel || '-';
     const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-block;" onclick="event.stopPropagation();">📎</a>` : '';
 
-    return`<tr class="${od?'overdue':''}">
+    const prog = getProgressData(it.durum);
+    return`<tr class="${od?'overdue':''}" style="background-image: linear-gradient(to right, ${prog.color} ${prog.pct}%, transparent ${prog.pct}%); background-size: 100% 3px; background-position: bottom left; background-repeat: no-repeat;">
       <td style="color:var(--text2);font-weight:600">${i+1}</td>
       <td class="editable-cell" data-id="${it.id}" data-field="otel" title="Çift tıklayıp şantiye adını düzenleyin">
         <div class="cell-text" style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px">${displayName}${fileAttachmentLink}</div>
@@ -703,8 +813,8 @@ function render(){
         <div class="cell-text" style="font-weight:700; white-space:nowrap;">${it.durum === 'Faturalandı' ? fmtN(it.ftut || it.otut, it.cur) : fmtN(it.otut,it.cur)}</div>
       </td>
       <td>
-        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
-        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
+        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)} <span style="color:var(--text3); font-size:10px">${getRelativeTime(it.bas)}</span></div>
+        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)} <span style="color:var(--text3); font-size:10px">${getRelativeTime(it.bit)}</span>${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
         <div style="margin-bottom:4px;">${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
         ${it.htut ? `<div style="font-size:12px;margin-bottom:4px;color:var(--purple);font-weight:700;white-space:nowrap;"><span style="color:var(--text2)">Hak:</span> ${fmtN(it.htut, it.cur)}</div>` : ''}
         <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
@@ -746,7 +856,8 @@ function render(){
       const displayName = it.santiye || it.otel || '-';
       const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${it.fileName || 'Belgeyi İndir'}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-block;" onclick="event.stopPropagation();">📎</a>` : '';
 
-      return `<div class="mobile-card ${od ? 'overdue' : ''}">
+      const prog = getProgressData(it.durum);
+      return `<div class="mobile-card ${od ? 'overdue' : ''}" style="background-image: linear-gradient(to right, ${prog.color} ${prog.pct}%, transparent ${prog.pct}%); background-size: 100% 3px; background-position: bottom left; background-repeat: no-repeat;">
         <div class="mobile-card-header">
           <div>
             <div class="mobile-card-title">${displayName}${fileAttachmentLink}</div>
@@ -1023,7 +1134,15 @@ function openModal(idx){
   document.getElementById('f_mahal').focus();
 }
 
-function closeModal(){document.getElementById('modalBg').classList.remove('open');editIdx=-1;}
+async function closeModal(){
+  if (window.currentFormState && window.currentFormState !== getFormState('modalBg')) {
+    const ok = await showConfirm("Kaydedilmemiş Değişiklikler", "Kaydedilmemiş değişiklikler var, çıkmak istiyor musunuz?", true);
+    if (!ok) return;
+  }
+  window.currentFormState = "";
+  document.getElementById('modalBg').classList.remove('open');
+  editIdx=-1;
+}
 function updateCur2Lbl(){document.getElementById('f_cur2_lbl').textContent=document.getElementById('f_cur').value;}
 
 function toggleNewMahal(){
@@ -1166,6 +1285,7 @@ async function saveItem(){
     }
     
     if(!mahalId){
+      shakeElement('f_mahal');
       showToast('Lütfen bir işveren seçin veya yeni işveren oluşturun!', 'error');
       btn.disabled=false;
       btn.textContent=document.getElementById('modalTitle').textContent==='Teklif Düzenle'?'Güncelle':'Kaydet';
@@ -1173,6 +1293,7 @@ async function saveItem(){
     }
     const otel=document.getElementById('f_otel').value.trim();
     if(!otel){
+      shakeElement('f_otel');
       showToast('Otel/proje adı gereklidir!', 'error');
       btn.disabled=false;
       btn.textContent=document.getElementById('modalTitle').textContent==='Teklif Düzenle'?'Güncelle':'Kaydet';
@@ -1246,6 +1367,7 @@ async function saveItem(){
         }
       }
     }
+    window.currentFormState = "";
     closeModal();render();updateStats();checkOverdue();
   }catch(e){
     showToast('Teklif kaydedilirken bir hata oluştu: ' + e.message, 'error');
@@ -1829,3 +1951,26 @@ function showStatDetails(type) {
     </tr>`;
   }).join('');
 }
+
+// ── OTOMATİK İLK HARF BÜYÜTME (TITLE CASE TR) ─────────────
+function toTitleCaseTR(str) {
+  if (!str) return '';
+  return str.split(' ').map(word => {
+    if (word.length === 0) return '';
+    return word.charAt(0).toLocaleUpperCase('tr-TR') + word.slice(1).toLocaleLowerCase('tr-TR');
+  }).join(' ');
+}
+
+// Tüm text inputları için global blur event listener (Kullanıcı inputtan çıkınca devreye girer)
+document.addEventListener('blur', function(e) {
+  if (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'search')) {
+    const oldVal = e.target.value;
+    const newVal = toTitleCaseTR(oldVal);
+    if (oldVal !== newVal) {
+      e.target.value = newVal;
+      // Sistemdeki diğer onchange ve oninput fonksiyonlarının da haberdar olması için tetikleme
+      e.target.dispatchEvent(new Event('change', { bubbles: true }));
+      e.target.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+}, true); // Capture phase (Tüm elementlerde kesin çalışması için)

@@ -115,8 +115,32 @@
   <header class="topbar">
     <div class="topbar-left">
       <span class="topbar-logo" style="display:inline-flex; align-items:center; gap:8px;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2l9 4.9v9.8L12 22l-9-5.3V6.9L12 2z"></path>
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.2));">
+          <defs>
+            <linearGradient id="logo-top" x1="0" y1="0" x2="32" y2="32">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#e0f2fe"/>
+            </linearGradient>
+            <linearGradient id="logo-left" x1="0" y1="0" x2="0" y2="32">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#0284c7"/>
+            </linearGradient>
+            <linearGradient id="logo-right" x1="32" y1="0" x2="0" y2="32">
+              <stop offset="0%" stop-color="#0ea5e9"/>
+              <stop offset="100%" stop-color="#0369a1"/>
+            </linearGradient>
+          </defs>
+          <g>
+            <!-- Right Face -->
+            <path d="M16 17 L29 9.5 L29 24.5 L16 32 Z" fill="url(#logo-right)"/>
+            <!-- Left Face -->
+            <path d="M3 9.5 L16 17 L16 32 L3 24.5 Z" fill="url(#logo-left)"/>
+            <!-- Top Face -->
+            <path d="M16 2 L29 9.5 L16 17 L3 9.5 Z" fill="url(#logo-top)"/>
+            <!-- Edge Highlights for Premium 3D effect -->
+            <path d="M16 2 L29 9.5 L16 17 L3 9.5 Z" stroke="#ffffff" stroke-width="1" stroke-opacity="0.9"/>
+            <path d="M16 17 L16 32" stroke="#ffffff" stroke-width="1" stroke-opacity="0.5"/>
+          </g>
         </svg>
         <span>YSR Teklif</span>
       </span>

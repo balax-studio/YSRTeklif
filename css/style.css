@@ -228,6 +228,17 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* SHAKE ERROR ANIMATION */
+  .shake-error {
+    animation: shakeError 0.4s cubic-bezier(.36,.07,.19,.97) both !important;
+    border-color: var(--red) !important;
+  }
+  @keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+  }
+
   /* Neon focus glow rings on input focus */
   .form-group input {
     transition: box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
@@ -639,6 +650,9 @@
   thead {
     background: var(--bg);
     border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 72px;
+    z-index: 10;
   }
   th {
     color: var(--text2);
