@@ -98,9 +98,8 @@ function renderCharts() {
       cycleAnalizCurrencies(dir);
       
       // Update main statistics card index to match consistently
-      const mainContent = document.getElementById('multiCurrencyStatContent');
-      if (mainContent && typeof renderCurrencyVal === 'function') {
-        mainContent.innerHTML = renderCurrencyVal();
+      if (typeof updateStats === 'function') {
+        updateStats();
       }
     };
 

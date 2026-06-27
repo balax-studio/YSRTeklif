@@ -2207,7 +2207,7 @@ window.executeCmd = function(action) {
     if (typeof openModal === 'function') openModal();
   } else if (action === 'new_report') {
     if (typeof showTab === 'function') showTab('raporlar');
-    if (typeof openRaporModal === 'function') openRaporModal();
+    if (typeof clearReportForm === 'function') clearReportForm();
   } else if (action === 'go_dashboard') {
     if (typeof showTab === 'function') showTab('analiz');
   }
@@ -2305,7 +2305,7 @@ window.loadDraft = function(formId) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadDraft('report');
+  window.loadDraft('report');
 });
 
 // ── Kanban / Sürükle Bırak ────────────────────────────────────
@@ -2360,9 +2360,8 @@ window.drop = async function(ev) {
       if (window.db) {
         import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js").then(async (mod) => {
           const { doc, updateDoc } = mod;
-          const ref = doc(window.db, "teklifler", idStr);
+          const ref = doc(window.db, "items", idStr);
           await updateDoc(ref, { durum: newStatus, lastEditedBy: (window.currentUser && window.currentUser.email) ? window.currentUser.email : 'system' });
-          if (typeof fetchItems === 'function') fetchItems();
         }).catch(err => {
           console.error("Kanban update remote failed", err);
           render();

@@ -273,3 +273,19 @@ function updateCalmBadge() {
     if (badge) badge.remove();
   }
 }
+
+function unsubscribeAll() {
+  if (window.activeListeners) {
+    Object.keys(window.activeListeners).forEach(key => {
+      if (typeof window.activeListeners[key] === 'function') {
+        try {
+          window.activeListeners[key]();
+        } catch (e) {
+          console.error(`Error unsubscribing from ${key}:`, e);
+        }
+        delete window.activeListeners[key];
+      }
+    });
+  }
+}
+window.unsubscribeAll = unsubscribeAll;
