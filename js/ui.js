@@ -2004,6 +2004,9 @@ function toTitleCaseTR(str) {
 // Tüm text inputları için global blur event listener (Kullanıcı inputtan çıkınca devreye girer)
 document.addEventListener('blur', function(e) {
   if (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'search')) {
+    // Giriş (login) ve şifre inputlarında otomatik büyük harf yapma
+    if (e.target.id === 'li_u' || e.target.id === 'li_p') return;
+    
     const oldVal = e.target.value;
     const newVal = toTitleCaseTR(oldVal);
     if (oldVal !== newVal) {
