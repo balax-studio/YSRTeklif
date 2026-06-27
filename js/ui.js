@@ -371,18 +371,40 @@ function filterByMahal(mahalId) {
 
 function renderMahalPanel(){
   const tb=document.getElementById('mahalTbody');
-  if(!mahals.length){tb.innerHTML='<tr><td colspan="3" style="padding:16px;color:var(--text2)">Henüz işveren eklenmedi.</td></tr>';return;}
+  const mobList=document.getElementById('mobileMahalWrap');
+  if(!mahals.length){
+    if(tb) tb.innerHTML='<tr><td colspan="3" style="padding:16px;color:var(--text2)">Henüz işveren eklenmedi.</td></tr>';
+    if(mobList) mobList.innerHTML='<div style="padding:16px;color:var(--text2);text-align:center;">Henüz işveren eklenmedi.</div>';
+    return;
+  }
   const sorted = [...mahals].sort((a,b) => a.name.localeCompare(b.name, 'tr'));
-  tb.innerHTML=sorted.map(m=>`<tr>
-    <td><span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele"><span>${m.name}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span></td>
-    <td style="color:var(--text2); cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</td>
-    <td>
-      <div style="display:flex; gap:6px;">
-        <button class="btn-edit" onclick="editMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini düzenle">Düzenle</button>
-        <button class="btn-del" onclick="delMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini sil">Sil</button>
+  if(tb) {
+    tb.innerHTML=sorted.map(m=>`<tr>
+      <td><span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="filterByMahal('${m.id}')" title="Bu işverene ait teklifleri listele/filtrele"><span>${m.name}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span></td>
+      <td style="color:var(--text2); cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</td>
+      <td>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-edit" onclick="editMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini düzenle">Düzenle</button>
+          <button class="btn-del" onclick="delMahal('${m.id}','${m.name}')" aria-label="${m.name} işverenini sil">Sil</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  }
+  if(mobList){
+    mobList.innerHTML=sorted.map(m=>`<div class="mobile-card" style="padding: 14px; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="mahal-tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700;" onclick="filterByMahal('${m.id}')">
+          <span>${m.name}</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <span style="font-size:12px; color:var(--text2); font-weight:600; cursor:pointer;" onclick="filterByMahal('${m.id}')">${items.filter(x=>x.mahalId===m.id).length} teklif</span>
       </div>
-    </td>
-  </tr>`).join('');
+      <div style="display:flex; gap:8px; margin-top: 4px;">
+        <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px;" onclick="editMahal('${m.id}','${m.name}')">✏️ Düzenle</button>
+        <button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px;" onclick="delMahal('${m.id}','${m.name}')">🗑️ Sil</button>
+      </div>
+    </div>`).join('');
+  }
 }
 async function editMahal(id, currentName) {
   const newName = await showPrompt("İşveren Adını Düzenle", currentName);
@@ -444,40 +466,59 @@ async function delMahal(id,name){
 async function renderAdminPanel(){
   try {
     const tb=document.getElementById('userTbody');
-    if(!tb) return;
+    const mobList=document.getElementById('mobileUserWrap');
+    if(!tb && !mobList) return;
 
-  
-  tb.innerHTML=users.map(u=>{
-    let name = u.name || "—";
-    let job = u.job || "—";
-    if (name === "—" || job === "—") {
-      const raw = localStorage.getItem('profile_' + u.u);
-      if (raw) {
-        const profile = JSON.parse(raw);
-        if (name === "—") name = profile.name || "—";
-        if (job === "—") job = profile.job || "—";
-      } else if (u.u === 'admin') {
-        if (name === "—") name = "YSR Admin";
-        if (job === "—") job = "Genel Yönetici";
-      } else if (u.u === 'ysr') {
-        if (name === "—") name = "YSR Kullanıcı";
-        if (job === "—") job = "İnşaat Mühendisi";
+    const itemsHtml = users.map(u=>{
+      let name = u.name || "—";
+      let job = u.job || "—";
+      if (name === "—" || job === "—") {
+        const raw = localStorage.getItem('profile_' + u.u);
+        if (raw) {
+          const profile = JSON.parse(raw);
+          if (name === "—") name = profile.name || "—";
+          if (job === "—") job = profile.job || "—";
+        } else if (u.u === 'admin') {
+          if (name === "—") name = "YSR Admin";
+          if (job === "—") job = "Genel Yönetici";
+        } else if (u.u === 'ysr') {
+          if (name === "—") name = "YSR Kullanıcı";
+          if (job === "—") job = "İnşaat Mühendisi";
+        }
       }
+      return { u, name, job };
+    });
+
+    if(tb) {
+      tb.innerHTML=itemsHtml.map(item=>`<tr>
+        <td>${item.u.u}</td>
+        <td>${item.u.r==='admin'?'Admin':'Kullanıcı'}</td>
+        <td style="font-weight:700;">${item.name}</td>
+        <td style="color:var(--text2); font-weight:600;">${item.job}</td>
+        <td>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-edit" onclick="openUserEditModal('${item.u.id}')" aria-label="${item.u.u} kullanıcısını düzenle">Düzenle</button>
+            ${item.u.u!=='admin'?`<button class="btn-del" onclick="delUser('${item.u.id}','${item.u.u}')" aria-label="${item.u.u} kullanıcısını sil">Sil</button>`:'—'}
+          </div>
+        </td>
+      </tr>`).join('');
     }
 
-    return `<tr>
-      <td>${u.u}</td>
-      <td>${u.r==='admin'?'Admin':'Kullanıcı'}</td>
-      <td style="font-weight:700;">${name}</td>
-      <td style="color:var(--text2); font-weight:600;">${job}</td>
-      <td>
-        <div style="display:flex; gap:6px;">
-          <button class="btn-edit" onclick="openUserEditModal('${u.id}')" aria-label="${u.u} kullanıcısını düzenle">Düzenle</button>
-          ${u.u!=='admin'?`<button class="btn-del" onclick="delUser('${u.id}','${u.u}')" aria-label="${u.u} kullanıcısını sil">Sil</button>`:'—'}
+    if(mobList) {
+      mobList.innerHTML=itemsHtml.map(item=>`<div class="mobile-card" style="padding:14px; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-weight:700; font-size:14px;">${item.name}</span>
+          <span class="badge ${item.u.r==='admin'?'b-2':'b-0'}" style="font-size:10px; padding:2px 8px;">${item.u.r==='admin'?'Admin':'Kullanıcı'}</span>
         </div>
-      </td>
-    </tr>`;
-  }).join('');
+        <div style="font-size:12px; color:var(--text2); font-weight:600;">
+          Kullanıcı Adı: <span style="color:var(--text);">${item.u.u}</span> | Meslek: <span style="color:var(--text);">${item.job}</span>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button class="btn-edit" style="padding:6px 10px; flex:1; font-size:12px;" onclick="openUserEditModal('${item.u.id}')">✏️ Düzenle</button>
+          ${item.u.u!=='admin'?`<button class="btn-del" style="padding:6px 10px; flex:1; font-size:12px;" onclick="delUser('${item.u.id}','${item.u.u}')">🗑️ Sil</button>`:''}
+        </div>
+      </div>`).join('');
+    }
   } catch(e) {
     console.error("renderAdminPanel error:", e);
     showToast("Kullanıcılar yüklenirken hata oluştu.", "error");
@@ -1897,53 +1938,105 @@ function showStatDetails(type) {
   document.getElementById('statDetailTitle').textContent = title + ` (${f.length})`;
   
   const tb = document.getElementById('statDetailTbody');
+  const mobList = document.getElementById('mobileStatDetailWrap');
+  if(!tb && !mobList) return;
+  
   if(!f.length){
-    tb.innerHTML=`<tr class="empty-row">
-      <td colspan="6" style="padding: 60px 20px; text-align: center; background:transparent;">
-        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;">
-          <svg class="empty-state-svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.9;">
+    if (tb) {
+      tb.innerHTML=`<tr class="empty-row">
+        <td colspan="6" style="padding: 60px 20px; text-align: center; background:transparent;">
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;">
+            <svg class="empty-state-svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.9;">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div>
+              <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px;">Harika! Kayıt Bulunmuyor</div>
+              <div style="font-size: 13px; color: var(--text2);">Bu grupta bekleyen veya geciken herhangi bir işlem bulunmamaktadır. İşler yolunda!</div>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }
+    if (mobList) {
+      mobList.innerHTML = `<div class="empty-row" style="padding:40px 16px; text-align:center;">
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
+          <svg class="empty-state-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.9;">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
-          <div>
-            <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px;">Harika! Kayıt Bulunmuyor</div>
-            <div style="font-size: 13px; color: var(--text2);">Bu grupta bekleyen veya geciken herhangi bir işlem bulunmamaktadır. İşler yolunda!</div>
-          </div>
+          <div style="font-size:14px; font-weight:700; color:var(--text);">Harika! Kayıt Bulunmuyor</div>
         </div>
-      </td>
-    </tr>`;
+      </div>`;
+    }
     return;
   }
   
-  tb.innerHTML = f.map((it, i) => {
-    const od = isOD(it);
-    const si = STAT_NAMES.indexOf(it.durum);
-    return `<tr class="${od?'overdue':''}">
-      <td style="color:var(--text2);font-weight:600">${i+1}</td>
-      <td>
-        <div style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px" title="${it.otel||''}">${it.otel||'-'}</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${getMahalName(it.mahalId)}</span>
-          <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat||'-'}</span>
+  if (tb) {
+    tb.innerHTML = f.map((it, i) => {
+      const od = isOD(it);
+      const si = STAT_NAMES.indexOf(it.durum);
+      return `<tr class="${od?'overdue':''}">
+        <td style="color:var(--text2);font-weight:600">${i+1}</td>
+        <td>
+          <div style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px" title="${it.otel||''}">${it.otel||'-'}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="mahal-tag" style="padding:2px 8px;font-size:10px">${getMahalName(it.mahalId)}</span>
+            <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 8px;font-size:10px">${it.kat||'-'}</span>
+          </div>
+        </td>
+        <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
+        <td>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
+          <div style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
+        </td>
+        <td>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.otar)}</div>
+          <div style="font-weight:700; white-space:nowrap;">${fmtN(it.otut,it.cur)}</div>
+        </td>
+        <td>
+          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
+          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
+          <div>${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
+          <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  if (mobList) {
+    mobList.innerHTML = f.map((it, i) => {
+      const od = isOD(it);
+      const si = STAT_NAMES.indexOf(it.durum);
+      return `<div class="mobile-card ${od?'overdue':''}" style="padding:14px; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:6px;">
+          <span style="font-weight:700; font-size:13px; color:var(--text);">${it.otel||'-'}</span>
+          <span class="badge ${STAT_CLS[si]||'b-0'}" style="font-size:10px; padding:2px 8px;">${it.durum||'-'}</span>
         </div>
-      </td>
-      <td><span class="badge ${STAT_CLS[si]||'b-0'}">${it.durum||'-'}</span></td>
-      <td>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.ttar)}</div>
-        <div style="font-weight:700; white-space:nowrap;">${fmtN(it.ttut,it.cur)}</div>
-      </td>
-      <td>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:4px">${fmt(it.otar)}</div>
-        <div style="font-weight:700; white-space:nowrap;">${fmtN(it.otut,it.cur)}</div>
-      </td>
-      <td>
-        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Baş:</span> ${fmt(it.bas)}</div>
-        <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">Bit:</span> ${fmt(it.bit)}${od?'<span class="warn-icon" title="Gecikti" style="display:inline-flex; margin-left:4px; color:var(--red)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>':''}</div>
-        <div>${getDynamicDateBadge(it.bas, it.bit, it.durum)}</div>
-        <div style="font-size:12px"><span style="color:var(--text2)">Fat:</span> ${fmt(it.ftar)}</div>
-      </td>
-    </tr>`;
-  }).join('');
+        <div style="font-size:12px; color:var(--text2); display:flex; gap:6px; flex-wrap:wrap; margin-top:2px;">
+          <span class="mahal-tag" style="padding:2px 6px; font-size:9px;">${getMahalName(it.mahalId)}</span>
+          <span class="badge ${CAT_CLS[it.kat]||'b-diger'}" style="padding:2px 6px; font-size:9px;">${it.kat||'-'}</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:12px; margin-top:4px;">
+          <div>
+            <div style="color:var(--text2); font-size:11px;">Teklif Tutarı</div>
+            <div style="font-weight:700; color:var(--text);">${fmtN(it.ttut,it.cur)}</div>
+          </div>
+          <div>
+            <div style="color:var(--text2); font-size:11px;">Onay Tutarı</div>
+            <div style="font-weight:700; color:var(--text);">${fmtN(it.otut,it.cur)}</div>
+          </div>
+        </div>
+        <div style="border-top:1px dashed var(--border); padding-top:6px; font-size:11px; color:var(--text2); display:flex; flex-direction:column; gap:2px;">
+          <div>Başlangıç: <span style="color:var(--text); font-weight:600;">${fmt(it.bas)}</span> | Bitiş: <span style="color:var(--text); font-weight:600;">${fmt(it.bit)}</span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+            <span>${getDynamicDateBadge(it.bas, it.bit, it.durum)}</span>
+            ${it.ftar ? `<span>Fatura: <span style="color:var(--text); font-weight:600;">${fmt(it.ftar)}</span></span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 // OTOMATİK İLK HARF BÜYÜTME Removed by User Request

@@ -904,6 +904,11 @@
     margin-bottom: 24px;
     letter-spacing: -0.03em;
   }
+  .grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1313,7 +1318,12 @@
       display: none !important;
     }
     #page_teklifler .table-wrap,
-    #page_kesifler .table-wrap {
+    #page_kesifler .table-wrap,
+    #page_logs .table-wrap,
+    #page_mahal .table-wrap,
+    #page_admin .table-wrap,
+    #page_raporlar .table-wrap,
+    #page_stat_detail .table-wrap {
       display: none !important;
     }
     
@@ -1343,8 +1353,9 @@
       grid-template-columns: 1fr !important;
       gap: 16px !important;
     }
-    .form-grid {
-      grid-template-columns: 1fr;
+    .form-grid,
+    .grid-2-col {
+      grid-template-columns: 1fr !important;
     }
     .fg.full {
       grid-column: 1;

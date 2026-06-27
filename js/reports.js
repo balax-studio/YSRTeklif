@@ -24,7 +24,7 @@ function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: ''
           ${optionsHtml}
         </select>
       </div>
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="grid-2-col" style="display:grid; gap: 12px;">
         <div>
           <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Birim / Bölüm Adı</label>
           <input type="text" class="unit-name" placeholder="Örn: Asma Tavan, Elektrik" value="${values.birimAdi || ''}" oninput="updateReportPreview()" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">
@@ -35,7 +35,7 @@ function addUnitRow(values = { birimAdi: '', ekip: '', faaliyet: '', malzeme: ''
         </div>
       </div>
     </div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+    <div class="grid-2-col" style="display:grid; gap: 12px;">
       <div>
         <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text)">Yapılan Faaliyetler</label>
         <textarea class="unit-activity" placeholder="Örn: 2. kat kablolama tamamlandı" oninput="updateReportPreview()" style="width:100%; height:50px; padding:6px; font-size:12px; font-family:inherit; border:1px solid var(--border); border-radius:6px; background:var(--bg); color:var(--text);">${values.faaliyet || ''}</textarea>
@@ -206,50 +206,98 @@ function renderReports() {
   });
   
   const tbody = document.getElementById('reportsTbody');
-  if (!tbody) return;
+  const mobList = document.getElementById('mobileReportsWrap');
+  if (!tbody && !mobList) return;
   
   if (filtered.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align:center; color:var(--text3); padding:24px;">Arşive kayıtlı günlük rapor bulunamadı.</td>
-      </tr>
-    `;
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; color:var(--text3); padding:24px;">Arşive kayıtlı günlük rapor bulunamadı.</td>
+        </tr>
+      `;
+    }
+    if (mobList) {
+      mobList.innerHTML = `<div style="text-align:center; color:var(--text3); padding:24px;">Arşive kayıtlı günlük rapor bulunamadı.</div>`;
+    }
     return;
   }
   
-  tbody.innerHTML = filtered.map(r => {
-    const formattedDate = fmt(r.tarih);
-    const employers = r.mahalIds ? r.mahalIds.map(id => getMahalName(id)).filter(name => name !== 'Tanımlanmamış').join(', ') : getMahalName(r.mahalId);
-    const title = r.santiye ? `${r.santiye} / ${employers}` : employers;
-    const unitsSummary = (r.birimler || []).map(u => `<span class="badge b-diger" style="margin-right:4px; font-size:10px;">${escapeHTML(u.birimAdi)}</span>`).join('');
-    
-    return `
-      <tr onclick="previewReport('${r.id}')" style="cursor:pointer;" class="clickable-row">
-        <td style="font-weight:700;">${formattedDate}</td>
-        <td>
-          <div style="font-weight:600; color:var(--text);">${escapeHTML(title)}</div>
-        </td>
-        <td><span style="font-size:12px; color:var(--text2);">${escapeHTML(r.hava) || '-'}</span></td>
-        <td><div style="display:flex; flex-wrap:wrap; gap:4px;">${unitsSummary || '<span style="color:var(--text3); font-size:11px;">Birim yok</span>'}</div></td>
-        <td><span style="font-size:12px; font-weight:550; color:var(--text2);">${escapeHTML(r.yazan) || '-'}</span></td>
-        <td style="text-align:right;" onclick="event.stopPropagation();">
-          <div style="display:inline-flex; gap:6px;">
-            <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" title="PDF Olarak İndir" style="padding:6px 10px; background:#d97706; color:white; border:none; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+  if (tbody) {
+    tbody.innerHTML = filtered.map(r => {
+      const formattedDate = fmt(r.tarih);
+      const employers = r.mahalIds ? r.mahalIds.map(id => getMahalName(id)).filter(name => name !== 'Tanımlanmamış').join(', ') : getMahalName(r.mahalId);
+      const title = r.santiye ? `${r.santiye} / ${employers}` : employers;
+      const unitsSummary = (r.birimler || []).map(u => `<span class="badge b-diger" style="margin-right:4px; font-size:10px;">${escapeHTML(u.birimAdi)}</span>`).join('');
+      
+      return `
+        <tr onclick="previewReport('${r.id}')" style="cursor:pointer;" class="clickable-row">
+          <td style="font-weight:700;">${formattedDate}</td>
+          <td>
+            <div style="font-weight:600; color:var(--text);">${escapeHTML(title)}</div>
+          </td>
+          <td><span style="font-size:12px; color:var(--text2);">${escapeHTML(r.hava) || '-'}</span></td>
+          <td><div style="display:flex; flex-wrap:wrap; gap:4px;">${unitsSummary || '<span style="color:var(--text3); font-size:11px;">Birim yok</span>'}</div></td>
+          <td><span style="font-size:12px; font-weight:550; color:var(--text2);">${escapeHTML(r.yazan) || '-'}</span></td>
+          <td style="text-align:right;" onclick="event.stopPropagation();">
+            <div style="display:inline-flex; gap:6px;">
+              <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" title="PDF Olarak İndir" style="padding:6px 10px; background:#d97706; color:white; border:none; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>PDF</span>
+              </button>
+              <button class="btn-edit" onclick="editReport('${r.id}')" title="Raporu Düzenle" style="padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Düzenle</span>
+              </button>
+              <button class="btn-del" onclick="deleteReport('${r.id}')" title="Raporu Sil" style="padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; justify-content:center;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  if (mobList) {
+    mobList.innerHTML = filtered.map(r => {
+      const formattedDate = fmt(r.tarih);
+      const employers = r.mahalIds ? r.mahalIds.map(id => getMahalName(id)).filter(name => name !== 'Tanımlanmamış').join(', ') : getMahalName(r.mahalId);
+      const title = r.santiye ? `${r.santiye} / ${employers}` : employers;
+      const unitsSummary = (r.birimler || []).map(u => `<span class="badge b-diger" style="margin-right:4px; font-size:10px; white-space:nowrap;">${escapeHTML(u.birimAdi)}</span>`).join('');
+      
+      return `
+        <div class="mobile-card" onclick="previewReport('${r.id}')" style="cursor:pointer; padding:14px; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:6px;">
+            <span style="font-weight:700; font-size:13px; color:var(--text);">${formattedDate}</span>
+            <span style="font-size:11px; color:var(--text2); font-weight:600;">☁️ ${escapeHTML(r.hava) || '-'}</span>
+          </div>
+          <div style="font-size:13px; color:var(--text); font-weight:600;">
+            Şantiye: <span style="font-weight:500; color:var(--text2);">${escapeHTML(title)}</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2);">
+            Hazırlayan: <span style="font-weight:500; color:var(--text);">${escapeHTML(r.yazan) || '-'}</span>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:2px;">
+            ${unitsSummary || '<span style="color:var(--text3); font-size:11px;">Birim yok</span>'}
+          </div>
+          <div style="display:flex; gap:8px; margin-top:6px;" onclick="event.stopPropagation();">
+            <button class="tb-btn" onclick="downloadReportPDFDirect('${r.id}')" style="padding:6px 10px; flex:1; font-size:12px; background:#d97706; color:white; border:none; display:flex; align-items:center; justify-content:center; gap:4px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>PDF</span>
+              PDF İndir
             </button>
-            <button class="btn-edit" onclick="editReport('${r.id}')" title="Raporu Düzenle" style="padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px;">
+            <button class="btn-edit" onclick="editReport('${r.id}')" style="padding:6px 10px; flex:1; font-size:12px; display:flex; align-items:center; justify-content:center; gap:4px;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              <span>Düzenle</span>
+              Düzenle
             </button>
-            <button class="btn-del" onclick="deleteReport('${r.id}')" title="Raporu Sil" style="padding:6px 10px; font-size:12px; display:inline-flex; align-items:center; justify-content:center;">
+            <button class="btn-del" onclick="deleteReport('${r.id}')" style="padding:6px 10px; font-size:12px; display:flex; align-items:center; justify-content:center;">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
           </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 async function saveReport() {

@@ -370,6 +370,7 @@
           </table>
         </div>
       </div>
+      <div class="mobile-list-wrap" id="mobileStatDetailWrap"></div>
     </section>
 
     <!-- GÜNLÜK İŞ RAPORLARI -->
@@ -388,7 +389,7 @@
               <button class="tb-btn" onclick="clearReportForm()" id="btnResetReport" style="padding: 4px 10px; font-size:12px; display:none;">Yeni Rapor</button>
             </div>
             
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; align-items:start;">
+            <div class="grid-2-col" style="display:grid; align-items:start;">
               <div>
                 <label style="display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--text)">Tarih</label>
                 <input type="date" id="rep_date" oninput="updateReportPreview()" style="width:100%;">
@@ -525,6 +526,7 @@
               </table>
             </div>
           </div>
+          <div class="mobile-list-wrap" id="mobileReportsWrap"></div>
         </div>
       </div>
     </section>
@@ -536,8 +538,13 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
           <span>İşveren Yönetimi</span>
         </div>
-        <table class="list-table"><thead><tr><th>İşveren Adı</th><th>Teklif Sayısı</th><th>İşlem</th></tr></thead>
-        <tbody id="mahalTbody"></tbody></table>
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table class="list-table"><thead><tr><th>İşveren Adı</th><th>Teklif Sayısı</th><th>İşlem</th></tr></thead>
+            <tbody id="mahalTbody"></tbody></table>
+          </div>
+        </div>
+        <div class="mobile-list-wrap" id="mobileMahalWrap"></div>
         <div class="add-row" role="form" aria-label="Yeni İşveren Ekle">
           <input id="new_mahal" type="text" placeholder="Yeni işveren adı (örn: Ethno Otel)" aria-label="Yeni işveren adı" onkeydown="if(event.key==='Enter') addMahal()">
           <button class="btn-add" onclick="addMahal()" aria-label="Yeni işvereni listeye ekle">+ Ekle</button>
@@ -657,14 +664,20 @@
           </table>
         </div>
       </div>
+      <div class="mobile-list-wrap" id="mobileLogsWrap"></div>
     </section>
 
     <!-- KULLANICILAR (sadece admin) -->
     <section class="page" id="page_admin" aria-label="Kullanıcı Yönetimi Sayfası">
       <div class="panel-card">
         <div class="panel-title">👥 Kullanıcı Yönetimi</div>
-        <table class="list-table"><thead><tr><th>Kullanıcı Adı</th><th>Rol</th><th>Ad Soyadı</th><th>Meslek</th><th>İşlem</th></tr></thead>
-        <tbody id="userTbody"></tbody></table>
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table class="list-table"><thead><tr><th>Kullanıcı Adı</th><th>Rol</th><th>Ad Soyadı</th><th>Meslek</th><th>İşlem</th></tr></thead>
+            <tbody id="userTbody"></tbody></table>
+          </div>
+        </div>
+        <div class="mobile-list-wrap" id="mobileUserWrap"></div>
         <div class="add-row" role="form" aria-label="Yeni Kullanıcı Ekle">
           <input id="nu" type="text" placeholder="Kullanıcı adı" aria-label="Yeni kullanıcı adı" onkeydown="if(event.key==='Enter') document.getElementById('np').focus()">
           <input id="np" type="password" placeholder="Şifre" aria-label="Yeni kullanıcı şifresi" onkeydown="if(event.key==='Enter') addUser()">

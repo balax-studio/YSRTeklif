@@ -38,17 +38,22 @@ function logAction(actionType, entity, docId, details) {
  */
 function renderLogs() {
   const tbody = document.getElementById('logsTbody');
-  if (!tbody) return;
+  const mobList = document.getElementById('mobileLogsWrap');
+  if (!tbody && !mobList) return;
 
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Yükleniyor...</td></tr>';
+  if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Yükleniyor...</td></tr>';
+  if (mobList) mobList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text2);">Yükleniyor...</div>';
 
   db.collection(LOGS_COLLECTION)
     .orderBy('createdAt', 'desc')
     .limit(50)
     .onSnapshot(snapshot => {
-      tbody.innerHTML = '';
+      if (tbody) tbody.innerHTML = '';
+      if (mobList) mobList.innerHTML = '';
+      
       if (snapshot.empty) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Henüz bir hareket bulunmuyor.</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Henüz bir hareket bulunmuyor.</td></tr>';
+        if (mobList) mobList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text2);">Henüz bir hareket bulunmuyor.</div>';
         return;
       }
 
@@ -68,20 +73,43 @@ function renderLogs() {
         if (actionLabel.toLowerCase().includes('sil')) badgeClass = 'status-reddedildi';
         if (actionLabel.toLowerCase().includes('hızlı')) badgeClass = 'status-tamamlandi';
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><div class="cell-text" style="font-weight:600; color:var(--text);">${dateStr}</div></td>
-          <td><div class="cell-text">${data.user}</div></td>
-          <td><span class="status-badge ${badgeClass}">${actionLabel}</span></td>
-          <td>
-            <div class="cell-text" style="color:var(--text); font-weight:500;">[${data.entity}]</div>
-            <div class="cell-sub" style="margin-top:4px;">${data.details}</div>
-          </td>
-        `;
-        tbody.appendChild(tr);
+        if (tbody) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><div class="cell-text" style="font-weight:600; color:var(--text);">${dateStr}</div></td>
+            <td><div class="cell-text">${data.user}</div></td>
+            <td><span class="status-badge ${badgeClass}">${actionLabel}</span></td>
+            <td>
+              <div class="cell-text" style="color:var(--text); font-weight:500;">[${data.entity}]</div>
+              <div class="cell-sub" style="margin-top:4px;">${data.details}</div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+
+        if (mobList) {
+          const card = document.createElement('div');
+          card.className = 'mobile-card';
+          card.style.padding = '14px';
+          card.style.gap = '8px';
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:6px;">
+              <span class="status-badge ${badgeClass}" style="font-size:10px; padding:2px 6px;">${actionLabel}</span>
+              <span style="font-size:11px; color:var(--text2); font-weight:600;">${dateStr}</span>
+            </div>
+            <div style="font-size:13px; color:var(--text); font-weight:600;">
+              [${data.entity}] <span style="font-weight:400; color:var(--text2);">${data.user}</span>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-top:2px;">
+              ${data.details}
+            </div>
+          `;
+          mobList.appendChild(card);
+        }
       });
     }, err => {
       console.error("Loglar okunurken hata:", err);
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red; padding:20px;">Loglar yüklenirken bir hata oluştu.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red; padding:20px;">Loglar yüklenirken bir hata oluştu.</td></tr>';
+      if (mobList) mobList.innerHTML = '<div style="text-align:center; color:red; padding:20px;">Loglar yüklenirken bir hata oluştu.</div>';
     });
 }
