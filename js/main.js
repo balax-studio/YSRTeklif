@@ -316,6 +316,7 @@ safeListen('tbody', 'dblclick', function(e) {
 window.addEventListener('load',()=>{
   initTheme();
   initEnergyMode();
+  initCalmUI();
   
   // Attach premium 3D Tilt mouse effect to Login Card and background mesh glow
   const loginScr = document.getElementById('loginScreen');
@@ -462,3 +463,37 @@ window.addEventListener('scroll', () => {
     }
   }
 });
+
+// ── Sakin Arayüz (Calm UI / Odak Modu) Logic ─────────────────
+function toggleCalmUI() {
+  const isCalm = document.body.classList.toggle('calm-ui');
+  localStorage.setItem('calmUI', isCalm ? 'enabled' : 'disabled');
+  if (typeof showToast === 'function') {
+    showToast(isCalm ? 'Sakin Arayüz (Odak Modu) Aktif' : 'Sakin Arayüz Kapatıldı', 'info');
+  }
+  updateCalmUIBtnState(isCalm);
+}
+
+function updateCalmUIBtnState(isCalm) {
+  const btn = document.getElementById('calmToggleBtn');
+  if (btn) {
+    if (isCalm) {
+      btn.style.color = 'var(--primary)';
+      btn.style.background = 'rgba(var(--primary-rgb), 0.1)';
+    } else {
+      btn.style.color = '';
+      btn.style.background = '';
+    }
+  }
+}
+
+function initCalmUI() {
+  const saved = localStorage.getItem('calmUI') || 'disabled';
+  const isCalm = saved === 'enabled';
+  if (isCalm) {
+    document.body.classList.add('calm-ui');
+  } else {
+    document.body.classList.remove('calm-ui');
+  }
+  updateCalmUIBtnState(isCalm);
+}
