@@ -979,7 +979,7 @@ function render(){
 
       const prog = getProgressData(it.durum);
       return `<div class="mobile-card ${od ? 'overdue' : ''}">
-        <div class="mobile-card-header" onclick="toggleAccordion('${it.id}')" style="cursor:pointer;">
+        <div class="mobile-card-header" onclick="toggleMobileAccordion('${it.id}')" style="cursor:pointer;">
           <div>
             <div class="mobile-card-title">${escapedDisplayName}${fileAttachmentLink}</div>
             <div class="mobile-card-tags" style="margin-top:6px;">
@@ -1042,7 +1042,7 @@ function render(){
   }
 }
 
-window.toggleAccordion = function(id) {
+window.toggleMobileAccordion = function(id) {
   const content = document.getElementById('mobile-accordion-' + id);
   const icon = document.getElementById('mobile-accordion-icon-' + id);
   if(content) {
