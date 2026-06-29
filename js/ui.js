@@ -911,8 +911,8 @@ function render(){
     const fileAttachmentLink = it.fileUrl ? `<a href="${it.fileUrl}" target="_blank" title="Ekli Belge: ${escapeHTML(it.fileName || 'Belgeyi İndir')}" style="text-decoration:none; margin-left:6px; font-size:14px; display:inline-flex; align-items:center; justify-content:center;" onclick="event.stopPropagation();"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg></a>` : '';
 
     const prog = getProgressData(it.durum);
-    return`<tr class="${od?'overdue':''}">
-      <td style="color:var(--text2);font-weight:600;cursor:pointer;text-align:center;background:var(--primary-color-faded);border-radius:4px;" onclick="toggleDesktopAccordion(event, '${it.id}')" title="Detayları Göster">${i+1}</td>
+    return`<tr class="${od?'overdue':''}" onclick="toggleDesktopAccordion(event, '${it.id}')" style="cursor:pointer;">
+      <td style="color:var(--text2);font-weight:600;text-align:center;background:var(--primary-color-faded);border-radius:4px;" title="Detayları Göster">${i+1}</td>
       <td class="editable-cell" data-id="${it.id}" data-field="otel" title="Çift tıklayıp şantiye adını düzenleyin">
         <div class="cell-text" style="font-weight:700;max-width:180px;white-space:normal;line-height:1.3;margin-bottom:6px">${escapedDisplayName}${fileAttachmentLink}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -2379,7 +2379,14 @@ window.drop = async function(ev) {
 };
 
 window.toggleDesktopAccordion = function(event, id) {
-  if (event) event.stopPropagation();
+  if (event) {
+    event.stopPropagation();
+    const target = event.target;
+    // Do not toggle if clicked on buttons, links, inputs, selects, or editable cells
+    if (target.closest('button, a, input, select, .editable-cell') || target.tagName === 'BUTTON') {
+      return;
+    }
+  }
   const el = document.getElementById('desktop-accordion-' + id);
   if (el) {
     if (el.style.display === 'none') {

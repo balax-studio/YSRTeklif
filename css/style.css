@@ -47,6 +47,7 @@
     --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.03);
     --topbar-bg: rgba(255, 255, 255, 0.85);
     --card-rgb: 255, 255, 255;
+    --grid-pattern: radial-gradient(var(--border) 1px, transparent 1px);
   }
 
   :root[data-theme="dark"] {
@@ -77,6 +78,7 @@
     --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.2);
     --topbar-bg: rgba(11, 15, 25, 0.7);
     --card-rgb: 11, 15, 25;
+    --grid-pattern: radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
   }
 
   body {
@@ -89,6 +91,18 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     overscroll-behavior-y: none;
+  }
+
+  body:not(.extreme-active) {
+    background-color: var(--bg);
+    background-image: 
+      var(--grid-pattern),
+      radial-gradient(circle at 12% 18%, var(--primary-bg) 0%, transparent 50%),
+      radial-gradient(circle at 88% 12%, var(--purple-bg) 0%, transparent 50%),
+      radial-gradient(circle at 78% 82%, var(--green-bg) 0%, transparent 50%),
+      radial-gradient(circle at 18% 78%, var(--amber-bg) 0%, transparent 50%);
+    background-size: 24px 24px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-attachment: fixed;
   }
 
   /* CUSTOM PREMIUM SCROLLBARS FOR 2026 UX */
@@ -1757,26 +1771,49 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    transform: translateY(20px);
+    transform: translateY(20px) scale(0.96);
     opacity: 0;
     pointer-events: auto;
     animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     max-width: 320px;
+    position: relative;
+    overflow: hidden;
   }
   .toast.success {
     border-left: 4px solid var(--green);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.06), var(--shadow-lg);
   }
   .toast.error {
     border-left: 4px solid var(--red);
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.06), var(--shadow-lg);
   }
   .toast.info {
     border-left: 4px solid var(--primary);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.06), var(--shadow-lg);
   }
+  .toast::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    transform-origin: left;
+    animation: toastProgress 4s linear forwards;
+  }
+  .toast.success::after { background: var(--green); }
+  .toast.error::after { background: var(--red); }
+  .toast.info::after { background: var(--primary); }
+
   @keyframes toastIn {
-    to { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
   }
   @keyframes toastOut {
-    to { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(-20px) scale(0.95); opacity: 0; }
+  }
+  @keyframes toastProgress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
   }
 
   /* CUSTOM CONFIRM MODAL */
@@ -1870,6 +1907,29 @@
     border-color: var(--primary);
   }
 
+  /* Static card style adjustments when Extreme Mode is OFF */
+  body:not(.extreme-active) .stat-card {
+    transition: background-color 0.3s ease;
+  }
+  body:not(.extreme-active) .stat-card::before {
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  body:not(.extreme-active) .stat-card:hover {
+    background: var(--primary-color-faded);
+  }
+  body:not(.extreme-active) .chart-card,
+  body:not(.extreme-active) .panel-card {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.3s ease;
+  }
+  body:not(.extreme-active) .chart-card:hover,
+  body:not(.extreme-active) .panel-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+
   /* 2026 Soft Animated Page Transitions */
   .page {
     transform: translateY(15px);
@@ -1884,6 +1944,27 @@
     transform: translateY(0);
     filter: blur(0);
     opacity: 1;
+  }
+
+  /* Premium Eco entrance for page headers & title texts */
+  .page.active .page-title,
+  .page.active h1,
+  .page.active h2:not(.modal-title),
+  .page.active .section-header {
+    animation: ecoFadeBlurIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes ecoFadeBlurIn {
+    from {
+      opacity: 0;
+      filter: blur(3px);
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
   }
 
   /* Rotating Gradient Borders for Extreme Mode */
