@@ -358,7 +358,6 @@ window.addEventListener('load',()=>{
     if (savedSession && db) {
       try {
         const session = JSON.parse(savedSession);
-        await loadAll();
         
         // Fetch only the specific user document to prevent loading entire collection
         const userQuery = await col('users').where('u', '==', session.u).get();
@@ -378,6 +377,9 @@ window.addEventListener('load',()=>{
           if (currentUser.r === 'admin') {
             await setupSnapshot('users', null, null, d => { users = d; });
           }
+          
+          // Load all database collections only after verifying user credentials
+          await loadAll();
           
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('appScreen').style.display = 'flex';

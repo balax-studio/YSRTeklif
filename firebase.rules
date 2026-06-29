@@ -1,4 +1,9 @@
 // Firebase security rules (Firestore)
+// ponytail: Bu projede Firebase Authentication kullanılmamakta ve yerel (file://) protokolü
+// üzerinden Firestore koleksiyonları doğrudan custom db kullanıcı doğrulaması ile okunmaktadır.
+// Bu sebeple 'allow read: if true;' basitleştirmesi kullanılmıştır.
+// Tavan Sınırı: Veritabanı okumaları tamamen internete açıktır.
+// Yükseltme Patikası: Firebase Email/Password Auth entegrasyonu yapılarak 'allow read: if request.auth != null;' kuralına geçilmelidir.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {

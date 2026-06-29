@@ -23,7 +23,6 @@ async function doLogin(){
   }
   
   try{
-    await loadAll();
     const hashedP = await sha256(p);
     
     // Secure query: check database directly for username matching lowercase entered input
@@ -50,6 +49,9 @@ async function doLogin(){
     if (currentUser.r === 'admin') {
       await setupSnapshot('users', null, null, d => { users = d; });
     }
+    
+    // Load all other data ONLY after successful validation
+    await loadAll();
     
     // Save session to localStorage for auto login on refresh
     localStorage.setItem('ysr_session', JSON.stringify({ u: found.u, p: hashedP }));
