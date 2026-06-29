@@ -40,12 +40,24 @@ export default defineConfig({
             })
             .join('\n\n');
 
+          // Find all top-level function declarations to expose them on the window object
+          // so that legacy inline HTML event handlers (e.g. onclick) can access them.
+          const functionRegex = /^(?:async\s+)?function\s+([a-zA-Z0-9_]+)\s*\(/gm;
+          let match;
+          const globalExposed = [];
+          while ((match = functionRegex.exec(concatenated)) !== null) {
+            const funcName = match[1];
+            globalExposed.push(`window.${funcName} = ${funcName};`);
+          }
+          
+          const finalBundleContent = concatenated + '\n\n/* Global Exports for HTML inline event handlers */\n' + globalExposed.join('\n');
+
           // Write to a temporary file that Vite will bundle
           const bundleDir = path.resolve(__dirname, 'js');
           if (!fs.existsSync(bundleDir)) {
             fs.mkdirSync(bundleDir, { recursive: true });
           }
-          fs.writeFileSync(path.resolve(__dirname, 'js/app-bundle.js'), concatenated);
+          fs.writeFileSync(path.resolve(__dirname, 'js/app-bundle.js'), finalBundleContent);
 
           // Replace the sequential script tags in HTML with a single module script tag
           const startTag = '<script src="js/utils.js?v=1.0.3"></script>';
