@@ -22,6 +22,7 @@ export default defineConfig({
             'js/ui.js',
             'js/auth.js',
             'js/kesifler.js',
+            'js/taseronlar.js',
             'js/reports.js',
             'js/charts.js',
             'js/pdf.js',

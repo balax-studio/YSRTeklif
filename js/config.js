@@ -68,9 +68,15 @@ function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
         isFirst = false;
         resolve();
       } else {
-        // Trigger UI updates safely if the functions exist
-        if (typeof render === 'function') {
-          try { render(); updateStats(); checkOverdue(); } catch(e){}
+        // Trigger UI updates safely using debounced functions to prevent thrashes
+        if (typeof debouncedRender === 'function') {
+          try { debouncedRender(); } catch(e){}
+        }
+        if (typeof updateStats === 'function') {
+          try { updateStats(); } catch(e){}
+        }
+        if (typeof checkOverdue === 'function') {
+          try { checkOverdue(); } catch(e){}
         }
         if (typeof populateMahalFilter === 'function') {
            try { populateMahalFilter(); } catch(e){}
@@ -81,17 +87,20 @@ function setupSnapshot(colName, orderByField, orderByDir, onUpdate) {
         if (typeof populateModalMahal === 'function') {
            try { populateModalMahal(); } catch(e){}
         }
-        if (typeof renderKesifler === 'function') {
-           try { renderKesifler(); } catch(e){}
+        if (typeof debouncedRenderKesif === 'function') {
+           try { debouncedRenderKesif(); } catch(e){}
         }
-        if (typeof renderReports === 'function') {
-           try { renderReports(); } catch(e){}
+        if (typeof debouncedRenderReports === 'function') {
+           try { debouncedRenderReports(); } catch(e){}
+        }
+        if (typeof debouncedRenderTaseron === 'function') {
+           try { debouncedRenderTaseron(); } catch(e){}
         }
         if (typeof renderCharts === 'function') {
-           try { 
-             const analizPage = document.getElementById('page_analiz');
-             if(analizPage && analizPage.classList.contains('active')) renderCharts();
-           } catch(e){}
+            try { 
+              const analizPage = document.getElementById('page_analiz');
+              if(analizPage && analizPage.classList.contains('active')) renderCharts();
+            } catch(e){}
         }
       }
     }, err => {
@@ -111,7 +120,9 @@ async function loadAll(){
       setupSnapshot('mahals', 'name', 'asc', d => { mahals = d; }),
       setupSnapshot('items', 'createdAt', 'desc', d => { items = d; }),
       setupSnapshot('surveys', null, null, d => { surveys = d; }),
-      setupSnapshot('reports', null, null, d => { reports = d; })
+      setupSnapshot('reports', null, null, d => { reports = d; }),
+      setupSnapshot('taseronlar', null, null, d => { taseronlar = d; }),
+      setupSnapshot('taseron_payments', 'date', 'desc', d => { taseron_payments = d; })
     ]);
     
     // Check and seed default users if empty

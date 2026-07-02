@@ -486,6 +486,7 @@
     transform: translateY(15px);
     max-width: 0;
     padding-right: 0;
+    overflow: hidden;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
@@ -493,7 +494,7 @@
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
-    max-width: 300px;
+    max-width: 450px;
     padding-right: 6px;
   }
 
@@ -2935,5 +2936,72 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  /* TODO List / Subcontractor Accordion Styles */
+  .todo-table th {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text2);
+    padding: 8px 4px;
+    font-weight: 700;
+  }
+  .todo-table td {
+    padding: 6px 4px;
+    vertical-align: middle;
+  }
+  .todo-table input[type="text"],
+  .todo-table input[type="number"],
+  .todo-table select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(var(--card-rgb), 0.5);
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+  .todo-table input[type="text"]:focus,
+  .todo-table input[type="number"]:focus,
+  .todo-table select:focus {
+    border-color: var(--primary);
+    background-color: var(--bg);
+  }
+  .todo-table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  /* Taseronlar Split-Pane CSS Styles */
+  .taseron-list-item:hover {
+    border-color: var(--primary) !important;
+    background: rgba(var(--primary-rgb), 0.03) !important;
+  }
+  .taseron-list-item.active {
+    border-color: var(--primary) !important;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  @media (max-width: 992px) {
+    .taseron-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .flex-col-mobile {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 12px;
+    }
+    .grid-3-mobile {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+    .grid-2-mobile {
+      grid-template-columns: 1fr !important;
+      gap: 20px !important;
     }
   }

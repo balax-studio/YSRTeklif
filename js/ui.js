@@ -41,23 +41,41 @@ document.addEventListener('keydown', (e) => {
 const debouncedRender = debounce(() => { if(typeof render === 'function') render(); }, 300);
 const debouncedRenderKesif = debounce(() => { if(typeof renderKesif === 'function') renderKesif(); }, 300);
 const debouncedRenderReports = debounce(() => { if(typeof renderReports === 'function') renderReports(); }, 300);
+const debouncedRenderTaseron = debounce(() => { if(typeof renderTaseron === 'function') renderTaseron(); }, 300);
 window.debouncedRender = debouncedRender;
 window.debouncedRenderKesif = debouncedRenderKesif;
 window.debouncedRenderReports = debouncedRenderReports;
+window.debouncedRenderTaseron = debouncedRenderTaseron;
 
-// Dynamic Radial-Gradient Card Reflection Glow Tracking (Optimized with requestAnimationFrame)
+// Dynamic Radial-Gradient Card Reflection Glow Tracking (Optimized with delegated mouseover/mousemove)
+let activeGlowCard = null;
 let isTickingMouse = false;
-document.addEventListener('mousemove', e => {
+
+document.addEventListener('mouseover', e => {
   if (window.energyMode === 'enabled') return;
+  const card = e.target.closest('.stat-card, .chart-card, .panel-card');
+  if (card) {
+    activeGlowCard = card;
+  }
+});
+
+document.addEventListener('mouseout', e => {
+  const card = e.target.closest('.stat-card, .chart-card, .panel-card');
+  if (card && activeGlowCard === card) {
+    activeGlowCard = null;
+  }
+});
+
+document.addEventListener('mousemove', e => {
+  if (!activeGlowCard || window.energyMode === 'enabled') return;
   if (!isTickingMouse) {
     window.requestAnimationFrame(() => {
-      const card = e.target.closest('.stat-card, .chart-card, .panel-card');
-      if (card) {
-        const rect = card.getBoundingClientRect();
+      if (activeGlowCard) {
+        const rect = activeGlowCard.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
+        activeGlowCard.style.setProperty('--mouse-x', `${x}px`);
+        activeGlowCard.style.setProperty('--mouse-y', `${y}px`);
       }
       isTickingMouse = false;
     });
@@ -199,6 +217,7 @@ function buildTabs(){
   html+=`<div class="tab" id="t_analiz" role="tab" tabindex="0" aria-selected="false" onclick="showTab('analiz')">Analiz</div>`;
   html+=`<div class="tab" id="t_raporlar" role="tab" tabindex="0" aria-selected="false" onclick="showTab('raporlar')">Raporlar</div>`;
   html+=`<div class="tab" id="t_mahal" role="tab" tabindex="0" aria-selected="false" onclick="showTab('mahal')">İşverenler</div>`;
+  html+=`<div class="tab" id="t_taseronlar" role="tab" tabindex="0" aria-selected="false" onclick="showTab('taseronlar')">Taşeronlar</div>`;
   html+=`<div class="tab" id="t_hesap" role="tab" tabindex="0" aria-selected="false" onclick="showTab('hesap')">Profilim</div>`;
   html+=`<div class="tab" id="t_logs" role="tab" tabindex="0" aria-selected="false" onclick="showTab('logs')">İşlem Geçmişi</div>`;
   if(currentUser.r==='admin')html+=`<div class="tab" id="t_admin" role="tab" tabindex="0" aria-selected="false" onclick="showTab('admin')">Kullanıcılar</div>`;
@@ -238,6 +257,10 @@ function buildTabs(){
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
     <span>İşverenler</span>
   </button>`;
+  mHtml+=`<button class="mobile-nav-item" id="mn_taseronlar" onclick="showTab('taseronlar')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    <span>Taşeronlar</span>
+  </button>`;
   mHtml+=`<button class="mobile-nav-item" id="mn_hesap" onclick="showTab('hesap')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
     <span>Profil</span>
@@ -248,7 +271,7 @@ function buildTabs(){
   </button>`;
   if(currentUser.r==='admin') {
     mHtml+=`<button class="mobile-nav-item" id="mn_admin" onclick="showTab('admin')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
       <span>Kullanıcılar</span>
     </button>`;
   }
@@ -271,6 +294,9 @@ function buildTabs(){
   stHtml+=`<button class="scrolled-tab-item" id="st_mahal" onclick="showTab('mahal')" data-tooltip="İşverenler">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
   </button>`;
+  stHtml+=`<button class="scrolled-tab-item" id="st_taseronlar" onclick="showTab('taseronlar')" data-tooltip="Taşeronlar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+  </button>`;
   stHtml+=`<button class="scrolled-tab-item" id="st_hesap" onclick="showTab('hesap')" data-tooltip="Profil">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
   </button>`;
@@ -279,7 +305,7 @@ function buildTabs(){
   </button>`;
   if(currentUser.r==='admin') {
     stHtml+=`<button class="scrolled-tab-item" id="st_admin" onclick="showTab('admin')" data-tooltip="Kullanıcılar">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
     </button>`;
   }
   const sTabs = document.getElementById('scrolledTabs');
@@ -339,6 +365,7 @@ function showTab(t){
   if(t==='raporlar')renderReports();
   if(t==='mahal')renderMahalPanel();
   if(t==='kesifler')renderKesif();
+  if(t==='taseronlar' && typeof renderTaseron === 'function') renderTaseron();
   if(t==='admin')renderAdminPanel();
 }
 

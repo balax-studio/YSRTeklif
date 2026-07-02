@@ -591,6 +591,75 @@
       </div>
     </section>
 
+    <!-- TAŞERONLAR -->
+    <section class="page" id="page_taseronlar" aria-label="Taşeron Yönetimi ve Cari Hesap Sayfası">
+      <div style="display: grid; grid-template-columns: 380px 1fr; gap: 24px;" class="taseron-grid">
+        
+        <!-- SOL PANEL: TAŞERON LİSTESİ VE EKLEME -->
+        <div class="panel-card" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+          <div class="panel-title" style="display:flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <span>Taşeron Yönetimi</span>
+          </div>
+          
+          <!-- Yeni Taşeron Ekleme Formu -->
+          <div class="add-taseron-form" style="border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: rgba(var(--card-rgb), 0.03);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Yeni Taşeron Ekle</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <input id="new_taseron_name" type="text" placeholder="Taşeron Adı Soyadı / Firma" style="width: 100%;" aria-label="Taşeron Adı">
+              <select id="new_taseron_branch" style="width: 100%;">
+                <option value="İnşaat">İnşaat</option>
+                <option value="Mekanik">Mekanik</option>
+                <option value="Elektrik">Elektrik</option>
+                <option value="Boyacı">Boyacı</option>
+                <option value="Alçıpan">Alçıpan</option>
+                <option value="Seramik">Seramik</option>
+                <option value="Kalıp/Demir">Kalıp/Demir</option>
+                <option value="Diğer">Diğer</option>
+              </select>
+              <button class="btn-save" onclick="addTaseron()" style="width:100%; justify-content:center; padding: 8px 12px; font-size:13px;">+ Taşeron Kaydet</button>
+            </div>
+          </div>
+          
+          <!-- Filtre ve Arama -->
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="srchTaseron" placeholder="Taşeron ara..." oninput="renderTaseronList()" style="flex:1;" aria-label="Taşeron adı ara">
+            <select id="fBranchTaseron" onchange="renderTaseronList()" style="width:120px;">
+              <option value="">Tüm Branşlar</option>
+              <option value="İnşaat">İnşaat</option>
+              <option value="Mekanik">Mekanik</option>
+              <option value="Elektrik">Elektrik</option>
+              <option value="Boyacı">Boyacı</option>
+              <option value="Alçıpan">Alçıpan</option>
+              <option value="Seramik">Seramik</option>
+              <option value="Kalıp/Demir">Kalıp/Demir</option>
+              <option value="Diğer">Diğer</option>
+            </select>
+          </div>
+          
+          <!-- Liste -->
+          <div style="flex-grow: 1; overflow-y: auto; max-height: 500px;" id="taseronListWrap"></div>
+        </div>
+        
+        <!-- SAĞ PANEL: CARİ HESAP DETAYI -->
+        <div class="panel-card" style="margin-bottom: 0; min-height: 600px; display: flex; flex-direction: column;" id="taseronCariPanel">
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; gap: 16px; color: var(--text3); text-align: center; padding: 40px;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <div>
+              <div style="font-size: 16px; font-weight: 750; color: var(--text); margin-bottom: 4px;">Taşeron Seçilmedi</div>
+              <div style="font-size: 13px;">Cari kartını, hak edişlerini ve ödeme hareketlerini görüntülemek için sol listeden bir taşeron seçin.</div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+
     <!-- PROFİL VE HESABIM -->
     <section class="page" id="page_hesap" aria-label="Profil ve Hesap Bilgileri Sayfası">
       <div class="profile-grid" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
@@ -728,24 +797,29 @@
 
     <!-- KEŞİFLER (Site Surveys) -->
     <section class="page" id="page_kesifler" aria-label="Keşif Listesi Sayfası">
-      <div class="filter-bar" style="display:flex; justify-content:space-between; align-items:center; gap: 12px;">
-        <div style="display:flex; gap:12px; flex-wrap:wrap; flex:1;">
-          <input type="text" id="srchKesif" placeholder="Şantiye veya işveren ara..." oninput="debouncedRenderKesif()" aria-label="Keşif ara">
-          <select id="fCatKesif" onchange="renderKesif()" aria-label="Kategori filtresi">
-            <option value="">Tüm kategoriler</option>
-            <option>İnşaat</option>
-            <option>Mekanik</option>
-            <option>Elektrik</option>
-            <option>Diğer</option>
-          </select>
-          <select id="fStatKesif" onchange="renderKesif()" aria-label="Durum filtresi">
-            <option value="">Tüm durumlar</option>
-            <option>Keşif Bekliyor</option>
-            <option>Keşif Yapıldı</option>
-            <option>Teklife Dönüştü</option>
-          </select>
+      <div class="filter-bar" role="search" aria-label="Keşif Filtreleme ve Arama" style="flex-direction: column; align-items: stretch;">
+        <div class="filter-main-row" style="justify-content: space-between; align-items: center; width: 100%;">
+          <div style="display:flex; gap:12px; flex-wrap:wrap; flex:1; min-width: 250px;">
+            <input type="text" id="srchKesif" placeholder="Şantiye veya işveren ara..." oninput="debouncedRenderKesif()" aria-label="Keşif ara" style="flex: 1; min-width: 150px;">
+            <select id="fCatKesif" onchange="renderKesif()" aria-label="Kategori filtresi" style="width: 130px;">
+              <option value="">Tüm kategoriler</option>
+              <option>İnşaat</option>
+              <option>Mekanik</option>
+              <option>Elektrik</option>
+              <option>Diğer</option>
+            </select>
+            <select id="fStatKesif" onchange="renderKesif()" aria-label="Durum filtresi" style="width: 130px;">
+              <option value="">Tüm durumlar</option>
+              <option>Keşif Bekliyor</option>
+              <option>Keşif Yapıldı</option>
+              <option>Teklife Dönüştü</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap: wrap;" class="flex-col-mobile">
+            <button class="tb-btn" onclick="openTodoModal(null)" style="background:var(--primary); color:white; justify-content:center;" aria-label="Yeni yapılacak iş ekle">+ İş Ekle</button>
+            <button class="tb-btn gold" onclick="openKesifModal(null)" style="justify-content:center;" aria-label="Yeni keşif ekle">+ Yeni Keşif Ekle</button>
+          </div>
         </div>
-        <button class="tb-btn gold" onclick="openKesifModal(null)" aria-label="Yeni keşif ekle">+ Yeni Keşif Ekle</button>
       </div>
 
       <!-- Masaüstü Keşif Tablosu -->
@@ -772,6 +846,48 @@
 
       <!-- Mobil Keşif Listesi -->
       <div class="mobile-list-wrap" id="mobileKesifWrap"></div>
+
+      <!-- Yapılacak İşler (TODO) Bölümü -->
+      <div style="margin-top: 40px;">
+        <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+          <span style="display:inline-flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span style="font-size:16px; font-weight:800;">Yapılacak İşler (TODO) Listesi</span>
+          </span>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; flex:1; justify-content:flex-end;" class="flex-col-mobile">
+            <input type="text" id="srchTodo" placeholder="İş tanımı veya proje ara..." oninput="renderTodoList()" style="flex:1; min-width:140px; padding:6px 12px; font-size:13px; width:auto;">
+            <select id="fTaseronTodo" onchange="renderTodoList()" style="flex:1; min-width:140px; padding:6px 12px; font-size:13px; width:auto;">
+              <option value="">Tüm Taşeronlar</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Masaüstü TODO Tablosu -->
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>Proje / Keşif</th>
+                  <th>İş Tanımı</th>
+                  <th>Sorumlu Mühendis</th>
+                  <th>Atanan Taşeron</th>
+                  <th style="text-align:right; width:140px;">Maliyet / Ücret</th>
+                  <th style="text-align:center; width:80px;">Bitti</th>
+                  <th style="text-align:right; width:100px;">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="todoListTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Mobil TODO Listesi -->
+        <div class="mobile-list-wrap" id="mobileTodoListWrap"></div>
+      </div>
     </section>
 
   </main>
@@ -989,6 +1105,43 @@
   </div>
 </div>
 
+<!-- YENİ YAPILACAK İŞ MODAL -->
+<div class="modal-bg" id="todoModalBg" role="dialog" aria-modal="true" aria-labelledby="todoModalTitle">
+  <div class="modal">
+    <h3 id="todoModalTitle">Yapılacak İş Ekle</h3>
+    <div class="form-grid">
+      <div class="fg full">
+        <label for="ft_kesif">İlişkili Keşif / Proje</label>
+        <select id="ft_kesif" style="width: 100%;"></select>
+      </div>
+      <div class="fg full">
+        <label for="ft_text">İş Tanımı</label>
+        <input id="ft_text" type="text" placeholder="Örn: Duvar örülmesi ve sıva yapılması">
+      </div>
+      <div class="fg">
+        <label for="ft_sorumlu">Sorumlu Mühendis</label>
+        <select id="ft_sorumlu" style="width: 100%;"></select>
+      </div>
+      <div class="fg">
+        <label for="ft_taseron">Atanan Taşeron (Opsiyonel)</label>
+        <select id="ft_taseron" style="width: 100%;"></select>
+      </div>
+      <div class="fg">
+        <label for="ft_maliyet">Maliyet / Ücret (₺)</label>
+        <input id="ft_maliyet" type="number" step="any" placeholder="0.00">
+      </div>
+      <div class="fg" style="display:flex; align-items:center; gap:8px; margin-top:20px;">
+        <input id="ft_done" type="checkbox" style="width:18px; height:18px; cursor:pointer;">
+        <label for="ft_done" style="margin-bottom:0; cursor:pointer; font-weight:700;">İş Tamamlandı</label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeTodoModal()">İptal</button>
+      <button class="btn-save" id="saveTodoBtn" onclick="saveTodoItem()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <!-- KULLANICI DÜZENLEME MODAL (ADMIN) -->
 <div class="modal-bg" id="userEditModalBg" role="dialog" aria-modal="true" aria-labelledby="userEditModalTitle">
   <div class="modal">
@@ -1072,17 +1225,7 @@
 
 <!-- Premium UX/UI Micro-details script -->
 <script>
-// Dynamic Radial-Gradient Card Reflection Glow Tracking
-document.addEventListener('mousemove', e => {
-  const card = e.target.closest('.stat-card, .chart-card, .panel-card');
-  if (card) {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-  }
-});
+
 
 // Dynamic Bitiş Sayaçları Badge Generator
 window.getDynamicDateBadge = function(bas, bit, durum) {
@@ -1234,6 +1377,7 @@ window.triggerConfetti = function(x, y) {
 <script src="js/ui.js?v=1.0.3"></script>
 <script src="js/auth.js?v=1.0.3"></script>
 <script src="js/kesifler.js?v=1.0.3"></script>
+<script src="js/taseronlar.js?v=1.0.3"></script>
 <script src="js/reports.js?v=1.0.3"></script>
 <script src="js/charts.js?v=1.0.3"></script>
 <script src="js/pdf.js?v=1.0.3"></script>

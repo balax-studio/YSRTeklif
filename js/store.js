@@ -7,6 +7,8 @@ const YSRStore = {
     logs: [],
     surveys: [],
     reports: [],
+    taseronlar: [],
+    taseron_payments: [],
     currentUser: null
   },
   
@@ -19,6 +21,8 @@ const YSRStore = {
     this._state.logs = this._wrapArray([], 'logs');
     this._state.surveys = this._wrapArray([], 'surveys');
     this._state.reports = this._wrapArray([], 'reports');
+    this._state.taseronlar = this._wrapArray([], 'taseronlar');
+    this._state.taseron_payments = this._wrapArray([], 'taseron_payments');
   },
   
   _wrapArray(arr, key) {
@@ -79,6 +83,18 @@ const YSRStore = {
     this.triggerUpdate('reports'); 
   },
 
+  get taseronlar() { return this._state.taseronlar; },
+  set taseronlar(val) {
+    this._state.taseronlar = this._wrapArray(val || [], 'taseronlar');
+    this.triggerUpdate('taseronlar');
+  },
+
+  get taseron_payments() { return this._state.taseron_payments; },
+  set taseron_payments(val) {
+    this._state.taseron_payments = this._wrapArray(val || [], 'taseron_payments');
+    this.triggerUpdate('taseron_payments');
+  },
+
   get currentUser() { return this._state.currentUser; },
   set currentUser(val) { this._state.currentUser = val; },
 
@@ -92,6 +108,8 @@ const YSRStore = {
     if (type === 'items' && typeof debouncedRender === 'function') debouncedRender();
     if (type === 'surveys' && typeof debouncedRenderKesif === 'function') debouncedRenderKesif();
     if (type === 'reports' && typeof debouncedRenderReports === 'function') debouncedRenderReports();
+    if (type === 'taseronlar' && typeof debouncedRenderTaseron === 'function') debouncedRenderTaseron();
+    if (type === 'taseron_payments' && typeof debouncedRenderTaseron === 'function') debouncedRenderTaseron();
   }
 };
 
@@ -99,7 +117,7 @@ const YSRStore = {
 YSRStore.init();
 
 // Expose state as global getters/setters on the window object for 100% backward compatibility
-['items', 'mahals', 'users', 'logs', 'surveys', 'reports', 'currentUser'].forEach(key => {
+['items', 'mahals', 'users', 'logs', 'surveys', 'reports', 'taseronlar', 'taseron_payments', 'currentUser'].forEach(key => {
   Object.defineProperty(window, key, {
     get() { return YSRStore[key]; },
     set(val) { YSRStore[key] = val; },
