@@ -163,33 +163,38 @@ function extremeMouseLeave() {
 }
 
 let activeTiltCard = null;
+let tiltRAF = null;
 
 function documentTiltMove(e) {
   if (energyMode === 'enabled') return;
-  const card = e.target.closest('.stat-card, .chart-card, .panel-card');
+  if (tiltRAF) cancelAnimationFrame(tiltRAF);
   
-  if (!card) {
-    if (activeTiltCard) {
-      activeTiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-      activeTiltCard.style.boxShadow = '';
-      activeTiltCard = null;
+  tiltRAF = requestAnimationFrame(() => {
+    const card = e.target.closest('.stat-card, .chart-card, .panel-card');
+    
+    if (!card) {
+      if (activeTiltCard) {
+        activeTiltCard.style.transform = '';
+        activeTiltCard.style.boxShadow = '';
+        activeTiltCard = null;
+      }
+      return;
     }
-    return;
-  }
-  
-  activeTiltCard = card;
-  const rect = card.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  const xc = rect.width / 2;
-  const yc = rect.height / 2;
-  
-  // Custom extreme tilt bounds
-  const rotateX = ((yc - y) / yc) * 12; // tilt max 12 deg
-  const rotateY = ((x - xc) / xc) * 12;
-  
-  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
-  card.style.boxShadow = `0 20px 40px rgba(99, 102, 241, 0.3), 0 0 30px rgba(167, 139, 250, 0.2)`;
+    
+    activeTiltCard = card;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const xc = rect.width / 2;
+    const yc = rect.height / 2;
+    
+    // Custom extreme tilt bounds (gentle 6deg max for premium feel)
+    const rotateX = ((yc - y) / yc) * 6;
+    const rotateY = ((x - xc) / xc) * 6;
+    
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`;
+    card.style.boxShadow = `0 12px 24px rgba(99, 102, 241, 0.15), 0 0 20px rgba(167, 139, 250, 0.1)`;
+  });
 }
 
 function bindExtremeEvents() {

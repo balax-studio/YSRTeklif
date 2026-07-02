@@ -2150,9 +2150,12 @@ function showStatDetails(type) {
 // OTOMATİK İLK HARF BÜYÜTME Removed by User Request
 
 // ── Command Palette (Ctrl+K) ──────────────────────────────────
+let activeCmdIndex = -1;
+
 window.openCmdPalette = function() {
   const palette = document.getElementById('cmdPalette');
   const input = document.getElementById('cmdSearchInput');
+  activeCmdIndex = -1;
   if (palette) {
     palette.style.display = 'flex';
     setTimeout(() => {
@@ -2178,14 +2181,38 @@ window.closeCmdPalette = function(e) {
 };
 
 document.addEventListener('keydown', (e) => {
+  const palette = document.getElementById('cmdPalette');
+  const isPaletteOpen = palette && palette.style.display === 'flex';
+  
   if (e.key === 'Escape') {
-    const palette = document.getElementById('cmdPalette');
-    if (palette && palette.style.display === 'flex') {
+    if (isPaletteOpen) {
       closeCmdPalette();
     }
   } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
     openCmdPalette();
+  } else if (isPaletteOpen) {
+    const visibleItems = Array.from(document.querySelectorAll('.cmd-item')).filter(x => x.style.display !== 'none');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (visibleItems.length === 0) return;
+      visibleItems.forEach(x => x.classList.remove('selected'));
+      activeCmdIndex = (activeCmdIndex + 1) % visibleItems.length;
+      visibleItems[activeCmdIndex].classList.add('selected');
+      visibleItems[activeCmdIndex].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (visibleItems.length === 0) return;
+      visibleItems.forEach(x => x.classList.remove('selected'));
+      activeCmdIndex = (activeCmdIndex - 1 + visibleItems.length) % visibleItems.length;
+      visibleItems[activeCmdIndex].classList.add('selected');
+      visibleItems[activeCmdIndex].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      if (activeCmdIndex >= 0 && activeCmdIndex < visibleItems.length) {
+        e.preventDefault();
+        visibleItems[activeCmdIndex].click();
+      }
+    }
   }
 });
 
@@ -2193,6 +2220,7 @@ window.handleCmdSearch = function(val) {
   const items = document.querySelectorAll('.cmd-item');
   const term = val.toLowerCase();
   items.forEach(item => {
+    item.classList.remove('selected');
     const text = item.querySelector('.cmd-text').textContent.toLowerCase();
     if (text.includes(term)) {
       item.style.display = 'flex';
@@ -2200,6 +2228,7 @@ window.handleCmdSearch = function(val) {
       item.style.display = 'none';
     }
   });
+  activeCmdIndex = -1;
 };
 
 window.executeCmd = function(action) {
@@ -2399,5 +2428,18 @@ window.toggleDesktopAccordion = function(event, id) {
     } else {
       el.style.display = 'none';
     }
+  }
+};
+
+window.toggleFilterBarOptions = function() {
+  const row = document.getElementById('filterSubRow');
+  const btn = document.getElementById('btnToggleFilters');
+  if (!row || !btn) return;
+  if (row.style.display === 'none' || row.style.display === '') {
+    row.style.display = 'flex';
+    btn.classList.add('active');
+  } else {
+    row.style.display = 'none';
+    btn.classList.remove('active');
   }
 };

@@ -238,6 +238,35 @@
     box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
   }
 
+  .password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  .password-input-wrapper input {
+    width: 100%;
+    padding-right: 44px !important;
+  }
+  .toggle-password-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .toggle-password-btn:hover {
+    background-color: var(--hover);
+    color: var(--primary);
+  }
+
   .eyebrow-tag {
     display: inline-block;
     font-size: 10px;
@@ -774,10 +803,28 @@
     padding: 20px 24px;
     margin-bottom: 24px;
     display: flex;
+    flex-direction: column;
     gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
     box-shadow: var(--shadow);
+  }
+  .filter-main-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .filter-sub-row {
+    display: none;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    animation: slideDownSubRow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideDownSubRow {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   .filter-bar input[type=text] {
     flex: 1;
@@ -1088,6 +1135,54 @@
   @keyframes modalZoom {
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+  }
+
+  /* HIGH-FIDELITY GLASS MODAL DRAWER (SLIDE-OVER PANEL) ON DESKTOP */
+  @media (min-width: 1025px) {
+    #modalBg.modal-bg {
+      align-items: stretch;
+      justify-content: flex-end;
+      padding: 0;
+      overflow-y: hidden;
+    }
+    #modalBg .modal {
+      border-radius: 0;
+      padding: 0;
+      max-width: 500px;
+      height: 100vh;
+      max-height: 100vh;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+      border: none;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      animation: modalDrawerSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes modalDrawerSlide {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    #modalBg .modal > h3 {
+      padding: 24px 28px 16px;
+      margin: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    #modalBg .form-grid {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      margin: 0;
+      scrollbar-width: thin;
+    }
+    #modalBg .modal-foot {
+      border-top: 1px solid var(--border);
+      padding: 20px 28px;
+      background: var(--card);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin: 0;
+    }
   }
   .modal h3 {
     font-size: 23px;
@@ -2510,9 +2605,9 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(3, 7, 18, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 10000;
     display: flex;
     justify-content: center;
