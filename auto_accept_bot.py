@@ -106,28 +106,15 @@ def find_and_click_blue_button(hwnd):
 
 def click_active(hwnd, x, y):
     try:
-        # Mevcut mouse konumunu kaydet
-        orig_x, orig_y = win32api.GetCursorPos()
+        # lparam: y in high word, x in low word
+        lParam = (y << 16) | x
         
-        # Pencereyi aktif hale getir (Electron arka plan tıklamalarını yoksayar)
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-        win32gui.SetForegroundWindow(hwnd)
+        # Click purely in background using Windows Messages
+        win32gui.PostMessage(hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam)
         time.sleep(0.05)
+        win32gui.PostMessage(hwnd, win32con.WM_LBUTTONUP, 0, lParam)
         
-        # Pencere koordinatlarını ekran koordinatına çevir
-        rect = win32gui.GetWindowRect(hwnd)
-        global_x = rect[0] + x
-        global_y = rect[1] + y
-        
-        # İmleci taşı ve tıkla
-        win32api.SetCursorPos((global_x, global_y))
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, global_x, global_y, 0, 0)
-        time.sleep(0.05)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, global_x, global_y, 0, 0)
-        
-        # Mouse imlecini eski yerine anında geri taşı
-        time.sleep(0.05)
-        win32api.SetCursorPos((orig_x, orig_y))
+        print(f"[{time.strftime('%H:%M:%S')}] Arka planda tıklandı (Cursor taşınmadı ve pencere boyutu değiştirilmedi).")
     except Exception as e:
         print(f"Tıklama hatası: {e}")
 

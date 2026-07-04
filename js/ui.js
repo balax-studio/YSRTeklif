@@ -218,6 +218,7 @@ function buildTabs(){
   html+=`<div class="tab" id="t_raporlar" role="tab" tabindex="0" aria-selected="false" onclick="showTab('raporlar')">Raporlar</div>`;
   html+=`<div class="tab" id="t_mahal" role="tab" tabindex="0" aria-selected="false" onclick="showTab('mahal')">İşverenler</div>`;
   html+=`<div class="tab" id="t_taseronlar" role="tab" tabindex="0" aria-selected="false" onclick="showTab('taseronlar')">Taşeronlar</div>`;
+  html+=`<div class="tab" id="t_akilli_moduller" role="tab" tabindex="0" aria-selected="false" onclick="showTab('akilli_moduller')">Akıllı Modüller</div>`;
   html+=`<div class="tab" id="t_hesap" role="tab" tabindex="0" aria-selected="false" onclick="showTab('hesap')">Profilim</div>`;
   html+=`<div class="tab" id="t_logs" role="tab" tabindex="0" aria-selected="false" onclick="showTab('logs')">İşlem Geçmişi</div>`;
   if(currentUser.r==='admin')html+=`<div class="tab" id="t_admin" role="tab" tabindex="0" aria-selected="false" onclick="showTab('admin')">Kullanıcılar</div>`;
@@ -236,7 +237,7 @@ function buildTabs(){
     });
   });
 
-  // Mobil alt menü (Bottom Navigation)
+  // Mobil alt menü (Bottom Navigation) - 5 Buton Sınırı ile
   let mHtml=`<button class="mobile-nav-item active" id="mn_teklifler" onclick="showTab('teklifler')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
     <span>Teklifler</span>
@@ -253,30 +254,15 @@ function buildTabs(){
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
     <span>Raporlar</span>
   </button>`;
-  mHtml+=`<button class="mobile-nav-item" id="mn_mahal" onclick="showTab('mahal')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-    <span>İşverenler</span>
+  mHtml+=`<button class="mobile-nav-item" id="mn_menu" onclick="toggleMobileMenu()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    <span>Menü</span>
   </button>`;
-  mHtml+=`<button class="mobile-nav-item" id="mn_taseronlar" onclick="showTab('taseronlar')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-    <span>Taşeronlar</span>
-  </button>`;
-  mHtml+=`<button class="mobile-nav-item" id="mn_hesap" onclick="showTab('hesap')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-    <span>Profil</span>
-  </button>`;
-  mHtml+=`<button class="mobile-nav-item" id="mn_logs" onclick="showTab('logs')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-    <span>Geçmiş</span>
-  </button>`;
-  if(currentUser.r==='admin') {
-    mHtml+=`<button class="mobile-nav-item" id="mn_admin" onclick="showTab('admin')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
-      <span>Kullanıcılar</span>
-    </button>`;
-  }
   const mNav = document.getElementById('mobileNav');
   if(mNav) mNav.innerHTML = mHtml;
+
+  // Mobil Bottom Sheet Menüsünü oluştur
+  buildMobileMenuSheet();
 
   // Desktop scrolled tabs (topbar sticky)
   let stHtml=`<button class="scrolled-tab-item active" id="st_teklifler" onclick="showTab('teklifler')" data-tooltip="Teklifler">
@@ -333,7 +319,26 @@ function showTab(t){
     b.classList.remove('active');
   });
   const mEl=document.getElementById('mn_'+t);
-  if(mEl) mEl.classList.add('active');
+  if(mEl) {
+    mEl.classList.add('active');
+  } else {
+    // Eğer seçilen sekme alt barda yoksa (örn: İşverenler, Taşeronlar vb.), Menü butonunu aktif et
+    const menuBtn = document.getElementById('mn_menu');
+    if (menuBtn) menuBtn.classList.add('active');
+  }
+
+  // Menü içindeki elemanların aktiflik durumunu güncelle
+  document.querySelectorAll('.menu-sheet-item').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = 'var(--border)';
+    b.style.background = 'var(--bg2)';
+  });
+  const sheetEl = document.getElementById('msi_' + t);
+  if (sheetEl) {
+    sheetEl.classList.add('active');
+    sheetEl.style.borderColor = 'var(--primary)';
+    sheetEl.style.background = 'rgba(var(--primary-rgb), 0.05)';
+  }
   
   // Scrolled-tab elemanlarını aktif yap
   document.querySelectorAll('.scrolled-tab-item').forEach(b=>{
@@ -2469,4 +2474,96 @@ window.toggleFilterBarOptions = function() {
     row.style.display = 'none';
     btn.classList.remove('active');
   }
+};
+
+/* ============================================================
+   MOBİL MENÜ YARDIMCI FONKSİYONLARI
+   ============================================================ */
+window.buildMobileMenuSheet = function() {
+  let sheet = document.getElementById('mobileMenuSheet');
+  if (!sheet) {
+    sheet = document.createElement('div');
+    sheet.id = 'mobileMenuSheet';
+    sheet.className = 'mobile-menu-sheet';
+    document.body.appendChild(sheet);
+  }
+
+  let adminItem = '';
+  if (window.currentUser && window.currentUser.r === 'admin') {
+    adminItem = `
+      <div class="menu-sheet-item" id="msi_admin" onclick="handleMobileMenuClick('admin')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+        <span>Kullanıcılar</span>
+      </div>
+    `;
+  }
+
+  sheet.innerHTML = `
+    <div class="menu-sheet-backdrop" onclick="toggleMobileMenu()"></div>
+    <div class="menu-sheet-content">
+      <div class="menu-sheet-header">
+        <h3>Menü</h3>
+        <button class="menu-sheet-close" onclick="toggleMobileMenu()">&times;</button>
+      </div>
+      <div class="menu-sheet-grid">
+        <div class="menu-sheet-item" id="msi_mahal" onclick="handleMobileMenuClick('mahal')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span>İşverenler</span>
+        </div>
+        <div class="menu-sheet-item" id="msi_taseronlar" onclick="handleMobileMenuClick('taseronlar')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>Taşeronlar</span>
+        </div>
+        <div class="menu-sheet-item" id="msi_akilli_moduller" onclick="handleMobileMenuClick('akilli_moduller')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>Akıllı Modüller</span>
+        </div>
+        <div class="menu-sheet-item" id="msi_hesap" onclick="handleMobileMenuClick('hesap')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <span>Profilim</span>
+        </div>
+        <div class="menu-sheet-item" id="msi_logs" onclick="handleMobileMenuClick('logs')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>İşlem Geçmişi</span>
+        </div>
+        ${adminItem}
+        <div class="menu-sheet-item logout" onclick="handleMobileLogout()">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Çıkış Yap</span>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+window.toggleMobileMenu = function() {
+  const sheet = document.getElementById('mobileMenuSheet');
+  if (sheet) {
+    sheet.classList.toggle('active');
+    
+    const menuBtn = document.getElementById('mn_menu');
+    if (menuBtn) {
+      if (sheet.classList.contains('active')) {
+        menuBtn.classList.add('active');
+      } else {
+        // If we are currently active on a tab inside the menu, keep Menü button highlighted
+        const activeSubPage = Array.from(document.querySelectorAll('.menu-sheet-item')).some(item => {
+          return item.classList.contains('active');
+        });
+        if (!activeSubPage) {
+          menuBtn.classList.remove('active');
+        }
+      }
+    }
+  }
+};
+
+window.handleMobileMenuClick = function(tabName) {
+  window.toggleMobileMenu();
+  window.showTab(tabName);
+};
+
+window.handleMobileLogout = function() {
+  window.toggleMobileMenu();
+  window.doLogout();
 };
