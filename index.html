@@ -662,40 +662,66 @@
 
     <!-- AKILLI MODÜLLER -->
     <section class="page" id="page_akilli_moduller" aria-label="Akıllı Modüller Sayfası">
-      <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-        <div class="panel-card" style="padding: 32px; border-radius: 20px; background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.05) 0%, rgba(139, 92, 246, 0.05) 100%); border: 1px dashed rgba(var(--primary-rgb), 0.3); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
-          <div style="width: 56px; height: 56px; border-radius: 16px; background: var(--primary-bg); color: var(--primary); display: flex; align-items: center; justify-content: center;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
+        
+        <div class="panel-card" style="padding: 48px 32px; border-radius: 24px; background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.08) 0%, rgba(139, 92, 246, 0.08) 100%); border: 1px solid rgba(var(--primary-rgb), 0.2); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; position: relative; overflow: hidden;">
+          <!-- Decorative Background Elements -->
+          <div style="position: absolute; top: -50px; left: -50px; width: 150px; height: 150px; background: rgba(var(--primary-rgb), 0.1); filter: blur(40px); border-radius: 50%;"></div>
+          <div style="position: absolute; bottom: -50px; right: -50px; width: 150px; height: 150px; background: rgba(139, 92, 246, 0.1); filter: blur(40px); border-radius: 50%;"></div>
+
+          <div style="width: 72px; height: 72px; border-radius: 20px; background: var(--primary-bg); color: var(--primary); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px -5px rgba(var(--primary-rgb), 0.3);">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
           </div>
-          <div>
-            <h2 style="font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.03em;">Akıllı Modüller & Yapay Zeka</h2>
-            <p style="font-size: 13px; color: var(--text2); max-width: 480px; margin: 8px auto 0; line-height: 1.6;">
-              YSR Construction sisteminize yakında entegre edilecek olan yapay zeka destekli analizler, şantiye rapor özetleri ve otomatik maliyet tahmin araçları bu ekranda yer alacaktır.
+          <div style="z-index: 1;">
+            <div style="display: inline-block; padding: 4px 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Yeni Nesil Araçlar</div>
+            <h2 style="font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.03em; margin-bottom: 12px;">YSR Smart Engine</h2>
+            <p style="font-size: 15px; color: var(--text2); max-width: 540px; margin: 0 auto; line-height: 1.6;">
+              Masaüstü bilgisayarınızın gücünü kullanarak Excel (BOQ) tekliflerinizi otomatik ayrıştırın, maliyet analizleri yapın ve yapay zeka destekli özellikleri keşfedin. Tarayıcı limitlerine takılmadan bağımsız çalışır.
             </p>
           </div>
-        </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          <!-- Kart 1 -->
-          <div class="panel-card" style="padding: 20px; border-radius: 16px; display: flex; flex-direction: column; gap: 12px; opacity: 0.85;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; background: var(--primary-bg); padding: 4px 8px; border-radius: 6px;">Yapay Zeka</span>
-              <span style="font-size: 11px; font-weight: 700; color: var(--amber);">YAKINDA</span>
-            </div>
-            <h3 style="font-size: 15px; font-weight: 750; color: var(--text);">Akıllı Teklif Analizi</h3>
-            <p style="font-size: 12px; color: var(--text2); line-height: 1.5; margin: 0;">Teklif dosyalarınızı yükleyerek piyasa fiyatları, risk analizi ve kazanma oranlarını otomatik hesaplayan akıllı motor.</p>
-          </div>
-
-          <!-- Kart 2 -->
-          <div class="panel-card" style="padding: 20px; border-radius: 16px; display: flex; flex-direction: column; gap: 12px; opacity: 0.85;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size: 10px; font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 0.1em; background: var(--purple-bg); padding: 4px 8px; border-radius: 6px;">Şantiye Özetleri</span>
-              <span style="font-size: 11px; font-weight: 700; color: var(--amber);">YAKINDA</span>
-            </div>
-            <h3 style="font-size: 15px; font-weight: 750; color: var(--text);">Otomatik Raporlama</h3>
-            <p style="font-size: 12px; color: var(--text2); line-height: 1.5; margin: 0;">Şantiyeden girilen günlük raporların haftalık/aylık özetlerini otomatik çıkarıp PDF formatında yönetim paneline sunan asistan.</p>
+          <div style="display: flex; gap: 16px; margin-top: 8px; z-index: 1; flex-wrap: wrap; justify-content: center;">
+            <a href="https://github.com/ysr-construction/ysr_smart_engine" target="_blank" class="btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 15px; background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.4);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Windows İçin İndir
+            </a>
+            <a href="https://github.com/ysr-construction/ysr_smart_engine" target="_blank" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; font-size: 15px; background: var(--panel-bg); color: var(--text); border: 1px solid var(--border);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+              GitHub Kaynak Kodu
+            </a>
           </div>
         </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <div class="panel-card" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text);">Akıllı BOQ Analizi</h3>
+            <p style="font-size: 13px; color: var(--text2); line-height: 1.5;">Yüzlerce satırlık keşif özetlerinizi ve Excel dosyalarınızı sürükle-bırak ile saniyeler içinde ayrıştırın. Otomatik kolon eşleştirme ile hataları en aza indirin.</p>
+          </div>
+          
+          <div class="panel-card" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(139, 92, 246, 0.1); color: #8b5cf6; display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text);">Maliyet Tahminleme</h3>
+            <p style="font-size: 13px; color: var(--text2); line-height: 1.5;">Geçmiş proje verilerinizi kullanarak yeni teklifleriniz için makine öğrenmesi destekli yaklaşık maliyet hesaplamaları yapın.</p>
+          </div>
+          
+          <div class="panel-card" style="padding: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text);">Açık Kaynak & Güvenli</h3>
+            <p style="font-size: 13px; color: var(--text2); line-height: 1.5;">Tüm verileriniz kendi bilgisayarınızda işlenir. Uygulamanın kaynak kodları GitHub'da açıktır, dilediğiniz gibi inceleyebilir ve geliştirebilirsiniz.</p>
+          </div>
+        </div>
+        
       </div>
     </section>
 
