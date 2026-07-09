@@ -27,6 +27,8 @@ export default defineConfig({
             'js/charts.js',
             'js/pdf.js',
             'js/logs.js',
+            'js/calculatorData.js',
+            'js/calculators.js',
             'js/main.js'
           ];
 
